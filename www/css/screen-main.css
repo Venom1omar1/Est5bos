@@ -1,0 +1,459 @@
+/* ==========================================================================
+1️⃣ CORE RESETS & GLOBAL VARIABLES
+========================================================================== */
+@font-face {
+    font-family: 'Cairo';
+    src: url('../img/Cairo-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Cairo';
+    src: url('../img/Cairo-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', 'Segoe UI', sans-serif !important;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+html,
+body {
+    font-family: 'Noto Color Emoji', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    height: 100vh !important;
+    width: 100vw !important;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* ==========================================================================
+2️⃣ PLATFORM OPTIMIZATIONS & TRANSITIONS
+========================================================================== */
+.main-action-btn-trigger,
+.lobby-start-btn-trigger,
+.roles-scratch-btn-trigger,
+.roles-done-btn-trigger,
+.court-objection-btn-trigger,
+.drawer-panel-context,
+.modal-card-body {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.app-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    padding-top: calc(15px + env(safe-area-inset-top));
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    overflow: hidden;
+    background-image: linear-gradient(var(--bg-gradient-overlay), var(--bg-gradient-overlay-dark)), url(../img/bbg.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.35s ease-in-out;
+}
+
+.app-container.lobby-active {
+    background-image: linear-gradient(var(--lobby-gradient-overlay), var(--lobby-gradient-overlay-dark)), url(../img/bbg.png);
+}
+
+.app-neon-bg-waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.app-neon-bg-waves .wave {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    -webkit-filter: blur(120px);
+    opacity: 0.12;
+    will-change: transform;
+}
+
+.app-neon-bg-waves .w1 {
+    top: -10%;
+    right: -10%;
+    width: 350px;
+    height: 350px;
+    background: var(--crimson);
+}
+
+.app-neon-bg-waves .w2 {
+    bottom: -10%;
+    left: -10%;
+    width: 350px;
+    height: 350px;
+    background: var(--wave-bg-purple);
+}
+
+.app-neon-bg-waves .w3 {
+    display: none;
+}
+
+/* ==========================================================================
+3️⃣ SCREEN CONTROL & GLASS PANEL BASE
+========================================================================== */
+.game-screen {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh !important;
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+#screen-specialist-challenges {
+    overflow: hidden !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.hidden,
+.hidden * {
+    animation: none !important;
+    transition: none !important;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+/* ==========================================================================
+5️⃣ MAIN SCREEN CONTEXT (MAIN SCREEN)
+========================================================================== */
+.main-screen-context .main-game-logo {
+    width: clamp(110px, 45vw, 175px) !important;
+    height: auto;
+    margin-bottom: clamp(10px, 3vh, 24px) !important;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    animation: logoBreathe 4s ease-in-out infinite;
+    box-sizing: border-box;
+}
+
+.main-screen-context .main-top-bar {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(10px, 2vh, 20px) 20px !important;
+    top: clamp(0px, 0.5vh, 8px) !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.main-screen-context .main-icon-btn {
+    background: var(--icon-btn-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-light);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    scale: 1.25;
+    transition: transform 0.2s, background 0.2s;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1 !important;
+}
+
+.main-screen-context .main-icon-btn:active {
+    transform: scale(0.9);
+    background: var(--icon-btn-active-bg);
+}
+
+.main-screen-context .main-screen-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 60px;
+    margin-top: -30px;
+}
+
+.main-screen-context .main-game-title {
+    font-size: clamp(0.25rem, 10vw, 3.6rem) !important;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: clamp(6px, 1.5vh, 12px) !important;
+    letter-spacing: -0.5px;
+    color: var(--text-light);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.main-screen-context .main-highlight {
+    background: linear-gradient(135deg, var(--highlight-grad-start) 30%, var(--highlight-grad-mid) 70%, var(--highlight-grad-end) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 900;
+    filter: drop-shadow(0 0 2px var(--highlight-drop-shadow));
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+.main-screen-context .main-game-tagline {
+    color: var(--text-dim);
+    font-size: clamp(0.5rem, 3.8vw, 1.2rem) !important;
+    font-weight: 600;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.main-screen-context .main-action-btn-trigger {
+    position: relative;
+    top: clamp(-140px, -13vh, -45px) !important;
+    left: 0px;
+    width: calc(100% - 40px);
+    margin: 0px 20px;
+    padding: clamp(11px, 2.2vh, 16px) !important;
+    border-radius: 12px;
+    font-size: clamp(1.05rem, 4.2vw, 1.3rem) !important;
+    font-weight: 900;
+    cursor: pointer;
+    color: var(--text-light);
+    background: linear-gradient(135deg, var(--btn-action-grad-start), var(--btn-action-grad-end));
+    border: 1px solid var(--btn-action-border);
+    overflow: hidden;
+    transform: translate3d(0px, 0px, 0px);
+    box-sizing: border-box;
+    text-align: center;
+    white-space: nowrap;
+    animation: 2.5s ease-in-out 0s infinite alternate none running btnGlowPulse;
+    transition: transform 0.1s;
+}
+
+.main-screen-context .main-action-btn-trigger .btn-text {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    animation: textUrgentShake 2.5s infinite ease-in-out alternate;
+    transform-origin: center;
+}
+
+.main-screen-context .main-action-btn-trigger::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--btn-shimmer), transparent);
+    transform: skewX(-20deg);
+    animation: btnShimmer 4s infinite ease-in-out;
+}
+
+.main-screen-context .main-action-btn-trigger:active {
+    transform: scale(0.96) translate3d(0, 0, 0);
+}
+
+.main-screen-context .app-version-text {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    opacity: 0.5;
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+🎬 MAIN SCREEN KEYFRAMES
+========================================================================== */
+@keyframes logoBreathe {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(0, -8px, 0) scale(1.02);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes textUrgentShake {
+    0% {
+        scale: 1;
+    }
+
+    50% {
+        scale: 1.1;
+    }
+
+    100% {
+        scale: 1;
+    }
+}
+
+@keyframes btnGlowPulse {
+    0% {
+        border-color: var(--btn-action-border);
+        box-shadow: 0 4px 15px var(--btn-shadow), 0 0 12px var(--btn-glow);
+    }
+
+    100% {
+        border-color: var(--btn-glow-pulse);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 30px 4px var(--btn-glow-strong), inset 0 0 8px var(--btn-glow-inset);
+    }
+}
+
+@keyframes btnShimmer {
+    0% {
+        left: -150%;
+    }
+
+    30% {
+        left: 150%;
+    }
+
+    100% {
+        left: 150%;
+    }
+}
+
+.main-game-tagline {
+    text-align: center;
+}
+
+.main-game-tagline .tagline-icon {
+    vertical-align: middle;
+    margin-right: 3px;
+}
+
+
+/* شاشة التغطية الكاملة */
+.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, #1a0a14 0%, var(--bg-dark) 100%);
+    z-index: 99999; /* أعلى من أي حاجة في اللعبة */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* محتوى الشاشة */
+.overlay-content {
+    max-width: 400px;
+    direction: rtl;
+}
+
+.game-title {
+    font-size: 2.5rem;
+    color: var(--title-gold);
+    text-shadow: 0 0 15px var(--title-gold-shadow);
+    margin-bottom: 10px;
+}
+
+.game-subtitle {
+    color: var(--text-dim);
+    font-size: 1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* زرار الدخول السحري */
+.fullscreen-btn {
+    background: linear-gradient(135deg, var(--crimson-mid) 0%, var(--crimson-dark) 100%);
+    border: 2px solid var(--btn-action-border);
+    color: var(--text-white);
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--btn-glow-strong);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fullscreen-btn:active {
+    transform: scale(0.95);
+    background: linear-gradient(135deg, #4d0000 0%, #1a0000 100%);
+}
+
+/* كلاس الإخفاء */
+.fullscreen-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   📱 PWA DETECTION (AUTO HIDDING FULLSCREEN OVERLAY ON HOME SCREEN)
+   ========================================================================== */
+
+/* لما اللعبة تفتح من أيقونة الموبايل كـ PWA مستقل.. إخفي الأوفرلاي فوراً وعنوة */
+@media (display-mode: standalone) {
+    #fullscreen-overlay, 
+    .fullscreen-overlay {
+        display: none !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+}
+
+/* زيادة تأكيد للآيفون وسفاري بالبند المخصص ليهم */
+@media (display-mode: fullscreen) {
+    #fullscreen-overlay, 
+    .fullscreen-overlay {
+        display: none !important;
+        opacity: 0 !important;
+    }
+}

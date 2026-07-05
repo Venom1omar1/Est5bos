@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content:">
+    <meta name="viewport"
+        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, viewport-fit=cover" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <title>في الاستخبُص</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- 1️⃣ الأول: ملف الـ variables الأساسي -->
+    <link rel="stylesheet" href="css/variables.css">
+
+    <!-- 2️⃣ التاني: ملف الثيم المختار (بيتغير حسب اختيار المستخدم) -->
+    <link rel="stylesheet" href="css/theme-crimson.css" id="theme-stylesheet">
+    <link rel="stylesheet" href="css/theme-blue.css" id="theme-stylesheet">
+    <link rel="stylesheet" href="css/theme-green.css" id="theme-stylesheet">
+    <link rel="stylesheet" href="css/theme-purple.css" id="theme-stylesheet">
+    <link rel="stylesheet" href="css/theme-gold.css" id="theme-stylesheet">
+
+    <link rel="stylesheet" href="./css/screen-main.css">
+    <link rel="stylesheet" href="./css/screen-settings.css">
+    <link rel="stylesheet" href="./css/screen-lobby.css">
+    <link rel="stylesheet" href="./css/screen-specialist-challenges.css">
+    <link rel="stylesheet" href="./css/screen-roles.css">
+    <link rel="stylesheet" href="./css/screen-court.css">
+    <link rel="stylesheet" href="./css/vote-confirm-modal.css">
+    <link rel="stylesheet" href="./css/expel-toast.css">
+    <link rel="stylesheet" href="./css/screen-vote.css">
+    <link rel="stylesheet" href="./css/screen-results.css">
+    <link rel="stylesheet" href="./css/objection-modal.css">
+    <link rel="stylesheet" href="./css/confrontation-modal.css">
+    <link rel="stylesheet" href="./css/custom-confirm-modal.css">
+</head>
+
+<body id="gamer">
+
+    <!-- <div id="fullscreen-overlay" class="fullscreen-overlay">
+        <div class="overlay-content">
+            <h1 class="game-title">لعبة الاستخبوص</h1>
+            <p class="game-subtitle">لتجربة لعب أفضل وأكثر حماسية، يرجى الانتقال إلى وضع ملء الشاشة</p>
+            <button id="start-fullscreen-btn" class="fullscreen-btn">
+                <span>🚀 ابدأ اللعبة الآن</span>
+            </button>
+        </div>
+    </div> -->
+
+    <div class="app-container">
+
+        <div id="screen-main" class="game-screen main-screen-context">
+            <div id="specialist-badge" class="mood hidden">مود المتخصص نشط</div>
+
+            <div class="main-top-bar">
+                <button class="main-icon-btn" id="help-btn-trigger"
+                    onclick="playGameSound(new Audio('./sounds/help.mp3'))">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 128 128"
+                        style="font-size: 1.5rem;">
+                        <path d="M0 0h128v128H0z" fill="none" />
+                        <circle cx="62.5" cy="112" r="12" fill="#BDBDBD" />
+                        <circle cx="60.9" cy="112" r="10.3" fill="#E0E0E0" />
+                        <path fill="#FFF"
+                            d="M55.1 108.4c1.2-1.8 3.8-3.3 6.5-3.7c.7-.1 1.3-.1 1.9.1c.4.2.8.6.5 1c-.2.4-.7.5-1.1.6c-2.5.7-4.8 2.4-6.2 4.4c-.5.8-1.4 2.9-2.4 2.4c-1-.7-.8-2.6.8-4.8" />
+                        <path fill="#BDBDBD"
+                            d="M46.1 24.3c-2.1 2-3.4 4.4-4 7.4c-.3 1.9-2 3.2-3.9 3.2h6.9c1.9 0 3.6-1.3 3.9-3.2c.5-3 1.9-5.4 4-7.4q3.15-2.85 7.8-3.6c-1.1-.2-2.3-.3-3.5-.3c-4.6.1-8.3 1.4-11.2 3.9" />
+                        <path fill="#BDBDBD"
+                            d="M89.5 12.2C83.4 6.7 75 4 64.2 4c-1.2 0-2.3 0-3.4.1c9.1.5 16.4 3.2 21.8 8.1c6.1 5.5 9.1 13.2 9.1 23c0 8.8-4.1 17.4-12.2 25.9l-9.8 9.6l-.3.3c-2.9 3.4-4.6 8-5.2 13.9c-.2 2-1.9 3.6-4 3.6h6.9c2 0 3.8-1.6 4-3.6c.5-5.9 2.3-10.5 5.2-13.9l.3-.3l9.8-9.6c8.2-8.5 12.2-17.1 12.2-25.9c-.1-9.8-3.1-17.5-9.1-23" />
+                        <path fill="#E0E0E0"
+                            d="M64.2 85c.5-5.9 2.3-10.5 5.2-13.9l.3-.3l9.8-9.6c8.2-8.5 12.2-17.1 12.2-25.9c0-9.8-3-17.5-9.1-23C77.2 7.4 70 4.7 60.8 4.2c-8.9.5-16.2 3.3-21.9 8.2c-5.3 4.6-8.5 10.6-9.4 18.1c-.3 2.4 1.6 4.4 4 4.4h4.8c1.9 0 3.6-1.3 3.9-3.2c.5-3 1.9-5.4 4-7.4c2.8-2.6 6.6-3.9 11.2-3.9c1.2 0 2.4.1 3.5.3c1.1-.2 2.2-.3 3.4-.3c4.8 0 8.5 1.3 11 4s3.8 6.5 3.8 11.5c0 3.8-1.1 7.4-3.2 10.6c-1.4 2.2-4.7 5.8-10 10.9c-5.2 5.1-8.8 9.8-10.5 14c-1.4 3.4-2.3 7.7-2.5 12.9c-.1 2.3 1.7 4.2 4 4.2h3.5c1.8.1 3.6-1.5 3.8-3.5" />
+                        <path fill="#FFF"
+                            d="M39.6 15.9C43 11.7 49.5 8.7 56 8.3c1.6-.1 3.2 0 4.5.7c1 .5 1.7 1.6 1 2.6c-.6.8-1.8 1.1-2.8 1.3c-6.1 1.2-12 4.7-15.9 9.3c-1.5 1.8-4 6.8-6.2 5.2c-2.3-1.9-1.2-6.4 3-11.5" />
+                    </svg>
+                </button>
+
+                <!-- المودال بالشرح المتوازن والكامل مع الحفاظ على الألوان الأصلية -->
+                <div id="help-modal" class="modal-layer-context hidden"
+                    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; box-sizing: border-box;">
+                    <div class="modal-card-body glass-modal" style="max-width: 480px; width: 100%;">
+                        <h2 class="modal-card-title"
+                            style="text-align: center; color: #fff; margin-bottom: 12px; font-weight: 800; font-size: 1.4rem;">
+                            دليلك للاستخبص</h2>
+                        <p class="game-description"
+                            style="text-align: center; color: #aaa; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
+                            اللعبة بدأت ... والثقة انتهت
+                            كل كلمة ليها معنى، وكل حركة ممكن تفضحك
+                            العبها صح ... أو خليك أول واحد يقع
+                        </p>
+
+                        <div class="roles-explanation-grid"
+                            style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; text-align: right;">
+
+                            <!-- بوكس التحديات (ألوانك المظبوطة #00ffcc) -->
+                            <div class="role-box challenge-info"
+                                style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 10px; border-right: 4px solid #2ecc71;">
+                                <span class="role-title" style="font-weight: bold; color: #2ecc71; font-size: 1.05rem;">
+                                    التحدي السري</span>
+                                <p class="role-desc"
+                                    style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e0e0e0; line-height: 1.5;">
+                                    معاك مهمة محدش يعرفها غيرك
+                                    خلصها وسط الناس وكأن مفيش حاجة بتحصل
+                                    أهم قاعدة .. متخليش حد يشك فيك
+                                </p>
+                            </div>
+
+                            <!-- بوكس الصعوبات (ألوانك المظبوطة #ff003c) -->
+                            <div class="role-box chaos-info"
+                                style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 10px; border-right: 4px solid #ff5252;">
+                                <span class="role-title"
+                                    style="font-weight: bold; color: #ff5252; font-size: 1.05rem;">إنذار اللعبة </span>
+                                <p class="role-desc"
+                                    style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e0e0e0; line-height: 1.5;">
+                                    فجأة اللعبة هتقطع عليك الكلام، وهتفرض أمر
+                                    لازم الكل ينفذه قبل انتهاء الوقت. مفيش استثناءات ... إلا لو معاك VIP 🔥
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <button class="close-modal-btn" id="close-help-btn" type="button"
+                            style="width: 100%; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer;"
+                            onclick="playGameSound(new Audio('./sounds/click.mp3'))">فهمت</button>
+                    </div>
+                </div>
+
+                <button class="main-icon-btn" id="btn-open-settings"
+                    onclick="playGameSound(new Audio('./sounds/click.mp3'))">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+                        style="font-size: 1.5rem;">
+                        <path d="M0 0h24v24H0z" fill="none" />
+                        <path fill="#fff"
+                            d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="main-screen-content">
+                <img src="img/logo2.png" class="main-game-logo" alt="اللوجو">
+
+                <h1 class="main-game-title">في <span class="main-highlight">الاستخبُص</span></h1>
+                <p class="main-game-tagline">فتّح عينك .. تاكل ملبن
+                    <svg class="tagline-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                        viewBox="0 0 128 128">
+                        <path d="M0 0h128v128H0z" fill="none" />
+                        <path fill="#FAFAFA"
+                            d="M34.16 106.51C18.73 106.51 6.19 87.44 6.19 64s12.55-42.51 27.97-42.51S62.13 40.56 62.13 64s-12.55 42.51-27.97 42.51" />
+                        <path fill="#B0BEC5"
+                            d="M34.16 23.49c6.63 0 12.98 4 17.87 11.27c5.22 7.75 8.1 18.14 8.1 29.24s-2.88 21.49-8.1 29.24c-4.89 7.27-11.24 11.27-17.87 11.27s-12.98-4-17.87-11.27C11.06 85.49 8.19 75.1 8.19 64s2.88-21.49 8.1-29.24c4.89-7.27 11.23-11.27 17.87-11.27m0-4C17.61 19.49 4.19 39.42 4.19 64s13.42 44.51 29.97 44.51S64.13 88.58 64.13 64S50.71 19.49 34.16 19.49" />
+                        <linearGradient id="SVGmUaXxe0S" x1="22.523" x2="22.523" y1="46.676" y2="82.083"
+                            gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#424242" />
+                            <stop offset="1" stop-color="#212121" />
+                        </linearGradient>
+                        <path fill="url(#SVGmUaXxe0S)"
+                            d="M25.63 59.84c-2.7-2.54-2.1-7.58 1.36-11.26c.18-.19.36-.37.55-.54c-1.54-.87-3.23-1.36-5.01-1.36c-7.19 0-13.02 7.93-13.02 17.7s5.83 17.7 13.02 17.7s13.02-7.93 13.02-17.7c0-1.75-.19-3.45-.54-5.05c-3.24 2.33-7.11 2.64-9.38.51" />
+                        <ellipse cx="93.84" cy="64" fill="#EEE" rx="29.97" ry="44.51" />
+                        <path fill="#FAFAFA"
+                            d="M93.84 106.51c-15.42 0-27.97-19.07-27.97-42.51s12.55-42.51 27.97-42.51S121.81 40.56 121.81 64s-12.54 42.51-27.97 42.51" />
+                        <path fill="#B0BEC5"
+                            d="M93.84 23.49c6.63 0 12.98 4 17.87 11.27c5.22 7.75 8.1 18.14 8.1 29.24s-2.88 21.49-8.1 29.24c-4.89 7.27-11.24 11.27-17.87 11.27s-12.98-4-17.87-11.27c-5.22-7.75-8.1-18.14-8.1-29.24s2.88-21.49 8.1-29.24c4.89-7.27 11.24-11.27 17.87-11.27m0-4c-16.55 0-29.97 19.93-29.97 44.51s13.42 44.51 29.97 44.51S123.81 88.58 123.81 64s-13.42-44.51-29.97-44.51" />
+                        <linearGradient id="SVGsunlQbYk" x1="82.209" x2="82.209" y1="46.676" y2="82.083"
+                            gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#424242" />
+                            <stop offset="1" stop-color="#212121" />
+                        </linearGradient>
+                        <path fill="url(#SVGsunlQbYk)"
+                            d="M85.31 59.84c-2.7-2.54-2.1-7.58 1.36-11.26c.18-.19.36-.37.55-.54c-1.54-.87-3.23-1.36-5.01-1.36c-7.19 0-13.02 7.93-13.02 17.7s5.83 17.7 13.02 17.7s13.02-7.93 13.02-17.7c0-1.75-.19-3.45-.54-5.05c-3.23 2.33-7.11 2.64-9.38.51" />
+                    </svg>
+                </p>
+            </div>
+            <button id="btn-start-game" class="main-action-btn-trigger"
+                onclick="playGameSound(new Audio('./sounds/click.mp3'))"><span class="btn-text">يلا نبدأ</span></button>
+
+            <p class="app-version-text">Version 1.0.0</p>
+        </div>
+
+        <div id="screen-settings" class="game-screen hidden">
+            <div class="settings-screen-context">
+
+                <!-- الهيدر الخاص بالإعدادات -->
+                <div class="settings-header-box">
+                    <div class="settings-back-box-container" id="SettingBackBox">
+                        <button id="btn-back-from-settings" class="settings-back-btn-element"
+                            onclick="playGameSound(new Audio('./sounds/back.mp3'))">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                                <path d="M0 0h16v16H0z" fill="none" />
+                                <path fill="#fff" fill-rule="evenodd"
+                                    d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <h1 class="settings-main-title">الإعدادات</h1>
+                    <div style="width: 40px;"></div>
+                </div>
+
+                <!-- قائمة الخيارات المرتبة تحت بعضها -->
+                <div class="settings-options-list">
+
+                    <!-- كارت ثيم اللعبة -->
+                    <div class="settings-option-item theme-vertical-card">
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                <svg class="theme-svg-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                    viewBox="0 0 80 80">
+                                    <path d="M0 0h80v80H0z" fill="none" />
+                                    <g fill="none">
+                                        <path fill="#f2c94c" fill-rule="evenodd"
+                                            d="M53.57 15.713a27.713 27.713 0 1 0-5.195 50.325l-4.723-9.446a8.9 8.9 0 0 1 7.96-12.88h15.524q.288-1.972.29-4c0-9.9-5.282-19.049-13.857-24"
+                                            clip-rule="evenodd" />
+                                        <path fill="#f2c94c"
+                                            d="m25.856 15.713l-1-1.732zm27.713 0l1-1.732zm-27.713 48l-1 1.732zm22.52 2.325l.625 1.9a2 2 0 0 0 1.163-2.795zm18.76-22.325v2A2 2 0 0 0 69.116 44zm-40.28-26.268a25.71 25.71 0 0 1 25.713 0l2-3.464a29.71 29.71 0 0 0-29.713 0zM14 39.713a25.71 25.71 0 0 1 12.856-22.268l-2-3.464A29.71 29.71 0 0 0 10 39.713zM26.856 61.98A25.71 25.71 0 0 1 14 39.713h-4a29.71 29.71 0 0 0 14.856 25.732zm20.894 2.157a25.72 25.72 0 0 1-20.894-2.157l-2 3.464a29.72 29.72 0 0 0 24.145 2.492zm2.414 1.005l-4.723-9.446l-3.578 1.79l4.724 9.445zm-4.723-9.446a6.9 6.9 0 0 1-.728-3.085h-4c0 1.692.394 3.36 1.15 4.874zm-.728-3.085a6.9 6.9 0 0 1 6.9-6.9v-4c-6.02 0-10.9 4.88-10.9 10.9zm6.9-6.9h15.523v-4H51.612zm13.813-6c0 1.254-.091 2.494-.27 3.712l3.96.577a30 30 0 0 0 .31-4.288zM52.569 17.446a25.71 25.71 0 0 1 12.857 22.268h4A29.71 29.71 0 0 0 54.569 13.98z" />
+                                        <path fill="#bb6bd9" stroke="#bb6bd9" stroke-linecap="square"
+                                            stroke-linejoin="round" stroke-width="4"
+                                            d="M23.414 45.463a2.598 2.598 0 1 1 2.598 4.5a2.598 2.598 0 0 1-2.598-4.5Z" />
+                                        <path fill="#219653" stroke="#219653" stroke-linecap="square"
+                                            stroke-linejoin="round" stroke-width="4"
+                                            d="M24.414 28.463a2.598 2.598 0 1 1 2.598 4.5a2.598 2.598 0 0 1-2.598-4.5Z" />
+                                        <path fill="#2f80ed" stroke="#2f80ed" stroke-linecap="square"
+                                            stroke-linejoin="round" stroke-width="4"
+                                            d="M38.701 20.75a2.598 2.598 0 1 1 2.598 4.5a2.598 2.598 0 0 1-2.598-4.5Z" />
+                                        <path fill="#eb5757" stroke="#eb5757" stroke-linecap="square"
+                                            stroke-linejoin="round" stroke-width="4"
+                                            d="M52.701 28.75a2.598 2.598 0 1 1 2.598 4.5a2.598 2.598 0 0 1-2.598-4.5Z" />
+                                    </g>
+                                </svg>
+                                ثيم اللعبة
+                            </h3>
+                            <p class="option-desc">اختر اللون الأساسي لمظهر اللعبة، القوائم، والتوجلز.</p>
+                        </div>
+
+                        <div class="theme-picker-container">
+                            <label class="theme-circle-wrapper">
+                                <input type="radio" name="game-theme" value="crimson" checked>
+                                <span class="theme-dot color-crimson"></span>
+                            </label>
+
+                            <label class="theme-circle-wrapper">
+                                <input type="radio" name="game-theme" value="blue">
+                                <span class="theme-dot color-blue"></span>
+                            </label>
+
+                            <label class="theme-circle-wrapper">
+                                <input type="radio" name="game-theme" value="green">
+                                <span class="theme-dot color-green"></span>
+                            </label>
+
+                            <label class="theme-circle-wrapper">
+                                <input type="radio" name="game-theme" value="purple">
+                                <span class="theme-dot color-purple"></span>
+                            </label>
+
+                            <label class="theme-circle-wrapper">
+                                <input type="radio" name="game-theme" value="gold">
+                                <span class="theme-dot color-gold"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- مود المتخصص -->
+                    <label class="settings-option-item">
+
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                <svg class="mind-svg-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                    viewBox="0 0 36 36">
+                                    <path d="M0 0h36v36H0z" fill="none" />
+                                    <path fill="#ea596e"
+                                        d="M29.896 26.667c.003.283-.07.653-.146.958c-.531 2.145-2.889 4.552-6.208 4.333c-3.008-.198-5.458-1.642-5.458-3.667s2.444-3.667 5.458-3.667s6.335.018 6.354 2.043" />
+                                    <path fill="#dd2e44"
+                                        d="M23.542 24.964c-1.619 0-5.314.448-6.162.448c-1.498 0-2.713.94-2.713 2.1c0 .558.286 1.062.744 1.438c0 0 1.006 1.009 2.818.525c.793-.212 2.083-1.786 4.354-2.036c1.131-.125 3.25.75 6.974.771c.16-.344.193-.583.193-.583c0-2.027-3.194-2.663-6.208-2.663" />
+                                    <path fill="#f4abba"
+                                        d="M29.75 27.625s2.184-.443 3.542-2.229c1.583-2.083 1.375-4.312 1.375-4.312c1.604-3-.5-5.813-.5-5.813C33.958 12.104 32 10.792 32 10.792c-1.271-3.021-4.083-3.833-4.083-3.833c-2.208-2.583-6.125-2.5-6.125-2.5s-3.67-1.345-8.708.167c-.833.25-3.625.833-5.667 2.083C.981 10.649.494 16.793.584 17.792C1.083 23.375 5 24.375 7.5 24.958c.583 1.583 2.729 4.5 6.583 3.417c4.75-.833 6.75-2.25 7.917-2.25s4.417 1.25 7.75 1.5" />
+                                    <g fill="#ea596e">
+                                        <path
+                                            d="M17.737 18.648c2.328-1.255 3.59-1.138 4.704-1.037c.354.032.689.057 1.028.055c1.984-.045 3.591-.881 4.302-1.69a.501.501 0 0 0-.752-.661c-.548.624-1.899 1.313-3.573 1.351c-.3.009-.601-.021-.913-.05c-1.195-.111-2.679-.247-5.271 1.152c-.665.359-1.577.492-2.565.592c-2.197-3.171-.875-5.933-.497-6.591c.037.002.073.014.111.014c.4 0 .802-.098 1.166-.304a.5.5 0 0 0-.492-.87a1.426 1.426 0 0 1-1.88-.467a.5.5 0 0 0-.841.539c.237.371.571.65.948.837c-.521 1.058-1.51 3.84.372 6.951c-1.324.13-2.65.317-3.688.986a7.2 7.2 0 0 0-1.878 1.791c-.629-.108-2.932-.675-3.334-3.231c.25-.194.452-.45.577-.766a.5.5 0 1 0-.93-.368a.77.77 0 0 1-.454.461a.78.78 0 0 1-.643-.07a.5.5 0 0 0-.486.874c.284.158.588.238.89.238c.037 0 .072-.017.109-.019c.476 2.413 2.383 3.473 3.732 3.794a3.7 3.7 0 0 0-.331 1.192a.5.5 0 0 0 .454.542l.045.002a.5.5 0 0 0 .498-.456c.108-1.213 1.265-2.48 2.293-3.145c.964-.621 2.375-.752 3.741-.879c1.325-.121 2.577-.237 3.558-.767m12.866-1.504a.5.5 0 0 0 .878.48c.019-.034 1.842-3.449-1.571-5.744a.5.5 0 0 0-.558.83c2.644 1.778 1.309 4.326 1.251 4.434M9.876 9.07a.5.5 0 0 0 .406-.208c1.45-2.017 3.458-1.327 3.543-1.295a.5.5 0 0 0 .345-.938c-.96-.356-3.177-.468-4.7 1.65a.5.5 0 0 0 .406.791m13.072-1.888c2.225-.181 3.237 1.432 3.283 1.508a.5.5 0 0 0 .863-.507c-.054-.091-1.34-2.218-4.224-1.998a.5.5 0 0 0 .078.997m9.15 14.611c-.246-.014-.517.181-.539.457c-.002.018-.161 1.719-1.91 2.294a.499.499 0 0 0 .157.975a.5.5 0 0 0 .156-.025c2.372-.778 2.586-3.064 2.594-3.161a.5.5 0 0 0-.458-.54" />
+                                        <path
+                                            d="M7.347 16.934a.5.5 0 1 0 .965.26a1.423 1.423 0 0 1 1.652-1.014a.5.5 0 0 0 .205-.979a2.35 2.35 0 0 0-1.248.086c-1.166-1.994-.939-3.96-.936-3.981a.5.5 0 0 0-.429-.562a.503.503 0 0 0-.562.427c-.013.097-.28 2.316 1.063 4.614a2.4 2.4 0 0 0-.71 1.149m11.179-2.47a1.07 1.07 0 0 1 1.455.015a.5.5 0 0 0 .707-.011a.5.5 0 0 0-.01-.707a2 2 0 0 0-.797-.465c.296-1.016.179-1.467-.096-2.312a21 21 0 0 1-.157-.498l-.03-.1c-.364-1.208-.605-2.005.087-3.13a.5.5 0 0 0-.852-.524c-.928 1.508-.587 2.637-.192 3.944l.03.1q.088.29.163.517c.247.761.322 1.016.02 1.936a2 2 0 0 0-1.01.504a.5.5 0 0 0 .682.731m6.365-2.985a2 2 0 0 0 .859-.191a.5.5 0 0 0-.426-.905a1.07 1.07 0 0 1-1.384-.457a.5.5 0 1 0-.881.472c.18.336.448.601.76.785c-.537 1.305-.232 2.691.017 3.426a.5.5 0 1 0 .947-.319c-.168-.498-.494-1.756-.002-2.826c.038.002.073.015.11.015m4.797 9.429a.497.497 0 0 0-.531-.467a1.825 1.825 0 0 1-1.947-1.703a.51.51 0 0 0-.533-.465a.5.5 0 0 0-.465.533c.041.59.266 1.122.608 1.555c-.804.946-1.857 1.215-2.444 1.284c-.519.062-.973.009-1.498-.053c-.481-.055-1.025-.118-1.698-.098l-.005.001c-.02-.286-.088-.703-.305-1.05a.501.501 0 0 0-.847.531c.134.215.159.558.159.725c-.504.181-.94.447-1.334.704c-.704.458-1.259.82-2.094.632c-.756-.173-1.513-.208-2.155-.118c-.1-.251-.258-.551-.502-.782a.5.5 0 0 0-.687.727c.086.081.154.199.209.317c-1.103.454-1.656 1.213-1.682 1.25a.499.499 0 0 0 .407.788a.5.5 0 0 0 .406-.205c.005-.008.554-.743 1.637-1.04c.56-.154 1.363-.141 2.146.037c.219.05.422.067.619.07c.093.218.129.477.134.573a.5.5 0 0 0 .499.472l.027-.001a.5.5 0 0 0 .473-.523a3 3 0 0 0-.13-.686c.461-.167.862-.428 1.239-.673c.572-.373 1.113-.726 1.82-.749c.592-.021 1.08.036 1.551.091c.474.055.94.091 1.454.061c.091.253.084.591.07.704a.503.503 0 0 0 .497.563a.5.5 0 0 0 .495-.435a2.9 2.9 0 0 0-.059-.981a4.67 4.67 0 0 0 2.345-1.471a2.8 2.8 0 0 0 1.656.413a.5.5 0 0 0 .465-.531" />
+                                    </g>
+                                </svg>
+                                مود المتخصص
+                            </h3>
+                            <p class="option-desc">اكتبوا التحديات بنفسكم جوة اللوبي وعيشوا المتعة.</p>
+                        </div>
+                        <div class="switch-toggle-wrapper">
+                            <input type="checkbox" id="specialist-mode-toggle">
+                            <span class="custom-toggle-slider"></span>
+                        </div>
+                    </label>
+
+                    <!-- أوامر الفوضى -->
+                    <label class="settings-option-item">
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                ⚠️ أوامر الفوضى
+                            </h3>
+                            <p class="option-desc">
+                                تشغيل أو إيقاف الأوامر المفاجئة التي تظهر لتغيير مجرى اللعبة أثناء المحاكمة.
+                            </p>
+                        </div>
+                        <div class="chaos-settings-controls">
+                            <div class="switch-toggle-wrapper">
+                                <input type="checkbox" id="chaos-mode-toggle" checked>
+                                <span class="custom-toggle-slider"></span>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- المؤثرات الصوتية -->
+                    <label class="settings-option-item">
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                <svg class="sound-svg-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                    viewBox="0 0 14 14">
+                                    <path d="M0 0h14v14H0z" fill="none" />
+                                    <g fill="none" fill-rule="evenodd" clip-rule="evenodd">
+                                        <path fill="#2859c5"
+                                            d="M9.695 5.478a.75.75 0 0 1 1.06-.05c.407.37.666.92.666 1.572c0 .653-.259 1.202-.667 1.573a.75.75 0 0 1-1.008-1.11c.086-.08.175-.222.175-.463c0-.24-.088-.383-.175-.462a.75.75 0 0 1-.051-1.06" />
+                                        <path fill="#2859c5"
+                                            d="M11.15 2.843a.75.75 0 0 1 1.06-.064C13.276 3.725 14 5.176 14 7s-.725 3.276-1.791 4.221a.75.75 0 1 1-.996-1.122c.737-.653 1.287-1.693 1.287-3.098c0-1.406-.55-2.445-1.287-3.098a.75.75 0 0 1-.063-1.059Z" />
+                                        <path fill="#8fbffa"
+                                            d="M8.42 2.54c-.033-.795-.43-1.468-1.051-1.745c-.659-.294-1.4-.07-1.906.604q-.275.365-.525.758a1.89 1.89 0 0 1-1.457.88c-.328.021-.61.05-.855.085C1.446 3.29.599 4.258.405 5.371A9.7 9.7 0 0 0 .25 7c0 .557.067 1.126.155 1.63c.194 1.111 1.041 2.08 2.22 2.247c.246.035.528.065.856.086l.033-.499l-.033.499a1.89 1.89 0 0 1 1.457.88q.25.392.525.758c.507.674 1.247.898 1.906.604c.62-.277 1.018-.95 1.05-1.746c.045-1.094.081-2.562.081-4.46c0-1.896-.036-3.364-.08-4.458Z" />
+                                    </g>
+                                </svg>
+                                المؤثرات الصوتية
+                            </h3>
+                            <p class="option-desc">تشغيل أو كتم أصوات التايمر، الأزرار، والأنيميشن.</p>
+                        </div>
+                        <div class="switch-toggle-wrapper">
+                            <input type="checkbox" id="sound-effects-toggle" checked>
+                            <span class="custom-toggle-slider"></span>
+                        </div>
+                    </label>
+
+                    <!-- اهتزاز الهاتف -->
+                    <label class="settings-option-item">
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                <svg class="Vibrate-svg-icon" xmlns="http://www.w3.org/2000/svg" width="1em"
+                                    height="1em" viewBox="0 0 48 48">
+                                    <path d="M0 0h48v48H0z" fill="none" />
+                                    <g fill="none" stroke-width="3">
+                                        <path fill="#8fbffa"
+                                            d="M9.39 39.807c.147 2.52 1.973 4.53 4.487 4.771c2.315.221 5.647.422 10.124.422s7.81-.2 10.124-.422c2.514-.24 4.34-2.25 4.487-4.771c.087-1.484.176-3.38.247-5.718l-1.497-1.248a5 5 0 0 1 0-7.682L38.753 24l-1.39-1.159a5 5 0 0 1 0-7.682l1.496-1.247a205 205 0 0 0-.247-5.719c-.147-2.52-1.974-4.53-4.487-4.771C31.81 3.2 28.478 3 24 3s-7.81.2-10.124.422c-2.514.24-4.34 2.25-4.487 4.771a205 205 0 0 0-.247 5.718l1.497 1.248a5 5 0 0 1 0 7.682L9.25 24l1.39 1.159a5 5 0 0 1 0 7.682L9.143 34.09c.07 2.337.16 4.234.247 5.718Z" />
+                                        <path fill="#fff"
+                                            d="m18.266 3.122l.406 3.25A3 3 0 0 0 21.649 9h4.703a3 3 0 0 0 2.977-2.628l.406-3.25C28.085 3.047 26.178 3 24 3c-2.177 0-4.084.047-5.734.122" />
+                                        <path stroke="#2859c5" stroke-linecap="round" stroke-linejoin="round"
+                                            d="m45 14l-5.078 4.232a1 1 0 0 0 0 1.536l4.157 3.464a1 1 0 0 1 0 1.536l-4.157 3.464a1 1 0 0 0 0 1.536L45.001 34M3 14l5.078 4.232a1 1 0 0 1 0 1.536l-4.156 3.464a1 1 0 0 0 0 1.536l4.156 3.464a1 1 0 0 1 0 1.536L3 34m35.658-21c-.065-1.925-.142-3.52-.218-4.807c-.147-2.52-1.973-4.53-4.487-4.771C31.638 3.2 28.306 3 23.829 3s-7.81.2-10.124.422c-2.514.24-4.34 2.25-4.487 4.771A198 198 0 0 0 9 13m0 22c.065 1.925.143 3.52.218 4.807c.147 2.52 1.973 4.53 4.487 4.771C16.02 44.8 19.352 45 23.83 45s7.81-.2 10.124-.422c2.514-.24 4.34-2.25 4.487-4.771c.076-1.286.153-2.882.218-4.807" />
+                                        <path stroke="#2859c5" stroke-linecap="round" stroke-linejoin="round"
+                                            d="m18.266 3.122l.406 3.25A3 3 0 0 0 21.649 9h4.703a3 3 0 0 0 2.977-2.627l.406-3.25M22 40h4" />
+                                    </g>
+                                </svg>
+                                اهتزاز الهاتف
+                            </h3>
+                            <p class="option-desc">تفعيل الهز التفاعلي مع الضغطات وانتهاء وقت التايمر.</p>
+                        </div>
+                        <div class="switch-toggle-wrapper">
+                            <input type="checkbox" id="vibration-toggle" checked>
+                            <span class="custom-toggle-slider"></span>
+                        </div>
+                    </label>
+
+                    <!-- زرار الفورم (الأفكار) -->
+                    <div class="settings-option-item" id="btn-share-ideas">
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                <svg class="Lightbulb-svg-icon" xmlns="http://www.w3.org/2000/svg" width="1em"
+                                    height="1em" viewBox="0 0 32 32">
+                                    <path d="M0 0h32v32H0z" fill="none" />
+                                    <g fill="none">
+                                        <path fill="url(#SVG7KZY1aiB)"
+                                            d="m20.834 25.5l-.412 1.787A3.5 3.5 0 0 1 17.012 30h-2.023a3.5 3.5 0 0 1-3.41-2.713l-.413-1.787z" />
+                                        <path fill="url(#SVG0jq8QSKv)"
+                                            d="m20.834 25.5l-.412 1.787A3.5 3.5 0 0 1 17.012 30h-2.023a3.5 3.5 0 0 1-3.41-2.713l-.413-1.787z" />
+                                        <path fill="url(#SVGW83t6d8B)"
+                                            d="M16 2C10.477 2 6 6.477 6 12a9.98 9.98 0 0 0 3.365 7.482c.343.304.561.645.64.986l.93 4.032h10.13l.93-4.032c.079-.34.297-.682.64-.986A9.98 9.98 0 0 0 26 12c0-5.523-4.477-10-10-10" />
+                                        <path fill="url(#SVGxd0iDbNo)" d="M21.18 24H10.82l.461 2h9.437z" />
+                                        <defs>
+                                            <radialGradient id="SVG7KZY1aiB" cx="0" cy="0" r="1"
+                                                gradientTransform="rotate(71.316 -3.008 12.651)scale(18.6545 32.4938)"
+                                                gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#ffe06b" />
+                                                <stop offset=".376" stop-color="#ffa43d" />
+                                                <stop offset="1" stop-color="#e67505" />
+                                            </radialGradient>
+                                            <radialGradient id="SVGW83t6d8B" cx="0" cy="0" r="1"
+                                                gradientTransform="rotate(75.116 1.527 8.482)scale(25.5993 36.4764)"
+                                                gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#ffe06b" />
+                                                <stop offset=".376" stop-color="#ffa43d" />
+                                                <stop offset="1" stop-color="#e67505" />
+                                            </radialGradient>
+                                            <linearGradient id="SVG0jq8QSKv" x1="15.999" x2="16" y1="25.5" y2="30"
+                                                gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#d34719" />
+                                                <stop offset="1" stop-color="#d34719" stop-opacity="0" />
+                                            </linearGradient>
+                                            <linearGradient id="SVGxd0iDbNo" x1="15.181" x2="16.968" y1="24.794"
+                                                y2="28.5" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#ffc7a3" />
+                                                <stop offset="1" stop-color="#ff9c70" />
+                                            </linearGradient>
+                                        </defs>
+                                    </g>
+                                </svg>
+                                شاركنا أفكارك واقتراحاتك
+                            </h3>
+                            <p class="option-desc">عندك تحدي صايع، مناقشة جديدة للجيم، أو عايز تبلغ عن مشكلة؟ قولي هنا.
+                            </p>
+                        </div>
+                        <span class="arrowset" style="transform: rotate(180deg); display: inline-block;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                                <path d="M0 0h16v16H0z" fill="none" />
+                                <path fill="#fff" fill-rule="evenodd"
+                                    d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                    </div>
+
+                    <!-- زرار الدعم (الواتساب) -->
+                    <div class="settings-option-item" id="btn-support-mail">
+                        <div class="option-info-side">
+                            <h3 class="option-title">
+                                <svg class="support-svg-icon" xmlns="http://www.w3.org/2000/svg" width="1em"
+                                    height="1em" viewBox="0 0 48 48">
+                                    <path d="M0 0h48v48H0z" fill="none" />
+                                    <path fill="#FFB74D"
+                                        d="M29 43v-4.6l2.6.5c2.9.6 5.6-1.5 5.8-4.4L38 28l2.9-1.2c1-.4 1.4-1.6.8-2.6L38 18c-.6-7.6-4.9-15-16-15C10.6 3 5 11.4 5 20c0 3.7 1.3 6.9 3.3 9.6c1.8 2.5 2.7 5.5 2.7 8.5v4.8h18z" />
+                                    <path fill="#FF9800" d="M29 43v-4.6L22 37v6z" />
+                                    <circle cx="33.5" cy="21.5" r="1.5" fill="#784719" />
+                                    <path fill="#FF5722"
+                                        d="M21.4 3C12.3 3 5 10.3 5 19.4c0 11.1 6 11.4 6 18.6l2.6-.9c2.1-.7 3.9-2.3 4.7-4.4l2.8-6.8L27 23v-6s7-3.8 7-10.3C31 4.2 25.7 3 21.4 3" />
+                                    <path fill="#546E7A"
+                                        d="M21 2.1c-.6 0-1 .4-1 1V17c0 .6.4 1 1 1s1-.4 1-1V3.1c0-.6-.4-1-1-1m15.9 29.8c-7.9 0-10.3-4.9-10.4-5.1c-.2-.5-.8-.7-1.3-.5s-.7.8-.5 1.3c.1.3 3 6.3 12.2 6.3c.6 0 1-.4 1-1s-.5-1-1-1" />
+                                    <circle cx="37" cy="33" r="2" fill="#37474F" />
+                                    <circle cx="21" cy="23" r="7" fill="#37474F" />
+                                    <circle cx="21" cy="23" r="4" fill="#546E7A" />
+                                </svg>
+                                الدعم الفني وتواصل معنا
+                            </h3>
+                            <p class="option-desc">راسلنا مباشرة على الواتساب لو واجهتك أي مشكلة في الفورم ومش راضي
+                                يفتح.</p>
+                        </div>
+                        <span class="arrowset" style="transform: rotate(180deg); display: inline-block;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                                <path d="M0 0h16v16H0z" fill="none" />
+                                <path fill="#fff" fill-rule="evenodd"
+                                    d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-lobby" class="game-screen hidden lobby-screen-context">
+            <div class="lobby-header-wrapper">
+                <div class="lobby-back-box" id="lobbyBackBox">
+                    <button id="btn-back-to-main" class="lobby-back-btn"
+                        onclick="playGameSound(new Audio('./sounds/back.mp3'))">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                            <path d="M0 0h16v16H0z" fill="none" />
+                            <path fill="#fff" fill-rule="evenodd"
+                                d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <h1 class="lobby-screen-title">تجهيز الشلة</h1>
+            </div>
+            <div class="lobby-add-player-box">
+                <input type="text" id="player-name-input" class="lobby-player-input" placeholder="اكتب اسم اللاعب..."
+                    maxlength="15">
+                <button id="btn-add-player" class="lobby-add-btn-trigger"
+                    onclick="playGameSound(new Audio('./sounds/click.mp3'))">+</button>
+            </div>
+
+            <div class="lobby-scrollable-list" id="players-list">
+            </div>
+
+            <div class="lobby-footer-box">
+
+                <div class="lobby-counter-badge glass-panel">
+                    <span class="badge-title">عدد اللاعبين</span>
+                    <span id="current-count" class="lobby-count-highlight">0</span>
+                </div>
+
+                <div class="lobby-time-picker-section">
+                    <span class="time-picker-label">وقت التحدي</span>
+                    <div class="lobby-time-chips">
+                        <button type="button" class="time-chip active" data-value="5"
+                            onclick="playGameSound(new Audio('./sounds/click.mp3'))">5 دقايق</button>
+                        <button type="button" class="time-chip" data-value="7"
+                            onclick="playGameSound(new Audio('./sounds/click.mp3'))">7 دقايق</button>
+                        <button type="button" class="time-chip" data-value="unlimited"
+                            onclick="playGameSound(new Audio('./sounds/click.mp3'))">بدون وقت</button>
+                    </div>
+                </div>
+
+                <button id="btn-lobby-ready" class="lobby-start-btn-trigger"
+                    onclick="playGameSound(new Audio('./sounds/click.mp3'))">جاهزين؟</button>
+            </div>
+        </div>
+
+        <div id="screen-specialist-challenges" class="game-screen hidden">
+            <div class="specialist-screen-context">
+
+                <div class="specialist-global-header">
+
+                    <div class="specialist-back-box-container" id="specialistBackBox">
+                        <button id="btn-back-specialist-to-lobby" class="specialist-back-btn-element">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                                <path d="M0 0h16v16H0z" fill="none" />
+                                <path fill="#fff" fill-rule="evenodd"
+                                    d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <h1 class="specialist-main-title">مود المتخصص</h1>
+                    <div style="width: 40px;"></div>
+                </div>
+
+                <div class="specialist-main-card">
+
+                    <div class="specialist-alert-badge" id="specialist-alert-counter">
+                        عدد التحديات: <span id="inserted-challenges-count" class="badge-num">0</span> / <span
+                            id="required-challenges-count" class="badge-num">0</span>
+                    </div>
+
+                    <p class="specialist-hint-text">اكتب التحدي ودوس ارسال :</p>
+
+                    <div class="specialist-input-group">
+                        <input type="text" id="specialist-challenge-input" class="dynamic-input"
+                            placeholder="اكتب التحدي السري هنا..." autocomplete="off"
+                            onkeydown="if(event.key === 'Enter') { event.preventDefault(); document.getElementById('btn-send-specialist-challenge').click(); }">
+                        <button id="btn-send-specialist-challenge" class="btn-start-game glow-crimson"
+                            onclick="playGameSound(new Audio('./sounds/click.mp3')); handleSpecialistChallengeSend();"
+                            disabled>
+                            إرسال التحدي
+                        </button>
+                    </div>
+
+                    <div class="specialist-footer-actions">
+                        <button id="btn-submit-specialist-game" class="btn-start-game disabled-btn" disabled>
+                            ابدأ توزيع الكروت
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="screen-roles" class="game-screen hidden roles-screen-context dark-overlay-screen">
+            <div id="role-step-handover"
+                class="role-phase-container central-role-card epic-glow-box handover-centered-layout">
+                <p class="handover-main-instruction">
+                    إدّي الموبيل لـ <span id="next-player-name" class="roles-user-highlight"></span> عشان يشوف التحدي
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32">
+                        <path d="M0 0h32v32H0z" fill="none" />
+                        <g fill="none">
+                            <path fill="#9B9B9B"
+                                d="M9.528 7a8.5 8.5 0 0 0-8.5 8.5v7a8.5 8.5 0 0 0 15 5.477a8.5 8.5 0 0 0 15-5.477v-7a8.5 8.5 0 0 0-15-5.477A8.48 8.48 0 0 0 9.528 7" />
+                            <path fill="#fff"
+                                d="M9.528 8a7.5 7.5 0 0 0-7.5 7.5v7a7.5 7.5 0 0 0 14 3.744a7.5 7.5 0 0 0 14-3.744v-7a7.5 7.5 0 0 0-14-3.744A7.5 7.5 0 0 0 9.528 8" />
+                            <path fill="#D3D3D3"
+                                d="M15.028 15.5c0-1.364.364-2.642 1-3.744A7.53 7.53 0 0 0 12.226 8.5h-.167c1.094.656 1.938 3.25 1.938 4.5v12.125c0 1.375-.157 3.093-1.937 4.437a7.53 7.53 0 0 0 3.968-3.318a7.47 7.47 0 0 1-1-3.744zm15 0a7.5 7.5 0 0 0-4.802-7h-.167c1.656 1.094 2.906 3.063 2.906 4.531V25c0 1.375-1.124 3.218-2.905 4.562a7.5 7.5 0 0 0 4.968-7.062z" />
+                            <path fill="#321B41"
+                                d="M6.59 13a3.5 3.5 0 0 0-3.5 3.5v5a3.5 3.5 0 1 0 7 0v-5a3.5 3.5 0 0 0-3.5-3.5m12.938 0a3.5 3.5 0 0 0-3.5 3.5v5a3.5 3.5 0 1 0 7 0v-5a3.5 3.5 0 0 0-3.5-3.5" />
+                            <path fill="#F4F4F4"
+                                d="M8.766 16.861c.372-.31.355-.942-.038-1.414s-1.012-.603-1.384-.294s-.354.942.039 1.414c.392.471 1.012.603 1.383.294m12.997 0c.371-.31.354-.942-.039-1.414s-1.012-.603-1.383-.294c-.372.309-.354.942.038 1.414c.393.471 1.012.603 1.384.294" />
+                        </g>
+                    </svg>
+                </p>
+
+                <button id="btn-i-am-player" class="roles-mini-action-btn">يلا وريني</button>
+            </div>
+
+            <div id="role-step-gameplay" class="role-phase-container hidden free-scratch-page-layout">
+
+                <h2 class="roles-screen-title" id="role-phase-guide-text">بص في شاشتك لوحدك</h2>
+
+
+                <div class="roles-card-wrapper">
+
+                    <img src="./img/per.png" class="peeking-character-avatar" alt="character">
+
+                    <div class="swipe-canvas-wrapper">
+
+                        <div id="secret-card-content" class="roles-hidden-card-info" style="opacity: 0;">
+                            <span id="player-role-badge" class="roles-badge-element"></span>
+
+                            <div class="roles-challenge-container">
+
+                                <p class="roles-challenge-label">🚨 التحدي بتاعك هو:</p>
+                                <p id="challenge-text-content" class="roles-challenge-text"></p>
+                            </div>
+
+                        </div>
+
+                        <div id="swipe-cover-card" class="roles-cover-card-element">
+                            <div class="cover-card-graphic">
+                                <h3 class="cover-main-title">طّير الكارت وشوف التحدي !</h3>
+                            </div>
+                            <div class="swipe-arrow-indicator">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1em" viewBox="0 0 12 8">
+                                    <path d="M0 0h12v8H0z" fill="none" />
+                                    <path fill="currentColor" d="M4 1L0 4l4 3zm0 3l4 3V1zm4 0l4 3V1z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <button id="btn-role-done" class="roles-done-btn-trigger hidden"
+                    onclick="playGameSound(new Audio('./sounds/click.mp3'))">اللي بعده</button>
+            </div>
+
+        </div>
+
+        <div id="screen-court" class="game-screen hidden court-screen-context">
+
+            <div class="court-screen-header">
+                <div class="court-back-box-container" id="courtBackBox">
+                    <button id="court-back-btn" class="court-back-btn-element"
+                        onclick="playGameSound(new Audio('./sounds/back.mp3'))">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <g fill="#fff" fill-rule="evenodd" clip-rule="evenodd">
+                                <path
+                                    d="M4.43 6.493c.442.202.912.334 1.395.392q.417.045.833 0c.284-.039.564-.11.832-.211a3.35 3.35 0 0 0 1.796-2.067a3.52 3.52 0 0 0-.16-2.639a2.6 2.6 0 0 0-.492-.652a4.2 4.2 0 0 0-.913-.702C3.868-1.523 2.815 2.76 2.755 3.062a3.15 3.15 0 0 0 .481 2.468a2.9 2.9 0 0 0 1.194.963m-.812-3.28c0-.282.812-3.803 3.672-1.897q.319.211.592.482c.158.16.287.347.38.551c.241.606.241 1.28 0 1.887A2.27 2.27 0 0 1 7.02 5.6q-.257.107-.532.14q-.286.03-.572 0a3.7 3.7 0 0 1-1.073-.25a1.9 1.9 0 0 1-.833-.512a2.17 2.17 0 0 1-.391-1.766" />
+                                <path
+                                    d="M15.848 9.192a5.27 5.27 0 0 0-2.127-1.956a8 8 0 0 0-1.003-.442a3.2 3.2 0 0 0-.833-.18a4.6 4.6 0 0 0-1.455.2c-1.003.291-1.906.823-2.81 1.094a5.7 5.7 0 0 1-1.243.19q-.652.054-1.305 0a2.6 2.6 0 0 1-.772-.22a10 10 0 0 1-1.204-.703a3.5 3.5 0 0 0-1.094-.551A1.58 1.58 0 0 0 1 6.744a1.645 1.645 0 0 0-.923 2.007a4.4 4.4 0 0 0 1.685 2.378c.783.505 1.68.805 2.609.873c.872.035 1.745-.039 2.599-.221q.113.152.2.32a.18.18 0 0 1 0 .201a.62.62 0 0 1-.34.201c-.322.11-.683.15-1.004.261a4.8 4.8 0 0 0-1.003.592A3.1 3.1 0 0 0 4 14.359a5.3 5.3 0 0 0-.582 2.438c.002.874.248 1.729.712 2.469a3.07 3.07 0 0 0 1.244 1.083c.375.167.788.226 1.194.17l.642-.2a1.3 1.3 0 0 0 .813-1.164a2.4 2.4 0 0 0-.23-1.003a8 8 0 0 1-.452-1.064a1.06 1.06 0 0 1 .11-.792a2.6 2.6 0 0 1 .672-.743q.316-.184.673-.26q.268-.06.541-.06c.263.825.616 1.62 1.054 2.367a8.5 8.5 0 0 0 1.786 2.247a2.1 2.1 0 0 0 1.876.442a1.32 1.32 0 0 0 .793-1.264a3.8 3.8 0 0 0-.281-1.595a16 16 0 0 0-.953-1.927c-.793-1.354-1.455-2.318-2.107-3.461a23 23 0 0 1-.703-1.335a1 1 0 0 1 1.004-.29c.73.27 1.41.663 2.006 1.163c.365.275.82.4 1.275.351a1.2 1.2 0 0 0 .792-.642a2.07 2.07 0 0 0-.03-2.097m-.692 1.696c-.08.16-.18.25-.301.25a1.2 1.2 0 0 1-.592-.21a7.8 7.8 0 0 0-2.298-1.164a1.585 1.585 0 0 0-1.756.682a.28.28 0 0 0 0 .281c.311.813.622 1.485.944 2.147c.471 1.004 1.003 1.897 1.545 3.09q.47.884.832 1.817c.15.352.225.73.221 1.113c0 .191-.05.301-.18.321a1.27 1.27 0 0 1-.753-.25a7.6 7.6 0 0 1-1.686-1.877c-.496-.716-.9-1.49-1.204-2.307a.33.33 0 0 0-.421-.221q-.392-.06-.783 0c-.35.047-.69.156-1.003.321a3.2 3.2 0 0 0-1.073 1.134c-.178.36-.234.768-.161 1.164c.07.471.431 1.103.512 1.655a.33.33 0 0 1-.211.371l-.301.09a1.12 1.12 0 0 1-.712-.18a1.95 1.95 0 0 1-.612-.602a3.6 3.6 0 0 1-.562-1.846a4.26 4.26 0 0 1 .35-2.007c.121-.27.3-.51.523-.702a3.7 3.7 0 0 1 .812-.532c.291-.15.713-.2 1.004-.371c.2-.094.374-.24.501-.421a.85.85 0 0 0 .15-.633a2.9 2.9 0 0 0-.51-.883a.33.33 0 0 0-.412-.01a.26.26 0 0 0-.15 0a9.3 9.3 0 0 1-2.469.13a4.9 4.9 0 0 1-2.207-.812A3.47 3.47 0 0 1 1.09 8.901c-.18-.481-.21-1.003.32-1.234a.6.6 0 0 1 .462 0q.331.12.622.321q.632.455 1.324.813c.347.172.72.287 1.104.341a9 9 0 0 0 1.495.07a6.4 6.4 0 0 0 1.515-.22c.913-.271 1.856-.813 2.82-1.104c.348-.119.714-.18 1.083-.18q.273.007.531.1q.471.157.924.36a4.13 4.13 0 0 1 1.755 1.486a1.21 1.21 0 0 1 .11 1.234m8.71.632q-.702-.433-1.445-.793a.76.76 0 0 0-.723.1a1.8 1.8 0 0 0-.501.823a3.9 3.9 0 0 0-.13 1.274q.051.231.16.442a1.23 1.23 0 0 1-.853-.17a3.7 3.7 0 0 1-.953-.653a2.1 2.1 0 0 1-.341-.481a1.4 1.4 0 0 0-.382-.362a1 1 0 0 0-1.173.14l-.392.322a4.8 4.8 0 0 0-1.214 3.401a5.57 5.57 0 0 0 1.134 3.381c.19.231.381.442.592.653l.22.2h-.09a1 1 0 0 0-.632 0a.86.86 0 0 0-.501.783a2.65 2.65 0 0 0 .692 2.097a4.14 4.14 0 0 0 2.73 1.304a.342.342 0 0 0 0-.682a3.4 3.4 0 0 1-1.937-.853a1.91 1.91 0 0 1-.713-1.726q.12-.008.241 0q.322.139.672.17a1.86 1.86 0 0 0 .943-.3a.62.62 0 0 0 .251-.542a.6.6 0 0 0-.17-.381a3.5 3.5 0 0 0-.512-.361a5 5 0 0 1-.542-.512a9 9 0 0 1-.491-.572a4.52 4.52 0 0 1-.843-2.709a3.73 3.73 0 0 1 .873-2.619l.19-.17h.05c0 .06.151.13.201.2q.152.213.351.382c.456.387.985.68 1.555.863a1.87 1.87 0 0 0 1.365 0a.64.64 0 0 0 .391-.602c0-.191-.15-.452-.17-.663a3.2 3.2 0 0 1 0-.852c.032-.225.118-.438.25-.623c.06.412 1.235.602 1.556.693a.3.3 0 0 0 .381-.2a.29.29 0 0 0-.09-.402m-2.72 2.007v-.12c0-.051.07.11 0 .1z" />
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="court-screen-body">
+                <!-- <div id="chaos-overlay" class="chaos-overlay hidden-element">
+                    <div id="chaos-mode-box" class="chaos-box">
+                        <div class="chaos-header">⚠️ وضع الفوضى! ⚠️</div>
+                        <div id="chaos-order-text" class="chaos-text">جاري تجهيز أمر تدميري...</div>
+                        <div class="chaos-footer">باقي على انتهاء الفوضى: <span id="chaos-order-timer">0</span> ثانية
+                        </div>
+                    </div>
+                </div> -->
+
+                <div id="court-case-box" class="court-case-container">
+                    <h3>الموضوع كبر مننا</h3>
+                    <p id="court-case-text" class="court-case-text-content"></p>
+                    <div id="court-speakers" class="court-speakers-badge hidden">
+                        📢 المتحدثين بس يتكلمو
+                    </div>
+                </div>
+
+                <div id="court-timer-section" class="court-timer-section hidden-element">
+                    <div class="timer-circle-container">
+                        <div id="timer-particles-container" class="timer-particles-holder"></div>
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-bg-circle" cx="50" cy="50" r="45"></circle>
+                            <circle id="timer-progress-circle" class="timer-progress-circle" cx="50" cy="50" r="45">
+                            </circle>
+                        </svg>
+                        <div id="game-timer" class="court-timer-display">05:00</div>
+                    </div>
+                </div>
+
+                <button id="btn-chaos-vote" class="court-action-btn chaos-vote-btn hidden-element"
+                    onclick="playGameSound(new Audio('./sounds/click.mp3'))">خلصنا
+                    تحدياتنا</button>
+
+            </div>
+        </div>
+
+        <div id="vote-confirm-modal" class="modal-layer-context hidden">
+            <div class="modal-card-body objection-modal-card">
+                <h3 class="modal-card-title">ليه هتخرجو؟</h3>
+                <p style="color: #eee; text-align: center; margin: 15px 0; font-size: 1.1rem; line-height: 1.6;">
+                    متأكدين إن الكل خلص كلام وعايزين تدخلوا على التصويت
+                </p>
+                <div style="display: flex; gap: 20px; width: 100%; margin-top: 20px;">
+                    <button id="btn-vote-yes" class="expel-action-btn"
+                        onclick="playGameSound(new Audio('./sounds/click.mp3'))">آه، يلا بينا!</button>
+                    <button id="btn-vote-no" class="expel-action-btn"
+                        onclick="playGameSound(new Audio('./sounds/click.mp3'))">لا، لسه</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="expel-toast" class="custom-toast-error hidden">
+            ⚠️ تم طرد اللاعب <span id="expelled-player-name" style="color: #ffd700;"></span> من الجيم كله!
+        </div>
+
+        <div id="screen-vote" class="game-screen hidden">
+            <div class="arcade-court-container">
+
+                <div class="vote-announcer-box">
+                    <h3 id="voting-target-player" class="target-player-title">جاري التحميل...</h3>
+                </div>
+
+                <div id="neon-gate" class="neon-gate-system gate-closed">
+                    <div class="shockwave-ring"></div>
+
+                    <button id="btn-master-reveal" class="master-scan-btn">
+                        <span class="pulse-glow"></span>
+                        <div class="finger-print-neon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
+                                <path d="M0 0h48v48H0z" fill="none" />
+                                <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
+                                    <path
+                                        d="M27.237 19.084A5.9 5.9 0 0 0 24 18.125c-3.288 0-5.953 2.675-5.953 5.974s2.665 5.973 5.953 5.973s5.953-2.674 5.953-5.973q-.002-.807-.202-1.55c.13-.303.202-.636.202-.987a2.485 2.485 0 0 0-2.716-2.478M24 28.081A3.976 3.976 0 0 0 27.968 24a2.483 2.483 0 0 1-2.976-2.439c0-.445.116-.862.32-1.223a3.976 3.976 0 0 0-5.28 3.76A3.975 3.975 0 0 0 24 28.08m3.969-6.519a.497.497 0 1 1-.994.002a.497.497 0 0 1 .994-.002" />
+                                    <path
+                                        d="M30.534 34.575a23.53 23.53 0 0 1-13.068 0a23.4 23.4 0 0 1-9.97-5.853L4.73 25.98a2.47 2.47 0 0 1-.052-3.456l2.756-2.903a22.87 22.87 0 0 1 10.23-6.224a22.8 22.8 0 0 1 12.671 0a22.87 22.87 0 0 1 10.23 6.224l2.757 2.904c.924.973.9 2.51-.052 3.455l-2.765 2.74a23.4 23.4 0 0 1-9.97 5.854m-12.52-1.914q.927.269 1.869.451a9.96 9.96 0 0 1-5.806-9.061a9.96 9.96 0 0 1 6.17-9.219q-1.026.188-2.034.479a20.9 20.9 0 0 0-6.453 3.154l1.588.637l-1.12 1.686l.663.444c.456.305.58.923.275 1.38a.99.99 0 0 1-1.376.276L9.477 21.34l.865-1.3 l-.35-.14q-.58.526-1.12 1.096l-1.956 2.06h1.51l1.737 1.162c.456.305.58.923.276 1.38a.99.99 0 0 1-1.376.277l-1.239-.828H6.611l2.279 2.258q.443.44.909.85l1.395-.764l.169-1.015a.993.993 0 1 1 1.957.328l-.327 1.971l-1.505.824a21.4 21.4 0 0 0 6.527 3.162m10.1.451a21.5 21.5 0 0 0 8.397-3.613l-1.505-.824l-.327-1.971a.993.993 0 1 1 1.957-.327l.169 1.014l1.395.764q.466-.41.909-.85l2.279-2.258h-1.213l-1.239.828a.99.99 0 0 1-1.376-.276a1 1 0 0 1 .276-1.38l1.738-1.164h1.51l-1.956-2.06q-.541-.57-1.122-1.095l-.349.14l.865 1.3l-2.314 1.548a.99.99 0 0 1-1.376-.276a1 1 0 0 1 .275-1.38l.663-.444l-1.12-1.686l1.588-.637a20.9 20.9 0 0 0-8.486-3.633a9.96 9.96 0 0 1 6.169 9.219a9.96 9.96 0 0 1-5.806 9.061m3.823-9.061c0 4.399-3.554 7.965-7.938 7.965s-7.938-3.566-7.938-7.965s3.554-7.965 7.938-7.965s7.938 3.566 7.938 7.965" />
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="scan-text">اكشف التحدي للتحقق</div>
+                    </button>
+
+                    <div class="hidden-challenge-board">
+                        <p id="challenge-text-placeholder" class="challenge-neon-text"></p>
+                    </div>
+                </div>
+
+                <div id="main-voting-dock" class="arcade-voting-dock">
+
+                    <div id="initial-actions-group"
+                        style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button id="btn-vote-success-init" class="arcade-btn arcade-success">
+                                <span class="btn-top">نفذته</span>
+                            </button>
+                            <button id="btn-vote-failed-init" class="arcade-btn arcade-failed">
+                                <span class="btn-top">منَفذتوش</span>
+                            </button>
+                        </div>
+                        <button id="btn-vote-caught" class="arcade-btn arcade-caught">
+                            <span class="btn-top">حد شاكك فيا؟</span>
+                        </button>
+                    </div>
+
+                    <div id="verify-actions-group"
+                        style="display: none; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+                        <button id="btn-verify-true" class="arcade-btn arcade-success">
+                            <span class="btn-top">طلع صادق</span>
+                        </button>
+                        <button id="btn-verify-false" class="arcade-btn arcade-failed">
+                            <span class="btn-top">طلع كداب</span>
+                        </button>
+                    </div>
+
+                    <div id="round-end-actions-group" style="display:none;">
+
+                        <div class="round-popup">
+
+                            <div class="popup-icon">
+                                🏆
+                            </div>
+
+                            <h2>انتهت الجولة!</h2>
+
+                            <p>
+                                حابين تكملوا جولة كمان بنفس السكور
+                                ولا نعرض النتائج؟
+                            </p>
+
+                            <div class="popup-buttons">
+
+                                <button class="arcade-btn arcade-success" id="btn-next-round-actual">
+
+                                    <span class="btn-top">
+                                        جولة كمان
+                                    </span>
+
+                                </button>
+
+                                <button class="arcade-btn arcade-failed" id="btn-view-results-actual">
+
+                                    <span class="btn-top">
+                                        🏆 النتائج
+                                    </span>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="screen-results" class="game-screen hidden results-screen-context">
+            <h2 class="podium-title">منصة التتويج 🏆</h2>
+
+            <div id="podium-top3-dock" class="podium-top3-container">
+            </div>
+
+            <div id="results-runners-list" class="results-runners-wrapper">
+            </div>
+
+            <div class="results-actions-wrapper">
+                <button id="btn-restart-same" class="results-btn-cyber btn-matte-gold"
+                    onclick=" playGameSound(new Audio('./sounds/click.mp3'))">
+                    <span class="btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                            viewBox="0 0 1200 1200">
+                            <path d="M0 0h1200v1200H0z" fill="none" />
+                            <path fill="currentColor"
+                                d="M600 0C308.74 0 66.009 207.555 11.499 482.812h166.553C229.37 297.756 398.603 161.719 600 161.719c121.069 0 230.474 49.195 309.668 128.613l-192.48 192.48H1200V0l-175.781 175.781C915.653 67.181 765.698 0 600 0M0 717.188V1200l175.781-175.781C284.346 1132.819 434.302 1200 600 1200c291.26 0 533.991-207.555 588.501-482.812h-166.553C970.631 902.243 801.396 1038.281 600 1038.281c-121.069 0-230.474-49.195-309.668-128.613l192.48-192.48z" />
+                        </svg>
+                    </span>
+                    <span class="btn-text">إعادة باللاعبين</span>
+                </button>
+                <button id="btn-exit-game" class="results-btn-cyber btn-matte-crimson "
+                    onclick="playGameSound(new Audio('./sounds/click.mp3'))">
+                    <span class="btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                            viewBox="0 0 32 32">
+                            <path d="M0 0h32v32H0z" fill="none" />
+                            <g fill="none">
+                                <path fill="#E19747"
+                                    d="M8 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z" />
+                                <path fill="#D3883E"
+                                    d="M10 5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H11a1 1 0 0 1-1-1zm0 12a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H11a1 1 0 0 1-1-1zm1 6a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z" />
+                                <path fill="#F9C23C" d="M23.25 14.5a1 1 0 1 1-2 0a1 1 0 0 1 2 0" />
+                            </g>
+                        </svg>
+                    </span>
+                    <span class="btn-text">الرئيسية</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="objection-modal" class="modal-layer-context hidden">
+            <div class="modal-card-body objection-modal-card">
+                <h3 class="modal-card-title">في حد اتكلم غيرنا؟</h3>
+                <p style="color: #aaa; text-align: center; font-size: 0.9rem; margin-top: -5px; margin-bottom: 15px;">
+                    اختار المستمع اللي اتكلم :</p>
+
+                <div id="listeners-list-container" class="listeners-scroll-grid"></div>
+
+                <button id="btn-expel-player" class="expel-action-btn"
+                    onclick="playGameSound(new Audio('./sounds/remove.mp3'))" disabled>طرد اللاعب 🚷</button>
+            </div>
+        </div>
+        <div id="confrontation-modal" class="modal-layer-context hidden">
+            <div class="modal-card-body glass-modal">
+                <h2 class="modal-card-title" style="color: #ffcc00;">🚨 مين اللي قفشك?</h2>
+                <p class="modal-card-desc">اختار اللاعب اللي رفع إيده وقال أنا قفشته عشان نستجوبه:</p>
+
+                <div id="confrontation-listeners-container" class="modal-listeners-list-wrapper"></div>
+
+                <div class="modal-actions-wrapper">
+                    <button id="btn-cancel-confrontation" onclick="playGameSound(new Audio('./sounds/click.mp3'))">إلغاء
+                        وتراجع</button>
+
+                    <button id="btn-confirm-confrontation-player"
+                        onclick="playGameSound(new Audio('./sounds/click.mp3'))" disabled>
+                        التالي 👈
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="custom-confirm-modal" class="modal-layer-context hidden">
+            <div class="modal-card-body glass-modal text-center">
+                <h2 class="modal-card-title" style="color: #ff0000; margin-bottom: 5%;">اقف ثواني! <svg
+                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32">
+                        <path d="M0 0h32v32H0z" fill="none" />
+                        <g fill="none">
+                            <path fill="#D3D3D3"
+                                d="M11.74 2h8.52c.99 0 1.93.39 2.63 1.09l6.02 6.02c.7.7 1.09 1.64 1.09 2.63v8.52c0 .99-.39 1.93-1.09 2.63l-6.02 6.02c-.7.7-1.64 1.09-2.63 1.09h-8.52c-.99 0-1.93-.39-2.63-1.09l-6.02-6.02c-.7-.7-1.09-1.64-1.09-2.63v-8.52c0-.99.39-1.93 1.09-2.63l6.02-6.02c.7-.7 1.64-1.09 2.63-1.09" />
+                            <path fill="#F8312F"
+                                d="M12.57 4h6.86c.99 0 1.93.39 2.63 1.09l4.85 4.85c.7.7 1.09 1.64 1.09 2.63v6.86c0 .99-.39 1.93-1.09 2.63l-4.85 4.85c-.7.7-1.64 1.09-2.63 1.09h-6.86c-.99 0-1.93-.39-2.63-1.09l-4.85-4.85c-.7-.7-1.09-1.64-1.09-2.63v-6.86c0-.99.39-1.93 1.09-2.63l4.85-4.85c.7-.7 1.64-1.09 2.63-1.09" />
+                        </g>
+                    </svg>
+                </h2>
+                <p class="modal-card-desc" style="color: #e0e0e0; font-size: 1.1rem; margin-bottom: 25px;">
+                    متاكد عايز تخرج برا الجيم؟<br>
+                </p>
+                <div class="vote-buttons-group" style="display: flex; gap: 15px; justify-content: center;">
+                    <button id="btn-confirm-yes" class="vote-action-btn vote-danger" style="flex: 1; font-weight: 800;"
+                        onclick="playGameSound(new Audio('./sounds/click.mp3'))">
+                        آه، اخرج</button>
+                    <button id="btn-confirm-no" class="vote-action-btn vote-success" style="flex: 1; font-weight: 800;"
+                        onclick="playGameSound(new Audio('./sounds/click.mp3'))">
+                        لا، كمل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-countdown" class="hidden-countdown">
+        <div class="countdown-wrapper">
+            <div id="countdown-number">3</div>
+        </div>
+    </div>
+    <div id="chaos-overlay" class="chaos-overlay hidden-element">
+        <div id="chaos-mode-box" class="chaos-box">
+            <div class="chaos-header">! أمر من السيستيم !</div>
+            <div id="chaos-order-text" class="chaos-text">جاري تجهيز أمر تدميري...</div>
+            <div class="chaos-footer"><span id="chaos-order-timer">0</span> ثانية</div>
+        </div>
+    </div>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const fullscreenOverlay = document.getElementById("fullscreen-overlay");
+            const startBtn = document.getElementById("start-fullscreen-btn");
+
+            if (startBtn && fullscreenOverlay) {
+                startBtn.addEventListener("click", () => {
+                    // 1. استدعاء دالة ملء الشاشة المتوافقة مع كل المتصفحات
+                    enterFullScreen();
+
+                    // 2. إخفاء الشاشة الترحيبية والزرار تماماً بسلاسة
+                    fullscreenOverlay.classList.add("hidden");
+                });
+            }
+        });
+
+        // دالة ملء الشاشة الاحترافية
+        function enterFullScreen() {
+            const docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            } else if (docElm.mozRequestFullScreen) { /* Firefox */
+                docElm.mozRequestFullScreen();
+            } else if (docElm.webkitRequestFullScreen) { /* Safari & Chrome iOS/Mac */
+                docElm.webkitRequestFullScreen();
+            } else if (docElm.msRequestFullscreen) { /* IE/Edge */
+                docElm.msRequestFullscreen();
+            }
+        }
+    </script>
+    <script>
+        if (window.cordova || window.location.protocol === 'file:') {
+            document.write('<script src="cordova.js"><\/script>');
+        }
+    </script>
+    <script src="./js/theme-switcher.js"></script>
+    <script src="./js/index.js"></script>
+    <!-- <script src="cordova.js"></script> -->
+</body>
+
+</html>

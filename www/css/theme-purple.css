@@ -1,0 +1,814 @@
+/* ==========================================================================
+🎨 MASTER THEME VARIABLES - لعبة الاستخبوص
+   نظام الألوان الموحد - ثيم Deep Purple 🔮🌑💜
+========================================================================== */
+:root[data-theme="purple"] {
+  /* ========================================
+     🎨 PRIMITIVE COLORS (الألوان الخام)
+     ======================================== */
+
+  /* 🔴 Crimson Family (محفوظة لأزرار الخطر والخروج) */
+  --color-crimson-lightest: #ff2a5f;
+  --color-crimson-light: #cc2323;
+  --color-crimson: #990000;
+  --color-crimson-mid: #7d0c1a;
+  --color-crimson-dark: #4a0000;
+  --color-crimson-deep: #2c0000;
+
+  /* 🔴 Red Family (محفوظة لأزرار الطرد والفشل) */
+  --color-red-lightest: #ff453a;
+  --color-red-light: #ff5252;
+  --color-red: #ff4757;
+  --color-red-neon: #ff0055;
+  --color-red-bright: #b30000;
+  --color-red-deep: #cc0000;
+  --color-red-pure: #ff0000;
+
+  /* 🔮 Dark Purple Family (الثيم الرئيسي - بنفسجي غامق عميق) */
+  --color-deep-purple-lightest: #5A3D6B;
+  --color-deep-purple-lighter: #4D3360;
+  --color-deep-purple-light: #3D2850;
+  --color-deep-purple: #2D1F3E;
+  --color-deep-purple-mid: #231830;
+  --color-deep-purple-deep: #1A1225;
+  --color-deep-purple-darker: #120C1A;
+  --color-deep-purple-dark: #0A0710;
+  --color-deep-purple-darker-2: #060408;
+  --color-deep-purple-deepest: #030205;
+
+  /* 🟡 Gold Family (محفوظة للعناوين والتاج) */
+  --color-gold-lightest: #ffd700;
+  --color-gold-light: #f1c40f;
+  --color-gold: #d4af37;
+  --color-gold-mid: #d4ac0d;
+  --color-gold-dark: #907530;
+
+  /* 🟢 Green Family */
+  --color-green: #2ecc71;
+  --color-green-bright: #17a554;
+  --color-green-mid: #0f753d;
+  --color-green-dark: #053b1e;
+  --color-green-deep: #0c552a;
+
+  /* 🔵 Blue Family */
+  --color-blue: #3498db;
+  --color-blue-deep: #0066cc;
+  --color-blue-bright: #2196f3;
+
+  /* 🟣 Purple Family (الكلاسيكية) */
+  --color-purple: #9b59b6;
+  --color-purple-deep: #4a0066;
+  --color-purple-light: #bb6bd9;
+
+  /* 🟠 Orange/Yellow */
+  --color-orange: #e67e22;
+  --color-orange-light: #ffa500;
+  --color-yellow: #ffeb3b;
+
+  /* ⚪ White/Neutrals */
+  --color-white: #ffffff;
+  --color-white-soft: #f5f5f7;
+  --color-gray-100: #e2e8f0;
+  --color-gray-200: #e0e0e0;
+  --color-gray-300: #d1d1d1;
+  --color-gray-400: #cccccc;
+  --color-gray-500: #a0aec0;
+  --color-gray-600: #9a94a0;
+  --color-gray-700: #718096;
+  --color-gray-800: #4f4f4f;
+  --color-gray-900: #262626;
+
+  /* ⚫ Black/Neutrals */
+  --color-black: #000000;
+  --color-black-soft: #09060b;
+  --color-black-mid: #1a1a1a;
+  --color-black-deep: #090a10;
+  --color-black-rich: #0f111a;
+  --color-black-card: #120f17;
+  --color-black-panel: #1a1d29;
+  --color-black-glass: #11131c;
+  --color-black-step: #141622;
+
+  /* ========================================
+     🔮 DARK PURPLE OPACITY SCALE
+     ======================================== */
+  --color-deep-purple-02: rgba(45, 31, 62, 0.02);
+  --color-deep-purple-04: rgba(45, 31, 62, 0.04);
+  --color-deep-purple-05: rgba(45, 31, 62, 0.05);
+  --color-deep-purple-08: rgba(45, 31, 62, 0.08);
+  --color-deep-purple-10: rgba(45, 31, 62, 0.1);
+  --color-deep-purple-15: rgba(45, 31, 62, 0.15);
+  --color-deep-purple-18: rgba(45, 31, 62, 0.18);
+  --color-deep-purple-20: rgba(45, 31, 62, 0.2);
+  --color-deep-purple-25: rgba(45, 31, 62, 0.25);
+  --color-deep-purple-30: rgba(45, 31, 62, 0.3);
+  --color-deep-purple-35: rgba(45, 31, 62, 0.35);
+  --color-deep-purple-40: rgba(45, 31, 62, 0.4);
+  --color-deep-purple-45: rgba(45, 31, 62, 0.45);
+  --color-deep-purple-50: rgba(45, 31, 62, 0.5);
+  --color-deep-purple-55: rgba(45, 31, 62, 0.55);
+  --color-deep-purple-60: rgba(45, 31, 62, 0.6);
+  --color-deep-purple-70: rgba(45, 31, 62, 0.7);
+  --color-deep-purple-75: rgba(45, 31, 62, 0.75);
+  --color-deep-purple-80: rgba(45, 31, 62, 0.8);
+  --color-deep-purple-85: rgba(45, 31, 62, 0.85);
+  --color-deep-purple-90: rgba(45, 31, 62, 0.9);
+
+  /* ========================================
+     🎨 THEME IDENTITY
+     ======================================== */
+  --crimson: var(--color-deep-purple);
+  --crimson-glow: var(--color-deep-purple-50);
+  --gold: var(--color-gold);
+  --blue-minute: var(--color-deep-purple-deep);
+
+  /* ========================================
+     🎨 BACKGROUNDS
+     ======================================== */
+  --bg-dark: var(--color-black-soft);
+  --bg-gradient-overlay: var(--color-black-55);
+  --bg-gradient-overlay-dark: var(--color-black-18);
+  --lobby-gradient-overlay: var(--color-black-88);
+  --lobby-gradient-overlay-dark: rgba(5, 2, 10, 0.88);
+
+  /* ========================================
+     🎨 GLASS
+     ======================================== */
+  --glass-bg: var(--color-white-03);
+  --glass-border: var(--color-white-08);
+
+  /* ========================================
+     🎨 TEXT COLORS
+     ======================================== */
+  --text-white: var(--color-white);
+  --text-light: var(--color-white-soft);
+  --text-dim: var(--color-gray-600);
+  --text-muted-light: var(--color-white-75);
+  --text-light-gray: var(--color-gray-200);
+  --text-description: var(--color-gray-300);
+  --text-shadow-light: var(--color-white-30);
+  --text-badge-title: var(--color-gray-400);
+  --text-time-chip: var(--color-gray-500);
+
+  /* ========================================
+     🎨 WAVE BACKGROUND
+     ======================================== */
+  --wave-bg-purple: var(--color-deep-purple-deepest);
+
+  /* ========================================
+     🎨 ICON BUTTON
+     ======================================== */
+  --icon-btn-bg: rgba(78, 78, 78, 0.3);
+  --icon-btn-active-bg: var(--color-white-10);
+
+  /* ========================================
+     🎨 HIGHLIGHT TEXT
+     ======================================== */
+  --highlight-grad-start: var(--color-white);
+  --highlight-grad-mid: #5a3d6b;
+  --highlight-grad-end: #2d1f3e;
+  --highlight-drop-shadow: var(--color-black-80);
+
+  /* ========================================
+     🎨 ACTION BUTTON (Main) — Dark Purple
+     ======================================== */
+  --btn-action-grad-start: var(--color-deep-purple-mid);
+  --btn-action-grad-end: var(--color-deep-purple-dark);
+  --btn-action-border: var(--color-deep-purple-25);
+  --btn-shimmer: var(--color-deep-purple-40);
+  --btn-glow-pulse: var(--color-deep-purple-60);
+  --btn-shadow: var(--color-black-50);
+  --btn-glow: var(--color-deep-purple-20);
+  --btn-glow-strong: var(--color-deep-purple-45);
+  --btn-glow-inset: var(--color-deep-purple-15);
+
+  /* ========================================
+     🎨 SHADOWS
+     ======================================== */
+  --shadow-dark: var(--color-black-70);
+
+  /* ========================================
+     🎨 TOAST COLORS
+     ======================================== */
+  --toast-warning-bg: rgba(255, 165, 0, 0.95);
+  --toast-warning-bg-dark: rgba(40, 30, 5, 0.98);
+  --toast-warning-border: rgba(255, 193, 7, 0.5);
+  --toast-warning-glow: rgba(255, 165, 0, 0.25);
+
+  /* ========================================
+     🎨 MODAL COLORS
+     ======================================== */
+  --modal-overlay-bg: rgba(5, 2, 10, 0.85);
+  --modal-glass-bg: rgba(26, 26, 26, 0.65);
+  --modal-border: rgba(40, 40, 40, 0.53);
+  --modal-shadow: var(--color-black-90);
+  --modal-glow-crimson: var(--color-deep-purple-20);
+
+  /* ========================================
+     🎨 VOTE MODAL
+     ======================================== */
+  --vote-modal-overlay-bg: var(--color-black-70);
+
+  /* ========================================
+     🎨 CONFIRM MODAL
+     ======================================== */
+  --confirm-modal-border: var(--color-deep-purple-30);
+  --confirm-modal-shadow: var(--color-black-80);
+  --confirm-modal-glow: var(--color-deep-purple-15);
+
+  /* ========================================
+     🎨 OBJECTION MODAL
+     ======================================== */
+  --objection-modal-border: var(--color-deep-purple-40);
+  --objection-modal-glow: var(--color-deep-purple-10);
+  --objection-card-hover-bg: var(--color-deep-purple-04);
+  --objection-card-hover-border: var(--color-deep-purple-20);
+  --objection-avatar-selected-shadow: var(--color-deep-purple-40);
+
+  /* ========================================
+     🎨 TITLE COLORS
+     ======================================== */
+  --title-gold: var(--color-deep-purple-lightest);
+  --title-gold-shadow: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 SCROLLBAR
+     ======================================== */
+  --scrollbar-accent: var(--color-deep-purple-mid);
+
+  /* ========================================
+     🎨 CARD COLORS
+     ======================================== */
+  --card-bg-subtle: var(--color-white-03);
+  --card-border-subtle: var(--color-white-08);
+  --card-hover-bg: rgba(45, 31, 62, 0.08);
+  --card-hover-border: rgba(45, 31, 62, 0.4);
+  --card-selected-grad-start: rgba(26, 18, 37, 0.35);
+  --card-selected-grad-end: rgba(35, 24, 48, 0.15);
+  --card-selected-border: var(--color-deep-purple-lightest);
+  --card-selected-shadow: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 AVATAR
+     ======================================== */
+  --avatar-bg: var(--color-black-mid);
+  --avatar-border: var(--color-white-20);
+  --avatar-selected-shadow: var(--color-deep-purple-50);
+
+  /* ========================================
+     🎨 CANCEL BUTTON
+     ======================================== */
+  --btn-cancel-bg: var(--color-white-05);
+  --btn-cancel-border: var(--color-white-10);
+  --btn-cancel-text: var(--color-gray-500);
+  --btn-cancel-hover-bg: var(--color-deep-purple-15);
+  --btn-cancel-hover-border: var(--color-deep-purple-light);
+  --btn-cancel-hover-shadow: var(--color-deep-purple-25);
+
+  /* ========================================
+     🎨 CONFIRM BUTTON
+     ======================================== */
+  --btn-confirm-grad-start: var(--color-green-deep);
+  --btn-confirm-grad-end: rgba(8, 15, 12, 1);
+  --btn-confirm-border: var(--color-green-40);
+  --btn-confirm-shadow: var(--color-green-25);
+  --btn-confirm-hover-grad-start: rgb(18, 116, 59);
+  --btn-confirm-hover-grad-end: rgb(11, 23, 18);
+  --btn-confirm-hover-border: var(--color-green);
+  --btn-confirm-hover-shadow: var(--color-green-50);
+
+  /* ========================================
+     🎨 DANGER BUTTON 🔴 (محفوظ — زر خروج)
+     ======================================== */
+  --btn-danger-grad-start: var(--color-crimson-dark);
+  --btn-danger-grad-end: #8a0000;
+  --btn-danger-border: var(--color-red-bright);
+  --btn-danger-shadow: rgba(235, 12, 12, 0.3);
+
+  /* ========================================
+     🎨 SUCCESS BUTTON
+     ======================================== */
+  --btn-success-grad-start: var(--color-green-dark);
+  --btn-success-grad-end: var(--color-green-mid);
+  --btn-success-border: var(--color-green-bright);
+  --btn-success-shadow: rgba(23, 165, 84, 0.3);
+
+  /* ========================================
+     🎨 EXPEL BUTTON 🔴 (محفوظ — زر طرد)
+     ======================================== */
+  --btn-expel-grad-start: var(--color-crimson-light);
+  --btn-expel-grad-end: var(--color-crimson-dark);
+  --btn-expel-shadow: rgba(204, 35, 35, 0.3);
+  --btn-expel-disabled-bg: #3a383c;
+  --btn-expel-disabled-text: var(--color-gray-700);
+
+  /* ========================================
+     🎨 CLOSE BUTTON
+     ======================================== */
+  --btn-close-bg: var(--color-white-08);
+  --btn-close-border: var(--color-deep-purple-30);
+  --btn-close-active-bg: var(--color-deep-purple-15);
+  --btn-close-x-color: var(--color-deep-purple-light);
+  --btn-close-x-active: var(--color-deep-purple-lightest);
+
+  /* ========================================
+     🎨 BUTTON TEXT SHADOW
+     ======================================== */
+  --btn-text-shadow: var(--color-black-60);
+
+  /* ========================================
+     🎨 DISABLED BUTTON
+     ======================================== */
+  --btn-disabled-bg: var(--color-white-02);
+  --btn-disabled-border: var(--color-white-05);
+  --btn-disabled-text: var(--color-white-25);
+
+  /* ========================================
+     🎨 ROLE BOX
+     ======================================== */
+  --role-box-border: var(--color-white-15);
+  --role-listener-bg: rgba(45, 31, 62, 0.2);
+  --role-listener-border: rgba(45, 31, 62, 0.4);
+  --role-speaker-bg: rgba(244, 67, 54, 0.2);
+  --role-speaker-border: rgba(244, 67, 54, 0.4);
+
+  /* ========================================
+     🎨 LOBBY SPECIFIC
+     ======================================== */
+  --lobby-box-grad-start: rgba(134, 134, 134, 0.14);
+  --lobby-box-grad-end: rgba(64, 64, 64, 0.4);
+  --lobby-box-bg-overlay: rgba(120, 120, 120, 0.06);
+  --input-border: var(--color-white-20);
+  --input-focus-bg: var(--color-deep-purple-18);
+  --input-focus-border: var(--color-deep-purple-45);
+  --input-focus-shadow: var(--color-deep-purple-15);
+  --player-chip-bg: rgba(215, 215, 215, 0.14);
+  --player-chip-border: var(--color-white-12);
+  --player-chip-accent: var(--color-deep-purple-mid);
+  --player-avatar-bg: rgba(20, 20, 25, 0.8);
+  --btn-remove-color: var(--color-white-40);
+  --time-chip-active-grad-start: #05020a;
+  --time-chip-active-grad-end: #150a20;
+  --laser-glow-border: rgba(26, 18, 37, 0.6);
+  --laser-glow-shadow: rgba(26, 18, 37, 0.4);
+  --laser-glow-inset: rgba(26, 18, 37, 0.2);
+  --laser-glow-active-border: rgba(61, 40, 80, 0.9);
+  --laser-glow-active-shadow: rgba(61, 40, 80, 0.65);
+  --laser-glow-active-inset: rgba(61, 40, 80, 0.3);
+  --remove-swipe-bg: rgba(45, 31, 62, 0.2);
+  --lobby-start-btn-border: var(--color-deep-purple-30);
+  --lobby-start-btn-shadow: var(--color-deep-purple-25);
+  --btn-add-grad-start: var(--color-deep-purple-mid);
+  --btn-add-grad-end: var(--color-deep-purple-dark);
+  --btn-add-shadow: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 COURT SPECIFIC
+     ======================================== */
+  --countdown-screen-bg: var(--color-black);
+  --countdown-title-color: var(--color-white-40);
+  --countdown-number-shadow: var(--color-deep-purple-50);
+  --court-bg-grad-start: rgba(3, 2, 8, 0.94);
+  --court-bg-grad-end: rgba(6, 3, 12, 0.88);
+  --court-back-btn-color: var(--color-white-60);
+  --court-back-btn-shadow: var(--color-deep-purple-50);
+  --court-case-grad-start: rgba(10, 6, 15, 0.85);
+  --court-case-grad-end: rgba(5, 3, 8, 0.6);
+  --court-case-border: var(--color-gold-15);
+  --court-case-move-border: var(--color-deep-purple-35);
+  --speakers-badge-bg: var(--color-deep-purple-20);
+  --speakers-badge-border: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 COURT TIMER
+     ======================================== */
+  --timer-bg-circle: var(--color-white-03);
+  --timer-progress-stroke: var(--color-deep-purple-mid);
+  --timer-progress-shadow: rgba(35, 24, 48, 0.4);
+  --timer-chaos-stroke: var(--color-orange);
+  --timer-chaos-shadow: rgba(230, 126, 34, 0.55);
+  --timer-danger-shadow: rgba(125, 12, 26, 0.8);
+  --timer-danger-pulse-start: rgba(125, 12, 26, 0.6);
+  --timer-danger-pulse-end: rgba(125, 12, 26, 0.95);
+  --timer-urgent-start: rgba(204, 0, 0, 0.4);
+  --timer-urgent-end: rgba(204, 0, 0, 0.8);
+
+  /* ========================================
+     🎨 COURT OBJECTION BUTTON 🔮 (Dark Purple)
+     ======================================== */
+  --objection-btn-border: var(--color-deep-purple-40);
+  --objection-btn-grad-start: var(--color-deep-purple-dark);
+  --objection-btn-grad-end: var(--color-deep-purple-deepest);
+  --objection-btn-shadow: var(--color-deep-purple-30);
+  --objection-btn-active-start: var(--color-deep-purple-darker-2);
+  --objection-btn-active-end: var(--color-black-mid);
+
+  /* ========================================
+     🎨 CHAOS VOTE BUTTON 🔮 (Dark Purple)
+     ======================================== */
+  --chaos-vote-border: var(--color-deep-purple-40);
+  --chaos-vote-grad-start: var(--color-deep-purple-dark);
+  --chaos-vote-grad-end: var(--color-deep-purple-deepest);
+  --chaos-vote-shadow: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 VOTE PULSE ANIMATION
+     ======================================== */
+  --vote-pulse-shadow: rgba(26, 18, 37, 0.5);
+  --vote-pulse-glow: var(--color-deep-purple-20);
+  --vote-pulse-strong: var(--color-deep-purple-70);
+  --vote-pulse-border: var(--color-deep-purple-80);
+
+  /* ========================================
+     🎨 RESULTS SCREEN - PODIUM
+     ======================================== */
+  --podium-avatar-bg: var(--color-black-deep);
+  --podium-avatar-shadow: var(--color-black-50);
+  --crown-badge-shadow: var(--color-black-40);
+  --step-block-grad-start: var(--color-black-step);
+  --step-block-border: var(--color-white-05);
+  --rank-1-border: var(--color-gold-light-25);
+  --rank-2-border: rgba(192, 192, 192, 0.2);
+  --rank-3-border: rgba(205, 127, 50, 0.15);
+  --rank-number-color: var(--color-gray-500);
+
+  /* ========================================
+     🎨 RESULTS SCREEN - RUNNERS
+     ======================================== */
+  --runner-strip-border: var(--color-white-06);
+  --strip-avatar-border: var(--color-white-10);
+  --score-badge-bg: var(--color-black-panel);
+
+  /* ========================================
+     🎨 RESULTS SCREEN - EXPELLED 🔴 (محفوظ)
+     ======================================== */
+  --expelled-bg: var(--color-red-02);
+  --expelled-border: var(--color-red-20);
+  --expelled-name-color: var(--color-gray-700);
+  --expelled-score-bg: #2d3748;
+
+  /* ========================================
+     🎨 RESULTS SCREEN - ACTION BUTTONS
+     ======================================== */
+  --results-btn-text: var(--color-gray-100);
+  --results-btn-bg: rgba(15, 17, 26, 0.75);
+  --results-gold-btn-border: var(--color-gold-20);
+  --results-gold-btn-hover-bg: var(--color-gold-08);
+  --results-gold-btn-hover-border: var(--color-gold-60);
+  --results-gold-btn-hover-shadow: var(--color-gold-light-15);
+  --results-crimson-btn-border: rgba(255, 71, 87, 0.15);
+  --results-crimson-btn-hover-bg: rgba(255, 71, 87, 0.06);
+  --results-crimson-btn-hover-border: rgba(255, 71, 87, 0.5);
+  --btn-matte-gold-bg: var(--color-gold-dark);
+  --btn-matte-gold-text: var(--color-black-rich);
+  --btn-matte-gold-shadow: rgba(197, 168, 92, 0.2);
+  --btn-matte-crimson-bg: #541014;
+  --btn-matte-crimson-shadow: rgba(184, 50, 57, 0.2);
+
+  /* ========================================
+     🎨 ROLES SCREEN - EPIC GLOW (Dark Purple)
+     ======================================== */
+  --epic-glow-border: #0A0710;
+  --epic-glow-inset: var(--color-deep-purple-15);
+  --epic-glow-mid: var(--color-deep-purple-55);
+  --epic-glow-breath: var(--color-deep-purple-25);
+  --epic-glow-active-border: var(--color-deep-purple-lightest);
+  --revealed-glow: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 ROLES SCREEN - USER HIGHLIGHT
+     ======================================== */
+  --user-highlight-color: var(--color-yellow);
+  --user-highlight-shadow: rgba(255, 235, 59, 0.5);
+
+  /* ========================================
+     🎨 ROLES SCREEN - MINI ACTION BUTTON
+     ======================================== */
+  --btn-mini-grad-start: var(--color-gray-800);
+  --btn-mini-grad-end: var(--color-gray-900);
+  --btn-mini-shadow: var(--color-black-40);
+  --btn-mini-active-start: #1f1d21;
+  --btn-mini-active-end: #151417;
+
+  /* ========================================
+     🎨 ROLES SCREEN - CARD ELEMENTS
+     ======================================== */
+  --roles-card-bg: var(--color-black-card);
+  --roles-card-border: #181020;
+  --hidden-card-grad-start: #08050e;
+  --hidden-card-grad-end: #030206;
+  --hidden-card-border: #1a0a2a;
+
+  /* ========================================
+     🎨 ROLES SCREEN - BADGE 🔮 (Dark Purple)
+     ======================================== */
+  --roles-badge-shadow: var(--color-deep-purple-40);
+  --roles-badge-grad-start: var(--color-deep-purple-dark);
+  --roles-badge-grad-end: var(--color-deep-purple-deepest);
+  --roles-badge-border: var(--color-deep-purple-30);
+
+  /* ========================================
+     🎨 ROLES SCREEN - COVER CARD
+     ======================================== */
+  --cover-card-grad-start: #10081a;
+  --cover-card-grad-end: #08050e;
+  --roles-done-btn-border: var(--color-white-25);
+
+  /* ========================================
+     🎨 ROLES SCREEN - ANIMATIONS
+     ======================================== */
+  --pulse-glow-start: var(--color-deep-purple-40);
+  --pulse-glow-end: var(--color-deep-purple-80);
+
+  /* ========================================
+     🎨 SETTINGS SCREEN
+     ======================================== */
+  --settings-bg-grad-start: var(--color-black-90);
+  --settings-bg-grad-end: rgba(5, 2, 10, 0.92);
+  --option-item-border: var(--color-white-07);
+  --option-item-inset-shadow: var(--color-white-05);
+  --option-active-grad-end: var(--color-white-02);
+  --option-active-bg: rgba(20, 20, 20, 0.7);
+  --option-desc-color: var(--color-white-55);
+  --arrow-indicator-color: var(--color-white-40);
+
+  /* ========================================
+     🎨 SETTINGS - TOGGLE SWITCH
+     ======================================== */
+  --toggle-bg: var(--color-white-08);
+  --toggle-knob: var(--color-white-80);
+  --toggle-active-end: #2D1F3E;
+  --toggle-active-border: var(--color-deep-purple-30);
+  --toggle-active-glow: var(--color-deep-purple-45);
+
+  /* ========================================
+     🎨 SETTINGS - THEME PICKER
+     ======================================== */
+  --theme-dot-border: var(--color-white-25);
+  --theme-blue: var(--color-blue);
+  --theme-green: var(--color-green);
+  --theme-purple: var(--color-deep-purple);
+  --theme-gold: var(--color-gold-light);
+  --theme-crimson-glow: var(--color-deep-purple-75);
+  --theme-blue-glow: rgba(52, 152, 219, 0.75);
+  --theme-green-glow: var(--color-green-75);
+  --theme-purple-glow: rgba(45, 31, 62, 0.75);
+  --theme-gold-glow: rgba(241, 196, 15, 0.75);
+
+  /* ========================================
+     🎨 SETTINGS - MOOD BADGE
+     ======================================== */
+  --mood-badge-bg: var(--color-green-20);
+  --mood-badge-shadow: var(--color-green-30);
+
+  /* ========================================
+     🎨 SPECIALIST SCREEN
+     ======================================== */
+  --specialist-bg-grad-start: var(--color-black-80);
+  --specialist-bg-grad-end: rgba(5, 2, 10, 0.85);
+  --specialist-card-grad-start: rgba(8, 4, 12, 0.96);
+  --specialist-card-grad-end: rgba(4, 2, 6, 0.98);
+  --specialist-card-border: var(--color-deep-purple-15);
+  --specialist-card-glow: var(--color-deep-purple-08);
+  --alert-badge-bg: rgba(26, 18, 37, 0.15);
+  --alert-badge-border: rgba(26, 18, 37, 0.4);
+  --alert-badge-shadow: rgba(26, 18, 37, 0.25);
+  --badge-num-bg: rgba(26, 18, 37, 0.6);
+  --hint-text-color: #b0a4c0;
+  --specialist-input-bg: rgba(8, 5, 12, 0.7);
+  --specialist-input-border: rgba(26, 18, 37, 0.3);
+  --dynamic-input-border: var(--color-deep-purple-20);
+  --dynamic-input-focus-shadow: var(--color-deep-purple-25);
+  --glow-crimson-start: #0A0710;
+  --glow-crimson-end: #2D1F3E;
+  --glow-crimson-shadow: rgba(35, 24, 48, 0.4);
+  --glow-crimson-active-start: #030205;
+  --btn-start-game-end: #0d0815;
+  --specialist-disabled-bg: #120a1a;
+
+  /* ========================================
+     🎨 VOTE SCREEN - NEON GATE
+     ======================================== */
+  --neon-gate-border: var(--color-black-panel);
+  --gate-open-border: #2D1F3E;
+  --gate-closed-border: #0A0710;
+  --gate-open-glow: rgba(35, 24, 48, 0.3);
+  --master-scan-border: rgba(16, 8, 26, 1);
+  --master-scan-grad-start: var(--color-black-glass);
+  --finger-print-shadow: rgba(213, 213, 213, 0.6);
+  --pulse-eye-start: rgba(35, 24, 48, 0.5);
+  --pulse-eye-end: rgba(61, 40, 80, 0.9);
+
+  /* ========================================
+     🎨 VOTE SCREEN - ARCADE BUTTONS 🔴 (محفوظ للفشل/القبض)
+     ======================================== */
+  --arcade-caught-start: rgb(45, 48, 56);
+  --arcade-caught-end: rgb(18, 19, 23);
+  --arcade-caught-border: rgba(160, 174, 192, 0.3);
+  --arcade-success-border: var(--color-green-30);
+  --gray-glow-start: rgba(160, 174, 192, 0.15);
+  --gray-glow-end: rgba(160, 174, 192, 0.35);
+  --gray-glow-inset-start: rgba(160, 174, 192, 0.05);
+  --gray-glow-inset-end: rgba(160, 174, 192, 0.1);
+  --success-active-glow: var(--color-green-85);
+  --success-active-inset: var(--color-green-60);
+  --failed-active-glow: var(--color-red-85);
+  --failed-active-inset: var(--color-red-60);
+
+  /* ========================================
+     🎨 VOTE SCREEN - VOTE OPTIONS 🔴 (محفوظ للفشل)
+     ======================================== */
+  --success-option-bg: var(--color-green-15);
+  --success-option-bg-end: var(--color-green-05);
+  --success-option-border: var(--color-green-20);
+  --failed-option-bg: rgba(149, 165, 166, 0.15);
+  --failed-option-bg-end: rgba(149, 165, 166, 0.05);
+  --failed-option-border: rgba(149, 165, 166, 0.2);
+  --failed-option-small: #bdc3c7;
+  --caught-option-end: #200000;
+
+  /* ========================================
+     🎨 VOTE SCREEN - LISTENER CARDS
+     ======================================== */
+  --listener-card-bg: var(--color-white-04);
+  --listener-avatar-border: var(--color-white-15);
+  --listener-selected-bg: var(--color-deep-purple-10);
+  --listener-selected-border: var(--color-deep-purple-40);
+  --listener-selected-shadow: var(--color-deep-purple-15);
+  --dead-player-bg: rgba(40, 40, 40, 0.4);
+  --result-expelled-bg: var(--color-red-05);
+
+  /* ========================================
+     🎨 SETTINGS - THEME PICKER DOTS (ألوان ثابتة)
+     ======================================== */
+  --theme-dot-crimson-color: #cc2323;
+  --theme-dot-blue-color: var(--color-blue);
+  --theme-dot-green-color: var(--color-green);
+  --theme-dot-purple-color: var(--color-deep-purple);
+  --theme-dot-gold-color: var(--color-gold-light);
+}
+
+/* ==========================================================================
+🔧 Overrides & Fixes - Dark Purple 🔮🌑💜
+========================================================================== */
+
+/* 1️⃣ Chaos Vote Button */
+.chaos-vote-btn {
+  width: clamp(260px, 50%, 360px);
+  padding: clamp(10px, 2.5vh, 14px) 16px;
+  font-size: clamp(0.9rem, 2vh, 1.1rem);
+  border: 1px solid var(--chaos-vote-border);
+  border-radius: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--chaos-vote-grad-start), var(--chaos-vote-grad-end));
+  color: var(--text-white);
+  box-shadow: 0 6px 20px var(--chaos-vote-shadow);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 99 !important;
+  margin-bottom: 5px;
+  flex-shrink: 0;
+}
+
+/* 2️⃣ Objection Button (Override inline style) */
+#btn-objection.court-action-btn {
+  background: linear-gradient(135deg, var(--objection-btn-grad-start), var(--objection-btn-grad-end)) !important;
+  border: 1px solid var(--objection-btn-border) !important;
+  box-shadow: 0 4px 15px var(--objection-btn-shadow) !important;
+  cursor: pointer;
+}
+
+#btn-objection.court-action-btn:active {
+  background: linear-gradient(135deg, var(--objection-btn-active-start), var(--objection-btn-active-end)) !important;
+}
+
+/* 3️⃣ Roles Badge */
+.roles-screen-context .roles-badge-element.crimson {
+  background: linear-gradient(135deg, var(--roles-badge-grad-start), var(--roles-badge-grad-end));
+  border: 1px solid var(--roles-badge-border);
+  box-shadow: 0 4px 15px var(--roles-badge-shadow);
+}
+
+/* 4️⃣ Lobby Start Button */
+.lobby-screen-context .lobby-start-btn-trigger {
+  width: 100%;
+  padding: clamp(10px, 1.8vh, 14px) !important;
+  border: 1px solid var(--lobby-start-btn-border);
+  border-radius: 12px;
+  font-size: clamp(1rem, 4vw, 1.25rem) !important;
+  font-weight: 900;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--btn-action-grad-start), var(--btn-action-grad-end));
+  color: var(--text-white);
+  box-shadow: 0 6px 10px var(--lobby-start-btn-shadow);
+  box-sizing: border-box;
+  text-align: center;
+  white-space: nowrap;
+  transition: transform 0.1s ease, border-color 0.2s ease;
+}
+
+/* 5️⃣ Player Chip */
+.lobby-screen-context .player-chip {
+  padding: clamp(6px, 1.2vh, 10px) 12px !important;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--player-chip-bg);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  border: 1px solid var(--player-chip-border);
+  border-right: 4px solid var(--player-chip-accent);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+
+/* 6️⃣ Lobby Add Button */
+.lobby-screen-context .lobby-add-btn-trigger {
+  width: clamp(40px, 11vw, 46px) !important;
+  height: clamp(40px, 11vw, 46px) !important;
+  background: linear-gradient(135deg, var(--btn-add-grad-start), var(--btn-add-grad-end));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 15px var(--btn-add-shadow);
+  transition: transform 0.1s ease;
+}
+
+/* ==========================================================================
+🔴 Protected Buttons (خروج/دخول/طرد) - أحمر قرمزي
+========================================================================== */
+#btn-vote-no.expel-action-btn {
+  flex: 1 !important;
+  padding: 14px 20px !important;
+  border-radius: 12px !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  background: linear-gradient(135deg, var(--btn-danger-grad-start), var(--btn-danger-grad-end)) !important;
+  border: 2px solid var(--btn-danger-border) !important;
+  color: var(--text-white) !important;
+  text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+  box-shadow: 0 4px 15px var(--btn-danger-shadow) !important;
+}
+
+.arcade-failed {
+  background: linear-gradient(135deg, var(--btn-danger-grad-start), var(--btn-danger-grad-end));
+  border: 1px solid var(--btn-danger-border);
+  animation: 2.5s ease-in-out 0.2s infinite alternate none running redGlowPulse;
+}
+
+.btn-matte-crimson {
+  background: var(--btn-matte-crimson-bg);
+  color: var(--text-white);
+  box-shadow: 0 4px 15px var(--btn-matte-crimson-shadow);
+}
+
+.expel-action-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-white);
+  background: linear-gradient(135deg, var(--btn-expel-grad-start), var(--btn-expel-grad-end));
+  cursor: pointer;
+  box-shadow: 0 4px 15px var(--btn-expel-shadow);
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+/* Theme Picker Dots - ألوان ثابتة لكل ثيم */
+.color-crimson {
+    background: var(--theme-dot-crimson-color) !important;
+}
+
+.color-blue {
+    background: var(--theme-dot-blue-color) !important;
+}
+
+.color-green {
+    background: var(--theme-dot-green-color) !important;
+}
+
+.color-purple {
+    background: var(--theme-dot-purple-color) !important;
+}
+
+.color-gold {
+    background: var(--theme-dot-gold-color) !important;
+}

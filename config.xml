@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.example.myapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Moryanola</name>
+
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+<platform name="android">
+        <icon src="./www/img/logo3.png" />
+
+        <preference name="android-compileSdkVersion" value="36" />
+        <preference name="android-targetSdkVersion" value="35" />
+        <preference name="AndroidXEnabled" value="true" />
+        <preference name="GradlePluginAndroidXEnabled" value="true" />
+
+        <preference name="InAppBrowserStorageEnabled" value="true" />
+        <preference name="DefaultVolumeStream" value="music" />
+        <preference name="FontSize" value="100%" />
+        <preference name="DisallowOverscroll" value="true" />
+
+        <preference name="Fullscreen" value="true" />
+
+        <preference name="AndroidWindowLayoutInDisplayCutoutMode" value="always" />
+
+        <preference name="StatusBarOverlaysWebView" value="true" />
+        <preference name="StatusBarBackgroundColor" value="#00000000" />
+
+        <preference name="AndroidWindowSplashScreenBackground" value="#000000" /> 
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="./www/img/clear.png" />
+        <preference name="SplashScreen" value="screen" />
+        <preference name="SplashScreenDelay" value="500" /> 
+        <preference name="FadeSplashScreen" value="true" />
+        <preference name="FadeSplashScreenDuration" value="250" />
+        <preference name="AutoHideSplashScreen" value="true" /> 
+        <preference name="KeepRunning" value="true" />
+
+        <preference name="Orientation" value="portrait" />
+    </platform>
+</widget>

@@ -1,0 +1,186 @@
+/* ==========================================================================
+🗳️ VOTE CONFIRM MODAL (مودال تأكيد التصويت النهائي)
+========================================================================== */
+
+/* ==========================================================================
+🌑 MODAL OVERLAY (الطبقة الخلفية الشفافة)
+========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--vote-modal-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ==========================================================================
+🎴 MODAL CARD BODY (الكارت الرئيسي للمودال)
+========================================================================== */
+.modal-card-body.glass-modal {
+    width: clamp(290px, 87%, 420px) !important;
+    padding: clamp(15px, 4vh, 0px) !important;
+    font-size: clamp(0.95rem, 3.5vw, 1.2rem) !important;
+    border-radius: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    height: auto !important;
+}
+
+/* ==========================================================================
+🎴 VOTE CONFIRM MODAL CARD (الكارت الخاص بمودال التصويت)
+========================================================================== */
+.objection-modal-card {
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    border: 1px solid var(--objection-modal-border) !important;
+    box-shadow: 0 20px 50px var(--modal-shadow), 0 0 30px var(--objection-modal-glow);
+    padding: 25px 15px 15px 15px;
+    display: flex;
+    flex-direction: column;
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.hidden .objection-modal-card {
+    transform: scale(0.85) !important;
+}
+
+/* ==========================================================================
+❌ CLOSE X BUTTON (زرار الإغلاق)
+========================================================================== */
+.objection-close-x {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    background: none;
+    border: none;
+    color: var(--btn-close-x-color);
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: transform 0.2s;
+}
+
+.objection-close-x:active {
+    transform: scale(0.85);
+    color: var(--btn-close-x-active);
+}
+
+/* ==========================================================================
+📝 MODAL TEXT CONTENT (النصوص جوه المودال)
+========================================================================== */
+.game-description {
+    color: var(--text-description);
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+🗳️ VOTE BUTTONS GROUP (مجموعة أزرار التصويت)
+========================================================================== */
+.vote-buttons-group {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* ==========================================================================
+🟢 VOTE SUCCESS BUTTON (زرار "آه، يلا بينا!")
+========================================================================== */
+.vote-action-btn.vote-success {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, var(--btn-success-grad-start), var(--btn-success-grad-end)) !important;
+    border: 2px solid var(--btn-success-border) !important;
+    color: var(--text-white) !important;
+    text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+    box-shadow: 0 4px 15px var(--btn-success-shadow) !important;
+}
+
+/* ==========================================================================
+🔴 VOTE DANGER BUTTON (زرار "لا، لسه")
+========================================================================== */
+.vote-action-btn.vote-danger {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, var(--btn-danger-grad-start), var(--btn-danger-grad-end)) !important;
+    border: 2px solid var(--btn-danger-border) !important;
+    color: var(--text-white) !important;
+    text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+    box-shadow: 0 4px 15px var(--btn-danger-shadow) !important;
+}
+
+.vote-action-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* ==========================================================================
+🎬 MODAL ANIMATIONS
+========================================================================== */
+@keyframes cyberModalPop {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes objectionPopIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.objection-appear {
+    animation: objectionPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+

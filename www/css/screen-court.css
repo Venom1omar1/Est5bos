@@ -1,0 +1,780 @@
+/* ==========================================================================
+⚖️ COURT SCREEN CONTEXT (ساحة المحكمة السينمائية)
+========================================================================== */
+
+/* ==========================================================================
+🎬 CINEMATIC COUNTDOWN SCREEN (شاشة العد التنازلي قبل الجيم)
+========================================================================== */
+#screen-countdown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--countdown-screen-bg);
+    z-index: 9999 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.4s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#screen-countdown.show-countdown {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hidden-countdown {
+    display: none !important;
+}
+
+.countdown-wrapper {
+    text-align: center;
+}
+
+.countdown-title {
+    color: var(--countdown-title-color);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#countdown-number {
+    font-size: 6rem;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 30px var(--countdown-number-shadow);
+    font-family: monospace;
+    animation: zoomPulse 1s infinite ease-in-out;
+}
+
+/* ==========================================================================
+🌑 COURT BACKGROUND CHANGE (تغيير الخلفية للمحكمة)
+========================================================================== */
+.app-container:has(#screen-court:not(.hidden)) {
+    background-image: linear-gradient(to bottom, var(--court-bg-grad-start), var(--court-bg-grad-end)), url(../img/bbg.png) !important;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* ==========================================================================
+📦 COURT MAIN CONTAINER (الحاوية الأم)
+========================================================================== */
+.court-screen-context {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+📤 COURT BACK BOX CONTAINER (المربع الجانبي للسحب)
+========================================================================== */
+.court-back-box-container {
+    position: fixed;
+    top: 25px;
+    left: 0;
+    width: 75px;
+    height: 60px;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--glass-border);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    z-index: 100;
+    transform: translate3d(-50px, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease;
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.court-back-box-container:active {
+    cursor: grabbing;
+}
+
+.court-back-box-container.loaded {
+    opacity: 1;
+}
+
+.court-back-box-container.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+}
+
+.court-back-btn-element {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.court-back-box-container.open .court-back-btn-element {
+    pointer-events: auto;
+}
+
+.court-back-btn-element svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.court-back-box-container.open svg {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+🎯 COURT HEADER (الهيدر)
+========================================================================== */
+.court-screen-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    min-height: 40px;
+    flex-shrink: 0;
+}
+
+.court-screen-context .court-back-btn {
+    position: relative;
+    top: 20px;
+    right: 0px;
+    background: none;
+    border: none;
+    color: var(--court-back-btn-color);
+    font-size: 2.2rem;
+    font-family: sans-serif;
+    cursor: pointer;
+    z-index: 10;
+    line-height: 1;
+    padding: 5px 10px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.court-screen-context .court-back-btn:active {
+    transform: scale(0.88);
+    color: var(--crimson);
+    text-shadow: 0 0 8px var(--court-back-btn-shadow);
+}
+
+/* ==========================================================================
+📦 COURT BODY (شريط المنتصف الديناميكي)
+========================================================================== */
+.court-screen-body {
+    width: 100%;
+    max-width: 380px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    min-height: 0;
+    padding: 4px 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    transform: translateY(-3vh);
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+📜 COURT CASE CONTAINER (كارت القضية الجنائية)
+========================================================================== */
+.court-screen-context .court-case-container {
+    position: relative;
+    width: 96%;
+    background: linear-gradient(145deg, var(--court-case-grad-start), var(--court-case-grad-end));
+    border: 1px solid var(--court-case-border);
+    border-radius: 20px;
+    padding: clamp(14px, 3vh, 20px) 16px;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 10px 24px var(--modal-shadow);
+    flex-shrink: 1;
+    max-height: 32vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.4s;
+}
+
+.court-screen-context .court-case-container.move-up {
+    transform: scale(0.98);
+    border-color: var(--court-case-move-border);
+}
+
+.court-screen-context .court-case-container h3 {
+    color: var(--gold);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 8px 0;
+    opacity: 0.85;
+}
+
+.court-screen-context .court-case-text-content {
+    font-size: clamp(0.85rem, 2.2vh, 1.15rem);
+    line-height: 1.3;
+    font-weight: 800;
+    color: var(--text-white);
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+.court-screen-context .court-case-text-content::after {
+    content: '|';
+    animation: blinkCursor 0.8s infinite;
+    color: var(--gold);
+    margin-right: 4px;
+}
+
+.court-screen-context .court-case-text-content.typing-done::after {
+    display: none;
+}
+
+.court-screen-context .court-speakers-badge {
+    margin-top: 10px;
+    font-size: clamp(0.75rem, 1.8vh, 0.85rem);
+    font-weight: 600;
+    color: var(--text-light);
+    background: var(--speakers-badge-bg);
+    border: 1px solid var(--speakers-badge-border);
+    padding: 6px 14px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 90%;
+    transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+🕒 THE CINEMATIC COURT TIMER (التايمر السينمائي الفخم)
+========================================================================== */
+.court-timer-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 1;
+    width: clamp(130px, 26vh, 180px);
+    height: clamp(130px, 26vh, 180px);
+    margin: 5px auto;
+    padding: 0;
+    box-shadow: none !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.court-timer-section.hidden-element {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+}
+
+.timer-circle-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+}
+
+.timer-particles-holder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none !important;
+    z-index: 1;
+    overflow: visible;
+}
+
+.time-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    animation: particleOutwardFloat var(--p-duration, 1s) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.timer-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.timer-bg-circle {
+    fill: none;
+    stroke: var(--timer-bg-circle);
+    stroke-width: 4;
+}
+
+.timer-progress-circle {
+    fill: none;
+    stroke: #d4ac0d;
+    filter: drop-shadow(0 0 2px rgba(212, 172, 13, 0.4));
+    stroke-width: 5px;
+    stroke-linecap: round;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease;
+}
+
+.timer-progress-circle.chaos-mode {
+    stroke: #e67e22 !important;
+    filter: drop-shadow(0 0 2px rgba(230, 126, 34, 0.55)) !important;
+}
+
+.timer-progress-circle.danger {
+    stroke: #7d0c1a !important;
+    filter: drop-shadow(0 0 2px rgba(125, 12, 26, 0.8)) !important;
+    animation: dangerPulseGlow 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.court-timer-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(1.8rem, 5vh, 2.2rem);
+    font-weight: 800;
+    font-family: monospace !important;
+    color: var(--text-white);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+🛑 OBJECTION BUTTON (زرار الاعتراض السينمائي)
+========================================================================== */
+.court-screen-context #btn-objection {
+    width: clamp(260px, 92%, 360px);
+    padding: clamp(10px, 2.5vh, 14px) 16px;
+    font-size: clamp(0.9rem, 2vh, 1.1rem);
+    border: 1px solid var(--objection-btn-border);
+    border-radius: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--objection-btn-grad-start), var(--objection-btn-grad-end));
+    color: var(--text-white);
+    box-shadow: 0 6px 20px var(--objection-btn-shadow);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 99 !important;
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+.court-screen-context #btn-objection:active:not(:disabled) {
+    transform: scale(0.96);
+    background: linear-gradient(135deg, var(--objection-btn-active-start), var(--objection-btn-active-end));
+}
+
+/* ==========================================================================
+📢 CHAOS VOTE BUTTON (زرار إنهاء الجلسة والتصويت السريع)
+========================================================================== */
+/* .chaos-vote-btn {
+    width: clamp(260px, 50%, 360px);
+    padding: clamp(10px, 2.5vh, 14px) 16px;
+    font-size: clamp(0.9rem, 2vh, 1.1rem);
+    border: 1px solid var(--chaos-vote-border);
+    border-radius: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--chaos-vote-grad-start), var(--chaos-vote-grad-end));
+    color: var(--text-white);
+    box-shadow: 0 6px 20px var(--chaos-vote-shadow);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 99 !important;
+    margin-bottom: 5px;
+    flex-shrink: 0;
+} */
+
+/* ==========================================================================
+🗳️ EXPEL ACTION BUTTONS (أزرار التصويت السريع)
+========================================================================== */
+/* #btn-vote-no.expel-action-btn {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, var(--btn-danger-grad-start), var(--btn-danger-grad-end)) !important;
+    border: 2px solid var(--btn-danger-border) !important;
+    color: var(--text-white) !important;
+    text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+    box-shadow: 0 4px 15px var(--btn-danger-shadow) !important;
+} */
+
+#btn-vote-yes.expel-action-btn {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, var(--btn-success-grad-start), var(--btn-success-grad-end)) !important;
+    border: 2px solid var(--btn-success-border) !important;
+    color: var(--text-white) !important;
+    text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+    box-shadow: 0 4px 15px var(--btn-success-shadow) !important;
+}
+
+/* ==========================================================================
+🎬 COURT KEYFRAMES
+========================================================================== */
+@keyframes zoomPulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    20% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    80% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes blinkCursor {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes particleOutwardFloat {
+    0% {
+        transform: translate(var(--p-start-x), var(--p-start-y)) scale(1);
+        opacity: 0.9;
+        box-shadow: 0 0 3px var(--p-color);
+    }
+
+    100% {
+        transform: translate(var(--p-end-x), var(--p-end-y)) scale(0.1);
+        opacity: 0;
+    }
+}
+
+@keyframes dangerPulseGlow {
+    0% {
+        filter: drop-shadow(0 0 2px var(--timer-danger-pulse-start));
+        stroke-width: 5px;
+    }
+
+    100% {
+        filter: drop-shadow(0 0 4px var(--timer-danger-pulse-end));
+        stroke-width: 5.8px;
+    }
+}
+
+@keyframes objectionPopIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes voteButtonPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 6px 20px var(--objection-btn-shadow), 0 0 12px var(--vote-pulse-glow);
+        border-color: var(--objection-btn-border);
+    }
+
+    100% {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px var(--vote-pulse-shadow), 0 0 22px var(--vote-pulse-strong), inset 0 0 8px rgba(255, 255, 255, 0.1);
+        border-color: var(--vote-pulse-border);
+    }
+}
+
+@keyframes timerUrgentPulse {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px var(--timer-urgent-start));
+    }
+
+    100% {
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 12px var(--timer-urgent-end));
+    }
+}
+
+.objection-appear {
+    animation: objectionPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.hidden-element {
+    display: none !important;
+}
+
+/* الكلاس اللي هيتحط على الـ body يخلي الشاشة كلها تولع فلاش أحمر */
+.chaos-alert-active {
+    animation: redSirenFlash 1s infinite alternate;
+}
+
+@keyframes redSirenFlash {
+    0% {
+        background-color: initial;
+    }
+
+    100% {
+        background-color: rgba(125, 12, 26, 0.4) !important;
+    }
+
+    /* أحمر غامق شفاف عشان الـ UI يبان */
+}
+
+
+
+/* ===========================
+   CHAOS OVERLAY
+=========================== */
+/* الأنميشن اللي هيخلي شاشة اللعبة تختفي بسلاسة */
+.app-container {
+    transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+/* الكلاس اللي هيقفل النور على اللعبة كلها */
+.app-container.chaos-dark-mode {
+    opacity: 0 !important;          /* اللعبة تختفي تماماً ورا */
+    filter: blur(20px);             /* زيادة أمان وغبش */
+    pointer-events: none;           /* نمنع اللعيبة تدوس على أي زرار ورا الكارت بالغلَط */
+}
+
+.chaos-overlay {
+    backdrop-filter: blur(8px);
+    background: #00000059;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    animation: chaosFade .25s ease forwards;
+}
+
+@keyframes chaosFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ===========================
+   THE NEON BOX
+=========================== */
+.chaos-box {
+    position: relative;
+    /* العرض مرن جداً وبيريح على أي شاشة */
+    width: min(85%, 440px);
+
+    /* الـ Padding والـ Border Radius بقوا مطاطيين بالـ clamp */
+    padding: clamp(20px, 5vw, 40px) clamp(16px, 4vw, 32px);
+    border-radius: clamp(16px, 3vw, 28px);
+
+    background: linear-gradient(145deg, #130205, #080102);
+    /* تغيير اللون الأحمر النيون الناري */
+    border: 2px solid #ff003c;
+    overflow: hidden;
+
+    box-shadow:
+        0 0 clamp(15px, 4vw, 35px) rgba(255, 0, 60, 0.25),
+        0 20px 50px rgba(0, 0, 0, 0.9);
+
+    animation: chaosAppear .3s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes chaosAppear {
+    0% {
+        transform: scale(.8) translateY(10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* الخط المتوهج اللي فوق بقا نيون أحمر تدميري */
+.chaos-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #ff003c, #ff5500, #ff003c);
+    box-shadow: 0 2px 15px #ff003c;
+}
+
+/* ===========================
+   HEADER (⚠️ وضع الفوضى!)
+=========================== */
+.chaos-header {
+    text-align: center;
+    color: #ff003c;
+    /* الـ Font Size بيكبر ويصغر ذكياً حسب الشاشة */
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 900;
+    margin-bottom: clamp(16px, 4vw, 26px);
+    text-shadow: 0 0 12px rgba(255, 0, 60, 0.6);
+    letter-spacing: 1px;
+}
+
+/* ===========================
+   THE ORDER TEXT CONTAINER
+=========================== */
+.chaos-text {
+    text-align: center;
+    font-size: clamp(18px, 4.5vw, 24px);
+    font-weight: 700;
+    line-height: 1.6;
+    color: #ffffff;
+    padding: clamp(14px, 3vw, 22px);
+    border-radius: 14px;
+    background: rgba(255, 0, 60, 0.04);
+    border: 1px solid rgba(255, 0, 60, 0.15);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    
+    /* 🎯 السحر كله هنا عشان النص ميهربش */
+    min-height: 100px;
+    max-height: 250px;       /* 1️⃣ سقف للبوكس عشان ميكبرش لحد آخر الشاشة */
+    overflow-y: auto;        /* 2️⃣ لو الكلام كتر أوي عن السقف، يظهر سكرول داخلي ناعم */
+    overflow-wrap: break-word;/* 3️⃣ بيكسر الكلمة غصب عنها لو طويلة ومفيهاش مسافات */
+    word-break: break-word;  /* أمان إضافي للمتصفحات القديمة */
+}
+
+/* ===========================
+   FOOTER & TIMER
+=========================== */
+.chaos-footer {
+    margin-top: clamp(18px, 4vw, 26px);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: clamp(13px, 3.5vw, 16px);
+}
+
+#chaos-order-timer {
+    display: inline-block;
+    min-width: 45px;
+    color: #ff5500;
+    /* التايمر لونه برتقالي ناري عشان يشد العين */
+    font-size: clamp(28px, 8vw, 38px);
+    font-weight: 900;
+    text-shadow: 0 0 15px rgba(2ff, 85, 0, 0.6);
+    margin: 0 4px;
+}
+
+/* ===========================
+   UTILITIES & CONTROLS
+=========================== */
+.hidden-element {
+    display: none !important;
+}
+
+.chaos-settings-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#chaos-events-count {
+    width: 65px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 0, 60, 0.3);
+    background: rgba(20, 5, 5, 0.8);
+    color: #fff;
+    text-align: center;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#chaos-events-count:focus {
+    border-color: #ff003c;
+    box-shadow: 0 0 8px rgba(255, 0, 60, 0.4);
+}
+
+#chaos-events-count option {
+    background: #0d0d0d;
+    color: #fff;
+}

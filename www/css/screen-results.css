@@ -1,0 +1,671 @@
+/* ==========================================================================
+   🎮 VARIABLES & AAA GAMING PALETTE (UNIVERSAL RESPONSIVE ENGINE)
+   ========================================================================== */
+:root {
+    --gold-primary: #ffd700;
+    --gold-glow: rgba(255, 215, 0, 0.6);
+    --gold-gradient: linear-gradient(135deg, #ffe066 0%, #f5b041 50%, #9a7d0a 100%);
+
+    --silver-primary: #e5e8e8;
+    --silver-glow: rgba(229, 232, 232, 0.4);
+    --silver-gradient: linear-gradient(135deg, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%);
+
+    --bronze-primary: #dc7633;
+    --bronze-glow: rgba(220, 118, 51, 0.4);
+    --bronze-gradient: linear-gradient(135deg, #f5b041 0%, #dc7633 50%, #873a5c 100%);
+
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+
+    /* تصميم الـ Pop-up المكسور في الصور */
+    --popup-border-glow: linear-gradient(135deg, #ff4757, #b71c1c);
+}
+
+/* ==========================================================================
+🌌 MAIN CONTAINER & FLOATING PARTICLES BACKGROUND
+========================================================================== */
+.results-screen-context {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(15px, 3.5vh, 25px);
+    padding: clamp(20px, 5vh, 40px) clamp(12px, 4vw, 20px);
+    box-sizing: border-box;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a1c29 0%, #0e1017 100%);
+}
+
+/* 🎯 التعديل الجوهري: نقل جزيئات النجوم الطائرة لتفرش على الـ app-container بالكامل */
+/* التأثير هيشتغل فقط لما شاشة النتائج تظهر وتتشال منها الـ .hidden */
+.app-container:has(#screen-results:not(.hidden))::before,
+.app-container:has(#screen-results:not(.hidden))::after {
+    content: '';
+    position: fixed; /* fixed عشان يغطي الشاشة كلها حتى لو فيه سكرول */
+    width: 100vw; /* مالية العرض بالكامل */
+    height: 100vh; /* مالية الطول بالكامل */
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1; /* ورا زحمة الواجهة والنصوص */
+}
+
+.app-container:has(#screen-results:not(.hidden))::before {
+    background-image: radial-gradient(circle, rgba(255, 215, 0, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+    animation: sparkleFloat 14s linear infinite;
+}
+
+.app-container:has(#screen-results:not(.hidden))::after {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1.5px, transparent 1.5px);
+    background-size: 40px 40px;
+    animation: sparkleFloat 9s linear infinite reverse;
+}
+
+.podium-title {
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.6);
+    /* 🎯 رفعنا الـ z-index للعنوان والواجهة عشان يطفوا فوق النجوم وميتحجبوش */
+    z-index: 2; 
+    margin: 0;
+    text-align: center;
+    animation: winnerFloat 3s ease-in-out infinite alternate;
+}
+
+/* ==========================================================================
+   🏆 3D PODIUM DOCK & STAGGERED ENTRANCE
+   ========================================================================== */
+.podium-top3-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(6px, 2vw, 14px);
+    width: 100%;
+    margin: 0;
+    z-index: 2;
+    perspective: 1000px;
+}
+
+.podium-rank-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 31%;
+    position: relative;
+    opacity: 0;
+}
+
+.podium-rank-card.rank-3 {
+    order: 3;
+    animation: podiumRise 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+}
+
+.podium-rank-card.rank-2 {
+    order: 1;
+    animation: podiumRise 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+    animation-delay: 150ms;
+}
+
+.podium-rank-card.rank-1 {
+    order: 2;
+    width: 36%;
+    z-index: 10;
+    animation: championDrop 0.65s cubic-bezier(0.25, 1.25, 0.5, 1.3) forwards;
+    animation-delay: 300ms;
+}
+
+/* ==========================================================================
+   🎭 AVATAR MECHANICS, HALO & CROWN FLOATING
+   ========================================================================== */
+.podium-avatar-wrapper {
+    position: relative;
+    width: clamp(46px, 12vw, 68px);
+    height: clamp(46px, 12vw, 68px);
+    border-radius: 50%;
+    padding: 2px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    margin-bottom: clamp(4px, 1vh, 8px);
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+}
+
+.rank-3 .podium-avatar-wrapper {
+    animation: avatarReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 450ms;
+}
+
+.rank-2 .podium-avatar-wrapper {
+    animation: avatarReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 600ms;
+}
+
+.rank-1 .podium-avatar-wrapper {
+    animation: avatarReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 950ms;
+}
+
+.podium-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+}
+
+.podium-rank-card.rank-1 .podium-avatar-wrapper {
+    width: clamp(68px, 17vw, 88px);
+    height: clamp(68px, 17vw, 88px);
+    border: 2.5px solid var(--gold-primary);
+    box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.podium-rank-card.rank-1 .podium-avatar-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    border: 2px dashed var(--gold-primary);
+    z-index: -1;
+    animation: haloPulse 2s linear infinite;
+}
+
+.podium-crown-badge {
+    position: absolute;
+    top: clamp(-18px, -2.5vh, -14px);
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    filter: drop-shadow(0 4px 8px var(--gold-glow));
+    z-index: 12;
+    animation: crownBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards,
+        winnerFloat 2.5s ease-in-out infinite alternate;
+    animation-delay: 1.2s, 1.8s;
+}
+
+/* ==========================================================================
+   🧱 PREMIUM 3D STEP BLOCKS & SHINE SWEEP
+   ========================================================================== */
+.podium-step-block {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(6px, 1.2vh, 12px) 4px;
+    box-sizing: border-box;
+    border-radius: 14px 14px 10px 10px;
+    box-shadow: 0 12px 28px var(--glass-shadow);
+    overflow: hidden;
+}
+
+.podium-rank-card.rank-1 .podium-step-block {
+    height: clamp(80px, 13vh, 115px);
+    background: linear-gradient(180deg, #2d2510 0%, #171308 100%);
+    border: 2px solid var(--gold-primary);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.2), 0 12px 25px rgba(0, 0, 0, 0.6);
+    animation: podiumBreath 4s ease-in-out infinite alternate;
+}
+
+.podium-rank-card.rank-1 .podium-step-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.35), transparent);
+    transform: skewX(-25deg);
+    animation: shineSweep 3.8s ease-in-out infinite;
+    animation-delay: 2s;
+}
+
+.podium-rank-card.rank-2 .podium-step-block {
+    height: clamp(65px, 10vh, 90px);
+    background: linear-gradient(180deg, #23272a 0%, #121416 100%);
+    border: 1.5px solid var(--silver-primary);
+}
+
+.podium-rank-card.rank-3 .podium-step-block {
+    height: clamp(52px, 8vh, 75px);
+    background: linear-gradient(180deg, #2c1911 0%, #140b07 100%);
+    border: 1.5px solid var(--bronze-primary);
+}
+
+/* ==========================================================================
+   🔢 TEXT TYPOGRAPHY (3D NUMBERS & BADGES)
+   ========================================================================== */
+.podium-number {
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    font-weight: 900;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.rank-1 .podium-number {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+
+.rank-2 .podium-number {
+    background: var(--silver-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+
+.rank-3 .podium-number {
+    background: var(--bronze-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+
+.podium-player-name {
+    color: #ffffff;
+    font-size: clamp(0.75rem, 2.4vw, 0.9rem);
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 0.3px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
+    margin-bottom: 2px;
+}
+
+.podium-player-score {
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    font-weight: 900;
+    padding: 2px clamp(6px, 1.8vw, 10px);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.rank-1 .podium-player-score {
+    color: var(--gold-primary);
+    border-color: rgba(255, 215, 0, 0.25);
+}
+
+/* ==========================================================================
+   📜 RUNNERS LIST (STAGGERED SCROLLABLE DOCK)
+   ========================================================================== */
+.results-runners-wrapper {
+    width: 100%;
+    max-height: clamp(120px, 28vh, 32vh);
+    /* 🎯 صغرتها تكة عشان تدي مساحة للسنترة المريحة */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1vh, 9px);
+    padding: 4px;
+    box-sizing: border-box;
+    scrollbar-width: none;
+}
+
+.results-runners-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.runner-cyber-strip {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: clamp(8px, 1.5vh, 12px) clamp(10px, 2.5vw, 14px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transform: translateX(-25px);
+    opacity: 0;
+    animation: fadeSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+}
+
+.runner-cyber-strip:nth-child(1) {
+    animation-delay: 1.05s;
+}
+
+.runner-cyber-strip:nth-child(2) {
+    animation-delay: 1.11s;
+}
+
+.runner-cyber-strip:nth-child(3) {
+    animation-delay: 1.17s;
+}
+
+.runner-cyber-strip:nth-child(4) {
+    animation-delay: 1.23s;
+}
+
+.runner-cyber-strip:not(.strip-player-expelled):hover {
+    transform: translateY(-3px) scale(1.01) !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.strip-left-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.strip-rank-number {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #95a5a6;
+    min-width: 18px;
+}
+
+.strip-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.strip-player-name {
+    color: #ffffff;
+    font-size: clamp(0.8rem, 2.3vw, 0.95rem);
+    font-weight: 700;
+}
+
+.strip-score-badge {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #f4d03f;
+}
+
+.strip-player-expelled,
+.podium-dead {
+    background: rgba(231, 76, 60, 0.04) !important;
+    border: 1px solid rgba(231, 76, 60, 0.25) !important;
+    border-left: 3px solid #e74c3c !important;
+    opacity: 0.45;
+    filter: grayscale(80%);
+}
+
+.strip-player-expelled .strip-player-name {
+    color: #95a5a6 !important;
+    text-decoration: line-through;
+}
+
+.strip-player-expelled .strip-score-badge {
+    background: transparent !important;
+    color: #7f8c8d !important;
+    border: none;
+}
+
+/* ==========================================================================
+   🕹️ ACTION BUTTONS SYSTEM & FIXED POP-UP FIX (UNIVERSAL FIT)
+   ========================================================================== */
+.results-actions-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: clamp(8px, 2.5vw, 14px) !important;
+    width: 100% !important;
+    z-index: 5;
+    margin: 0;
+    box-sizing: border-box !important;
+}
+
+.results-btn-cyber,
+[id*="screen-results"] button,
+.results-screen-context button {
+    flex: 1 1 0% !important;
+    width: 50% !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: clamp(10px, 1.8vh, 15px) 4px !important;
+    font-size: clamp(0.8rem, 2.3vw, 0.95rem) !important;
+    font-weight: 900 !important;
+    border-radius: 14px !important;
+    border: none !important;
+    cursor: pointer;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-matte-gold {
+    background: linear-gradient(180deg, #f39c12 0%, #d35400 100%) !important;
+    color: #fff !important;
+    border-bottom: 3.5px solid #a04000 !important;
+    box-shadow: 0 4px 15px rgba(211, 84, 0, 0.35);
+}
+
+.btn-matte-crimson {
+    background: linear-gradient(180deg, #c0392b 0%, #7b241c 100%) !important;
+    color: #fff !important;
+    border-bottom: 3.5px solid #5c1d16 !important;
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.35);
+}
+
+.results-btn-cyber:active,
+button:active {
+    transform: translateY(2.5px) scale(0.98) !important;
+    border-bottom-width: 1px !important;
+}
+
+/* ==========================================================================
+   ⚠️ FIXING THE POP-UP DIALOG FROM SCREENSHOTS
+   ========================================================================== */
+.results-screen-context>div[style*="position"] {
+    max-width: 90% !important;
+    width: clamp(280px, 85vw, 360px) !important;
+    padding: clamp(16px, 3vh, 24px) 16px !important;
+    border-radius: 20px !important;
+    background: rgba(14, 16, 23, 0.96) !important;
+    border: 1.5px solid rgba(255, 71, 87, 0.3) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), var(--glass-shadow) !important;
+    box-sizing: border-box !important;
+}
+
+.results-screen-context div:has(> button) {
+    padding-bottom: 4vh !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: clamp(8px, 2.5vw, 12px) !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+    box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   🎬 AAA ANIMATION KEYFRAMES ENGINE
+   ========================================================================== */
+@keyframes podiumRise {
+    0% {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes championDrop {
+    0% {
+        transform: translateY(-180px);
+        opacity: 0;
+    }
+
+    60% {
+        transform: translateY(12px);
+        opacity: 1;
+    }
+
+    80% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes avatarReveal {
+    0% {
+        transform: scale(0) rotate(-30deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes crownBounce {
+    0% {
+        transform: translateX(-50%) scale(0);
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+@keyframes winnerFloat {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes haloPulse {
+    0% {
+        transform: rotate(0deg) scale(0.96);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.04);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: rotate(360deg) scale(0.96);
+        opacity: 0.4;
+    }
+}
+
+@keyframes shineSweep {
+    0% {
+        left: -150%;
+    }
+
+    35% {
+        left: 150%;
+    }
+
+    100% {
+        left: 150%;
+    }
+}
+
+@keyframes fadeSlide {
+    0% {
+        transform: translateX(-25px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes sparkleFloat {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 0 -400px;
+    }
+}
+
+@keyframes podiumBreath {
+    0% {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.1), 0 12px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.3), 0 12px 25px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* ==========================================================================
+   📱 ULTRA RESPONSIVE SCREEN-ADAPT ENGINE (Landscape & Tiny Displays)
+   ========================================================================== */
+@media (max-height: 640px) {
+    .results-screen-context {
+        padding: clamp(12px, 3vh, 20px) 12px;
+        gap: 12px;
+    }
+
+    .podium-title {
+        font-size: 1.3rem;
+    }
+
+    .podium-top3-container {
+        margin-top: 0;
+    }
+
+    .podium-rank-card.rank-1 .podium-step-block {
+        height: clamp(65px, 11vh, 85px);
+    }
+
+    .podium-rank-card.rank-2 .podium-step-block {
+        height: clamp(50px, 9vh, 68px);
+    }
+
+    .podium-rank-card.rank-3 .podium-step-block {
+        height: clamp(40px, 7vh, 55px);
+    }
+
+    .podium-avatar-wrapper {
+        margin-bottom: 2px;
+    }
+
+    .podium-crown-badge {
+        top: -12px;
+        font-size: 1.1rem;
+    }
+}

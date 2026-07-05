@@ -1,0 +1,214 @@
+/* ==========================================================================
+🎯 CUSTOM CONFIRM MODAL (مودال التأكيد المخصص - "ليه هتخرجو؟")
+========================================================================== */
+
+/* ==========================================================================
+🎴 CUSTOM CONFIRM MODAL CARD (الكارت الرئيسي للمودال)
+========================================================================== */
+#custom-confirm-modal .modal-card-body {
+    max-width: 400px;
+    width: 80%;
+    border: 2px solid var(--confirm-modal-border);
+    box-shadow: 0 20px 50px var(--confirm-modal-shadow), 0 0 30px var(--confirm-modal-glow);
+}
+
+#custom-confirm-modal .text-center {
+    text-align: center;
+}
+
+/* ==========================================================================
+🗳️ VOTE BUTTONS GROUP (مجموعة أزرار التصويت المصغرة)
+========================================================================== */
+#custom-confirm-modal .vote-buttons-group button,
+#custom-confirm-modal .vote-buttons-group .expel-action-btn {
+    height: 60px;
+    flex: initial !important;
+    width: 100% !important;
+    max-width: 120px !important;
+    padding: 10px 16px !important;
+    font-size: 0.95rem !important;
+}
+
+/* ==========================================================================
+🔴 VOTE DANGER BUTTON (زرار "لا، لسه" - أحمر مرعب)
+========================================================================== */
+#custom-confirm-modal .vote-action-btn.vote-danger {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, var(--btn-danger-grad-start), var(--btn-danger-grad-end)) !important;
+    border: 2px solid var(--btn-danger-border) !important;
+    color: var(--text-white) !important;
+    text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+    box-shadow: 0 4px 15px var(--btn-danger-shadow) !important;
+}
+
+/* ==========================================================================
+🟢 VOTE SUCCESS BUTTON (زرار "آه، يلا بينا!" - أخضر فخم)
+========================================================================== */
+#custom-confirm-modal .vote-action-btn.vote-success {
+    flex: 1 !important;
+    padding: 1px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, var(--btn-success-grad-start), var(--btn-success-grad-end)) !important;
+    border: 2px solid var(--btn-success-border) !important;
+    color: var(--text-white) !important;
+    text-shadow: 0 2px 4px var(--btn-text-shadow) !important;
+    box-shadow: 0 4px 15px var(--btn-success-shadow) !important;
+}
+
+/* ==========================================================================
+✨ HOVER EFFECT (تأثير الـ Hover على الأزرار)
+========================================================================== */
+#custom-confirm-modal .vote-action-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* ==========================================================================
+📝 GAME DESCRIPTION (النص التوضيحي)
+========================================================================== */
+.game-description {
+    color: var(--text-description);
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+🎭 ROLES EXPLANATION GRID (جريد شرح الأدوار - مودال المساعدة)
+========================================================================== */
+.roles-explanation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.role-box {
+    padding: 15px 10px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--role-box-border);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.role-box.listener {
+    background: var(--role-listener-bg);
+    border-color: var(--role-listener-border);
+}
+
+.role-box.speaker {
+    background: var(--role-speaker-bg);
+    border-color: var(--role-speaker-border);
+}
+
+.role-title {
+    display: block;
+    font-weight: 900;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--text-white);
+}
+
+.role-desc {
+    font-size: 0.85rem;
+    color: var(--text-light-gray);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ==========================================================================
+📋 HELP STEPS CONTAINER (خطوات المساعدة)
+========================================================================== */
+.help-steps-container {
+    text-align: right;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.help-step {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-light-gray);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-step .step-num {
+    background: var(--crimson);
+    color: var(--text-white);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    box-shadow: 0 0 8px var(--crimson-glow);
+}
+
+/* ==========================================================================
+🔒 CLOSE MODAL BUTTON (زرار إغلاق المودال)
+========================================================================== */
+.close-modal-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--btn-close-bg);
+    color: var(--gold);
+    border: 1px solid var(--btn-close-border);
+    transition: background 0.2s;
+}
+
+.close-modal-btn:active {
+    background: var(--btn-close-active-bg);
+}
+
+/* ==========================================================================
+🎬 SWIPE OUT EFFECT (أنيميشن الخروج)
+========================================================================== */
+.swipe-out-effect {
+    animation: swipeOutRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+@keyframes swipeOutRight {
+    0% {
+        opacity: 1;
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        -webkit-transform: translate3d(150%, 0, 0) scale(0.9);
+        transform: translate3d(150%, 0, 0) scale(0.9);
+    }
+}
+

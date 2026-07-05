@@ -1,0 +1,5083 @@
+/* file-1-screen-main*/
+
+/* ==========================================================================
+1️⃣ CORE RESETS & GLOBAL VARIABLES
+========================================================================== */
+:root {
+    /* أرضية غامقة فخمة وناعمة مريحة للعين */
+    --bg-dark: #09060b;
+    /* أساس الزجاج الشفاف */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    /* ألوان الهوية مصقولة وبدون توهج فاقع */
+    --crimson: #990000;
+    --gold: #d4af37;
+    --text-light: #f5f5f7;
+    --text-dim: #9a94a0;
+    --blue-minute: #0066cc;
+}
+
+@font-face {
+    font-family: 'Cairo';
+    src: url('../img/Cairo-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Cairo';
+    src: url('../img/Cairo-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', 'Segoe UI', sans-serif !important;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+html,
+body {
+    font-family: 'Noto Color Emoji', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    /* 👇 التعديل الأول: إجبار الـ Viewport الفيزيائية بالكامل */
+    height: 100vh !important;
+    width: 100vw !important;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* ==========================================================================
+2️⃣ PLATFORM OPTIMIZATIONS & TRANSITIONS
+========================================================================== */
+/* تحسين أداء العناصر المتحركة والتنقل السلس على كوردوفا والموبايل */
+.main-action-btn-trigger,
+.lobby-start-btn-trigger,
+.roles-scratch-btn-trigger,
+.roles-done-btn-trigger,
+.court-objection-btn-trigger,
+.drawer-panel-context,
+.modal-card-body {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Container اللعبة الأساسي */
+.app-container {
+    /* 👇 التعديل الثاني: إجبار الـ Container يملأ الشاشة بالكامل غصب عن الأندرويد */
+    width: 100vw !important;
+    height: 100vh !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    padding-top: calc(15px + env(safe-area-inset-top));
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    overflow: hidden;
+    background-image: linear-gradient(rgba(10, 10, 10, 0.55), rgba(0, 0, 0, 0.18)), url(../img/bbg.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.35s ease-in-out;
+}
+
+/* عندما يدخل اللوبي، الخلفية تتحول للتدرج الداكن تلقائياً */
+.app-container.lobby-active {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.88), rgba(15, 5, 5, 0.82)), url(../img/bbg.png);
+}
+
+/* خلفية زجاجية ضبابية ناعمة خافتة لإعطاء عمق سينمائي */
+.app-neon-bg-waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.app-neon-bg-waves .wave {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    -webkit-filter: blur(120px);
+    opacity: 0.12;
+    will-change: transform;
+}
+
+.app-neon-bg-waves .w1 {
+    top: -10%;
+    right: -10%;
+    width: 350px;
+    height: 350px;
+    background: var(--crimson);
+}
+
+.app-neon-bg-waves .w2 {
+    bottom: -10%;
+    left: -10%;
+    width: 350px;
+    height: 350px;
+    background: #4a0066;
+}
+
+.app-neon-bg-waves .w3 {
+    display: none;
+}
+
+/* ==========================================================================
+3️⃣ SCREEN CONTROL & GLASS PANEL BASE
+========================================================================== */
+.game-screen {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* 🚀 التعديل السحري الأول: بنجبر الشاشة تاخد طول الموبايل بالظبط */
+    height: 100vh !important;
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    /* animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); */
+
+    /* 🎯 السحر كله هنا: بنفتح السكرول الرأسي جوة الشاشة دي بالذات 
+     عشان تشيل الهيدر والكروت وتخليهم يتسحبوا لفوق مع بعض */
+    overflow-x: hidden !important;
+
+    /* تنعيم السكرول على الموبايلات */
+    -webkit-overflow-scrolling: touch;
+}
+
+#screen-specialist-challenges {
+    overflow: hidden !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.hidden,
+.hidden * {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* كلاس موحد لتطبيق ستايل الزجاج الشفاف الفخم */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+/* ==========================================================================
+5️⃣ MAIN SCREEN CONTEXT (MAIN SCREEN)
+========================================================================== */
+/* اللوجو: عائم وبيتنفس بنعومة */
+.main-screen-context .main-game-logo {
+    /* 🚀 العرض المرن:
+  - الحد الأدنى: 110px (عشان ميكشش أوي في الشاشات الصغيرة)
+  - المرن: 35vw (بيكسب مساحة ذكية من عرض الشاشة)
+  - الحد الأقصى: 160px (عشان ميبقاش عملاق بزيادة في الشاشات الكبيرة) */
+    width: clamp(110px, 45vw, 175px) !important;
+    height: auto;
+    /* 📐 المسافة التحتانية بقت مرنة مع طول الشاشة (vh) عشان توفر مساحة */
+    margin-bottom: clamp(10px, 3vh, 24px) !important;
+
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    animation: logoBreathe 4s ease-in-out infinite;
+    box-sizing: border-box;
+}
+
+.main-screen-context .main-top-bar {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* 🎯 بيضمن إن زرار المساعدة والإعدادات يبقوا على خط أفقي واحد بالملي */
+    /* 📐 البادينج المرن: 10px في الشاشات الصغيره عشان نوفر مساحة، و 20px في الكبير */
+    padding: clamp(10px, 2vh, 20px) 20px !important;
+
+    /* 🚀 تظبيط الارتفاع من فوق: بدل الـ 1% الثابتة، بنخليه مطاطي مع طول الشاشة (vh)
+     عشان يرفع الأزرار لفوق خالص قريب من حافة الشاشة وميسيبش فراغ ميت */
+    top: clamp(0px, 0.5vh, 8px) !important;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.main-screen-context .main-icon-btn {
+    background: rgb(78 78 78 / 30%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-light);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    scale: 1.25;
+    transition: transform 0.2s, background 0.2s;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1 !important;
+}
+
+.main-screen-context .main-icon-btn:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.main-screen-context .main-screen-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 60px;
+    margin-top: -30px;
+}
+
+.main-screen-context .main-game-title {
+    /* 🚀 الفونت السحري: بيكش لـ 1.8rem في الشاشات الضيقة ويطلع لـ 2.6rem في الكبيرة */
+    font-size: clamp(0.25rem, 10vw, 3.6rem) !important;
+    font-weight: 900;
+    line-height: 1.2;
+    /* تقليل المسافة التحتانية في الشاشات القصيرة */
+    margin-bottom: clamp(6px, 1.5vh, 12px) !important;
+
+    letter-spacing: -0.5px;
+    color: var(--text-light);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* كلمة (الاستخبُص): تأثير سينمائي ميتالك مع هالة قرمزي ضبابية */
+.main-screen-context .main-highlight {
+    background: linear-gradient(135deg, #ffffff 30%, #a6a6a6 70%, #595959 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 900;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+/* 3️⃣ الجملة الدعائية (Main Game Tagline) */
+.main-screen-context .main-game-tagline {
+    color: var(--text-dim);
+    /* 🚀 خسسنا التاج لاين: بينزل لـ 0.95rem في الشاشات الكنزة عشان يفضل سطر واحد وشيك */
+    font-size: clamp(0.5rem, 3.8vw, 1.2rem) !important;
+    font-weight: 600;
+
+    /* مسافة مرنة فوقه */
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* جسم الزرار الرئيسي (ثابت بالشادو والمطاطية) */
+.main-screen-context .main-action-btn-trigger {
+    /* 🚀 تظبيط مكان الزرار: بدل -15% الملعونة، هنخليها بـ clamp معتمد على الـ vh
+  عشان يفضل مكانه ثابت وموزون بالملي في كل الشاشات ومن غير ما يهرب فوق أو تحت */
+    position: relative;
+    top: clamp(-140px, -13vh, -45px) !important;
+    left: 0px;
+    /* 📐 العرض المحمي */
+    width: calc(100% - 40px);
+    margin: 0px 20px;
+
+    /* 🚀 التخسيس السريع للبادينج: خس لـ 11px في الشاشات الكنزة وبيفرد لـ 16px في الفخمة */
+    padding: clamp(11px, 2.2vh, 16px) !important;
+    border-radius: 12px;
+
+    /* 🧠 الفونت الذكي: بيكش لـ 1.05rem في الشاشات الضيقة ويطلع لـ 1.3rem براحته */
+    font-size: clamp(1.05rem, 4.2vw, 1.3rem) !important;
+    font-weight: 900;
+
+    cursor: pointer;
+    color: var(--text-light);
+    background: linear-gradient(135deg, rgb(125, 12, 26), rgb(15, 10, 18));
+    border: 1px solid rgba(255, 82, 82, 0.25);
+    overflow: hidden;
+
+    /* حماية الأنيميشن والـ ليرز جوه كوردوفا */
+    transform: translate3d(0px, 0px, 0px);
+    box-sizing: border-box;
+    text-align: center;
+    white-space: nowrap;
+
+    animation: 2.5s ease-in-out 0s infinite alternate none running btnGlowPulse;
+    transition: transform 0.1s;
+}
+
+/* الكلمة اللي جوة الزرار (نبضة تكبير وتصغير ناعمة متناسقة) */
+.main-screen-context .main-action-btn-trigger .btn-text {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    animation: textUrgentShake 2.5s infinite ease-in-out alternate;
+    transform-origin: center;
+}
+
+/* مسحة الإضاءة العابرة (Shimmer) */
+.main-screen-context .main-action-btn-trigger::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 82, 82, 0.4), transparent);
+    transform: skewX(-20deg);
+    animation: btnShimmer 4s infinite ease-in-out;
+}
+
+.main-screen-context .main-action-btn-trigger:active {
+    transform: scale(0.96) translate3d(0, 0, 0);
+}
+
+.main-screen-context .app-version-text {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    opacity: 0.5;
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+🎬 MAIN SCREEN KEYFRAMES
+========================================================================== */
+@keyframes logoBreathe {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(0, -8px, 0) scale(1.02);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes textUrgentShake {
+    0% {
+        scale: 1;
+    }
+
+    50% {
+        scale: 1.1;
+    }
+
+    100% {
+        scale: 1;
+    }
+}
+
+@keyframes btnGlowPulse {
+    0% {
+        border-color: rgba(255, 82, 82, 0.25);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 82, 82, 0.2);
+    }
+
+    100% {
+        border-color: rgba(255, 82, 82, 0.6);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 30px 4px rgba(255, 82, 82, 0.45), inset 0 0 8px rgba(255, 82, 82, 0.15);
+    }
+}
+
+@keyframes btnShimmer {
+    0% {
+        left: -150%;
+    }
+
+    30% {
+        left: 150%;
+    }
+
+    100% {
+        left: 150%;
+    }
+}
+
+.main-game-tagline {
+    text-align: center;
+}
+
+.main-game-tagline .tagline-icon {
+    vertical-align: middle; /* يربطه بمنتصف الحروف الرأسية */
+    margin-right: 3px;      /* مسافة بسيطة من الكلمة (بما أن النص عربي) */
+}
+
+
+/* file-2-screen-lobby*/
+
+/* ==========================================================================
+🎮 LOBBY SCREEN CONTEXT (ROOM & TIME PICKER)
+========================================================================== */
+
+/* 1️⃣ الحاوية الكبيرة لشاشة اللوبي (طبيعية جداً وبدون display إجباري هنا) */
+.lobby-screen-context {
+    flex-direction: column !important;
+    width: 100%;
+    height: 100vh !important;
+    padding: clamp(10px, 2vh, 15px) 15px !important;
+    box-sizing: border-box;
+    overflow: hidden !important;
+    justify-content: flex-start !important;
+    gap: clamp(8px, 1.5vh, 14px) !important;
+}
+
+/* 2️⃣ السحر بطريقتك وهندستك:
+   لما الأب الكبير يشوف إن شاشة اللوبي (#screen-lobby) مش واخدة كلاس (.hidden)،
+   اقلب الشاشة flex فوراً وبالمقاسات الحديد اللي ظبطناها من غير ما تظهر في الأول */
+.app-container:has(#screen-lobby:not(.hidden)) .lobby-screen-context {
+    display: flex !important;
+}
+
+/* ==========================================================================
+📤 LOBBY BACK BOX (المربع الجانبي للسحب)
+========================================================================== */
+.lobby-back-box {
+    position: fixed;
+    top: 25px;
+    /* نقطة البداية الافتراضية */
+    left: 0;
+    width: 75px;
+    height: 60px;
+
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+
+    z-index: 100;
+
+    /* 🚀 التعديل: الترانزيشن على الـ transform فقط عشان الفتح والقفل، الـ top حر تماماً */
+    transform: translate3d(-50px, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease;
+
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    cursor: grab;
+    /* شكل الماوس يد بتسحب */
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    padding-right: 10px;
+    opacity: 0;
+
+    /* منع تحديد العناصر أثناء السحب العمودي السريع */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.lobby-back-box:active {
+    cursor: grabbing;
+    /* شكل اليد وهي قافلة وقت السحب */
+}
+
+.lobby-back-box.loaded {
+    opacity: 1;
+}
+
+.lobby-back-box.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+    /* يفضل يقبل السحب حتى وهو مفتوح */
+}
+
+.lobby-back-btn {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    margin: 0;
+
+    cursor: pointer;
+
+    pointer-events: none;
+}
+
+.lobby-back-box.open .lobby-back-btn {
+    pointer-events: auto;
+}
+
+.lobby-back-btn svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.lobby-back-box.open svg {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+🎯 LOBBY HEADER (الهيدر: العنوان + زرار الرجوع)
+========================================================================== */
+.lobby-screen-context .lobby-header-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100%;
+    /* الارتفاع المحكوم عشان الزرار يتوازن جواه */
+    height: clamp(45px, 6vh, 55px) !important;
+    padding: 5px 0 0 0 !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box;
+}
+
+/* عنوان شاشة اللوبي (أقصى اليمين) */
+.lobby-screen-context .lobby-screen-title {
+    font-size: clamp(1.2rem, 4.5vw, 1.6rem) !important;
+    font-weight: 900;
+    /* 🎯 الطيران لأقصى اليمين بالملي */
+    width: 100% !important;
+    text-align: right !important;
+    padding-right: 5px !important;
+
+    color: #ffffff;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* زرار الرجوع من اللوبي */
+.lobby-screen-context .lobby-back-btn {
+    position: absolute !important;
+    left: 0px !important;
+    /* 🎯 سنترة رأسية قاتلة في نص الهيدر بالظبط */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    background: none !important;
+    border: none !important;
+    color: #ffffff;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: clamp(1.3rem, 5vw, 1.6rem) !important;
+    cursor: pointer;
+    padding: 10px !important;
+    margin: 0;
+    z-index: 10;
+    transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.lobby-screen-context .lobby-back-btn svg {
+    display: block;
+}
+
+.lobby-screen-context .lobby-back-btn:active {
+    transform: translateY(-50%) scale(0.85) !important;
+    /* حافظنا على السنترة أثناء الضغط */
+    color: var(--crimson, #ff5252);
+}
+
+/* ==========================================================================
+➕ ADD PLAYER BOX (صندوق إضافة اللاعب)
+========================================================================== */
+.lobby-screen-context .lobby-add-player-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 0 !important;
+    /* معتمدين على الـ gap بتاع الأب */
+}
+
+.lobby-screen-context .lobby-player-input {
+    flex: 1;
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: clamp(8px, 1.2vh, 12px) clamp(10px, 3vw, 15px) !important;
+    /* ظبطنا الصفر vh الميت */
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: clamp(0.9rem, 3.5vw, 1rem) !important;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-player-input:focus {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.lobby-screen-context .lobby-add-btn-trigger {
+    width: clamp(40px, 11vw, 46px) !important;
+    height: clamp(40px, 11vw, 46px) !important;
+    background: linear-gradient(135deg, #cc2323, #7a0000);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(204, 35, 35, 0.4);
+    transition: transform 0.1s ease;
+}
+
+.lobby-screen-context .lobby-add-btn-trigger:active {
+    transform: scale(0.9);
+}
+
+/* ==========================================================================
+📜 SCROLLABLE LIST (الكارت المظلم للّستة)
+========================================================================== */
+.lobby-screen-context .lobby-scrollable-list {
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    /* 🚀 التعديل السحري: ابلع أي مساحة فاضية متبقية واقفل عليها من غير vh ثابت */
+    flex-grow: 1 !important;
+    height: auto !important;
+    min-height: 150px !important;
+
+    border-radius: 16px;
+    padding: 10px !important;
+    margin-bottom: 0 !important;
+    position: relative;
+
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05), 0 12px 36px rgba(0, 0, 0, 0.5);
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-sizing: border-box;
+}
+
+/* إخفاء شريط السكرول للّستة */
+.lobby-screen-context .lobby-scrollable-list::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* ==========================================================================
+👤 PLAYER CHIP (كارت اللاعب)
+========================================================================== */
+.lobby-screen-context .player-chip {
+    padding: clamp(6px, 1.2vh, 10px) 12px !important;
+    /* ظبطنا الصفر vh والـ padding الميت */
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgb(215 215 215 / 14%);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 4px solid #cc2323;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .player-info-side {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lobby-screen-context .player-avatar {
+    width: clamp(34px, 9vw, 40px) !important;
+    height: clamp(34px, 9vw, 40px) !important;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(20, 20, 25, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    display: block;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .player-name-text {
+    font-size: clamp(0.9rem, 3.8vw, 1.1rem) !important;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.lobby-screen-context .remove-player-btn {
+    position: relative;
+    scale: 1.5;
+    /* نزلنا الإسكيل من 2 لـ 1.5 عشان ميبقاش مرعب وضخم */
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem !important;
+    cursor: pointer;
+    padding: 0 4px;
+    top: 0 !important;
+    /* سنترناه في النص بالظبط بدون ترحيل */
+    transition: color 0.2s ease;
+}
+
+.lobby-screen-context .remove-player-btn:active {
+    color: #ff5252;
+}
+
+/* ==========================================================================
+💥 SUPER SMOOTH REMOVE PLAYER ANIMATION (أنيميشن الزحلقة والانطواء الفائق السلاسة)
+========================================================================== */
+/* ==========================================================================
+💥 ZERO-STUTTER REMOVE PLAYER ANIMATION (أنيميشن الحذف بدون نتشة نهائياً)
+========================================================================== */
+.lobby-screen-context .player-chip.removing {
+    /* تم ربطه بكلاس الـ JS واستخدام forwards لتثبيت الحالة النهائية */
+    animation: zeroStutterSlideOut 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    pointer-events: none; /* حظر الضغط تماماً أثناء الحذف */
+    will-change: transform, opacity, margin, max-height; /* تهيئة كارت الشاشة لأداء 120fps */
+}
+
+@keyframes zeroStutterSlideOut {
+    0% {
+        transform: translateX(0) scaleY(1);
+        opacity: 1;
+        max-height: 120px;
+        margin-bottom: 6px;
+    }
+    
+    /* 🔥 قللنا النسبة لـ 40%.. يعني الزحلقة للشمال هتحصل بسرعة خاطفة */
+    40% {
+        transform: translateX(-105%) scaleY(1);
+        opacity: 0;
+        max-height: 120px;
+        margin-bottom: 6px;
+    }
+    
+    /* 📐 من أول 40% لـ 100% (يعني 60% من الوقت كامل) الكروت اللي تحت هتطلع لفوق */
+    /* المساحة المتاحة الكبيرة دي بتخلي الحركة تطلع Smooth جداً وبسرعة مريحة للعين */
+    100% {
+        transform: translateX(-105%) scaleY(0);
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+/* ==========================================================================
+📊 FOOTER BOX (عداد اللاعبين + اختيار الوقت + زرار البداية)
+========================================================================== */
+.lobby-screen-context .lobby-footer-box {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vh, 12px) !important;
+    /* مسافات ملمومة ومحكومة جداً */
+    margin-top: 0 !important;
+}
+
+/* عداد اللاعبين */
+.lobby-screen-context .lobby-counter-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(8px, 1.2vh, 12px) 15px !important;
+    /* مساحات رشيقة */
+    border-radius: 12px;
+    width: 100%;
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-counter-badge .badge-title {
+    font-size: clamp(0.95rem, 3.8vw, 1.1rem) !important;
+    font-weight: 700;
+    color: #cccccc;
+}
+
+.lobby-screen-context .lobby-counter-badge .lobby-count-highlight {
+    font-size: clamp(1rem, 3.8vw, 1.15rem) !important;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* ==========================================================================
+⏱️ TIME PICKER (اختيار وقت التحدي)
+========================================================================== */
+.lobby-screen-context .lobby-time-picker-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+}
+
+.lobby-screen-context .time-picker-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #cccccc;
+    padding-right: 5px;
+}
+
+.lobby-screen-context .lobby-time-chips {
+    display: flex;
+    gap: clamp(6px, 3vw, 12px) !important;
+    width: 100%;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .time-chip {
+    flex: 1;
+    padding: clamp(8px, 1.5vh, 12px) 4px !important;
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: #aaaaaa;
+    font-size: clamp(0.8rem, 3.2vw, 0.95rem) !important;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lobby-screen-context .time-chip:active {
+    transform: scale(0.95);
+}
+
+.lobby-screen-context .time-chip.active {
+    background: linear-gradient(135deg, #050202, #3d0505) !important;
+    color: #ffffff !important;
+    font-weight: bold;
+    transform: scale(1.04);
+    animation: borderLaserGlow 1.8s infinite ease-in-out;
+}
+
+/* ==========================================================================
+🚀 START BUTTON (زرار جاهزين؟)
+========================================================================== */
+.lobby-screen-context .lobby-start-btn-trigger {
+    width: 100%;
+    padding: clamp(10px, 1.8vh, 14px) !important;
+    /* تظبيط الطول المفرط */
+    border: 1px solid rgba(255, 82, 82, 0.4);
+    border-radius: 12px;
+    font-size: clamp(1rem, 4vw, 1.25rem) !important;
+    font-weight: 900;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7d0c1a, #0f0a12);
+    color: #ffffff;
+    box-shadow: 0 6px 10px rgba(204, 35, 35, 0.25);
+    box-sizing: border-box;
+    text-align: center;
+    white-space: nowrap;
+    transition: transform 0.1s ease, border-color 0.2s ease;
+}
+
+.lobby-screen-context .lobby-start-btn-trigger:active {
+    transform: scale(0.97);
+}
+
+/* ==========================================================================
+🎬 LOBBY KEYFRAMES
+========================================================================== */
+@keyframes borderLaserGlow {
+    0% {
+        border-color: rgba(140, 19, 19, 0.6) !important;
+        box-shadow: 0 0 10px rgba(140, 19, 19, 0.4), inset 0 0 4px rgba(140, 19, 19, 0.2);
+    }
+
+    50% {
+        border-color: rgba(255, 51, 51, 0.9) !important;
+        box-shadow: 0 0 12px 1px rgba(255, 51, 51, 0.65), inset 0 0 8px rgba(255, 51, 51, 0.3);
+    }
+
+    100% {
+        border-color: rgba(140, 19, 19, 0.6) !important;
+        box-shadow: 0 0 10px rgba(140, 19, 19, 0.4), inset 0 0 4px rgba(140, 19, 19, 0.2);
+    }
+}
+
+@keyframes removePlayerSwipe {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+        max-height: 80px;
+    }
+
+    40% {
+        background: rgba(255, 51, 51, 0.2) !important;
+    }
+
+    100% {
+        transform: translateX(-120%);
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        border-color: transparent;
+    }
+}
+
+/* file-3-screen-roles*/
+/* ==========================================================================
+🎭 ROLES SCREEN CONTEXT (SCRATCH CARDS)
+========================================================================== */
+
+/* 🌑 توماتيك أول ما شاشة الأدوار تفتح، الخلفية تتدرج للون الداكن */
+.app-container:has(#screen-roles:not(.hidden)) {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.88), rgba(15, 5, 5, 0.82)), url("../img/bbg.png") !important;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* ==========================================================================
+📦 ROLES MAIN CONTAINER (الحاوية الأم)
+========================================================================== */
+.roles-screen-context {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 15px;
+}
+
+/* ==========================================================================
+⬅️ ROLES BACK BUTTON (زرار الرجوع الخاص بالأدوار)
+========================================================================== */
+.roles-screen-context .lobby-back-btn {
+    position: relative;
+    top: 0%;
+    right: 0%;
+    background: none;
+    border: none;
+    border-radius: 0;
+    width: auto;
+    height: auto;
+    box-shadow: none;
+    color: #e0e0e0;
+    font-size: 2.2rem;
+    font-family: sans-serif;
+    cursor: pointer;
+    z-index: 100;
+    line-height: 1;
+    padding: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.roles-screen-context .lobby-back-btn:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================================================
+👤 PEEKING CHARACTER (شخصية المجرم المتدلية فوق الكارت)
+========================================================================== */
+.roles-card-wrapper .peeking-character-avatar {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translate(-50%, 10px) scale(1.2);
+    width: 135px;
+    height: auto;
+    z-index: 25;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.roles-card-wrapper:has(.revealed-glow) .peeking-character-avatar {
+    animation: peekInAfterReveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ==========================================================================
+✨ EPIC GLOW BOX (البوكس المتوهج قبل السحب - المرحلة الأولى)
+========================================================================== */
+.epic-glow-box {
+    background: linear-gradient(135deg, #050202, #3d0505) !important;
+    color: #ffffff !important;
+    border: 2px solid #67001a !important;
+    border-radius: 20px;
+    padding: 35px 25px;
+    width: 85%;
+    max-width: 360px;
+    box-sizing: border-box;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 42, 95, 0.2), inset 0 0 15px rgba(255, 42, 95, 0.15);
+    z-index: 10;
+    /* 🚀 تشغيل أنيميشن التنفس السحرية الخاصة بالكارت هنا غصب عن أي حاجة */
+    animation: handoverBreathingGlow 2.5s infinite ease-in-out !important;
+}
+
+/* 🎭 أنيميشن التنفس السينمائي للكارت (تكبير خفيف جداً مع نبض التوهج الأحمر) */
+@keyframes handoverBreathingGlow {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(255, 42, 95, 0.25),
+            inset 0 0 15px rgba(255, 42, 95, 0.15);
+        border-color: #67001a;
+    }
+
+    50% {
+        /* الكارت بياخد نفس (يكبر 2% والـ Glow الأحمر يفرش وينور أكتر) */
+        transform: translate(-50%, -50%) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6),
+            0 0 35px rgba(255, 42, 95, 0.55),
+            inset 0 0 25px rgba(255, 42, 95, 0.3);
+        border-color: #ff2a5f;
+        /* البوردر ينور أحمر صريح */
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(255, 42, 95, 0.25),
+            inset 0 0 15px rgba(255, 42, 95, 0.15);
+        border-color: #67001a;
+    }
+}
+
+/* ==========================================================================
+🎯 HANDOVER CENTERED LAYOUT (التخطيط المركزي)
+========================================================================== */
+.handover-centered-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+
+.handover-main-instruction {
+    font-family: 'Cairo', sans-serif;
+    font-size: 1.2rem;
+    color: #ffffff;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 600;
+}
+
+.roles-screen-context .roles-user-highlight {
+    color: #ffeb3b !important;
+    font-size: 1.4rem;
+    font-weight: 800;
+    display: inline-block;
+    margin: 0 4px;
+    text-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+}
+
+.roles-mini-action-btn {
+    background: linear-gradient(135deg, #4f4f4f, #262626) !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #3a383c !important;
+    border-radius: 8px !important;
+    padding: 10px 28px !important;
+    font-size: 15px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.2s ease !important;
+}
+
+.roles-mini-action-btn:active {
+    transform: scale(0.96) !important;
+    background: linear-gradient(135deg, #1f1d21, #151417) !important;
+}
+
+/* ==========================================================================
+🎴 FREE SCRATCH PAGE LAYOUT (شاشة الكارت السحاب - المرحلة الثانية)
+========================================================================== */
+.free-scratch-page-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 40px 20px 20px 20px;
+    box-sizing: border-box;
+    gap: 15px;
+}
+
+.roles-screen-context .roles-screen-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-align: center;
+    color: #ffffff;
+    margin: 0;
+}
+
+.roles-screen-context .roles-sub-title {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ==========================================================================
+🎴 ROLES CARD WRAPPER (حاوية الكارت)
+========================================================================== */
+.free-scratch-page-layout .roles-card-wrapper {
+    width: 90%;
+    max-width: 380px;
+    height: auto;
+    /* 🚀 الحل السحري: خلي الحد الأدنى مرن ومبحبح عشان يستوعب كارت المتخصص الداخلي بدون ما يقطعه */
+    min-height: clamp(185px, 11vh, 260px);
+
+    position: relative;
+    background: #120f17;
+    border-radius: 24px;
+    border: 1px solid #282030;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+
+    /* 🔥 أمان إضافي: بيضمن إن لو أي حاجة كبرت جوه، الأب يتمط معاها وميقصهاش */
+    overflow: visible;
+}
+
+.free-scratch-page-layout .swipe-canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+🎴 ROLES HIDDEN CARD INFO (الكارت المخفي والمفاجأة بالداخل)
+========================================================================== */
+.free-scratch-page-layout .roles-hidden-card-info {
+    width: 100%;
+    /* 🚀 التعديل السحري: لغينا الـ min-height والـ max-height خالص */
+    height: auto !important;
+
+    position: relative;
+    background: linear-gradient(145deg, #0e0a12, #050306) !important;
+    border-radius: 24px !important;
+
+    /* 📐 البادينج هنا هو اللي بيخلق مساحة الكارت توماتيك: 30px فوق وتحت، و20px يمين وشمال */
+    padding: 30px 20px !important;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 2px solid #490303 !important;
+
+    /* 🔴 تغيير مهم: رجعناها لـ visible عشان الـ scale ميعملش جليتش في المساحة الفاضية */
+    overflow: visible !important;
+
+    opacity: 0 !important;
+    transform: translateY(15px) scale(0.98);
+    /* خفينا الكشة شوية عشان الجليتش البصري */
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* حالة الـ Reveal (الظهور والتوهج) */
+.free-scratch-page-layout .roles-hidden-card-info.revealed-glow {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+    /* 🔴 نسف أي شادو تري دي قديم وتوحيد التوهج القرمزي الفخم للعبة */
+    box-shadow: 0 0 25px rgba(255, 42, 95, 0.3) !important;
+
+    /* 📐 إجبار الكارت على الثبات في مكانه ومنع أي تمطيط سفلي */
+    margin: 0 !important;
+    bottom: 0 !important;
+
+    /* انتقال فوري وسريع جداً يمنع ظهور الخلفية */
+    transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        opacity 0.05s ease-out !important;
+}
+
+.free-scratch-page-layout .roles-hidden-card-info::-webkit-scrollbar {
+    display: none;
+}
+
+/* ==========================================================================
+🏷️ ROLES BADGE ELEMENT (شارة الدور)
+========================================================================== */
+.roles-screen-context .roles-badge-element {
+    display: inline-block;
+    align-self: center;
+    padding: 6px 22px;
+    border-radius: 30px;
+    font-weight: 900;
+    font-size: 1rem;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgb(106 1 1 / 40%);
+    flex-shrink: 0;
+}
+
+.roles-screen-context .roles-badge-element.crimson {
+    background: linear-gradient(135deg, #cc0000, #7a0000);
+    border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
+/* ==========================================================================
+📝 ROLES CHALLENGE CONTAINER (حاوية التحدي)
+========================================================================== */
+.roles-screen-context .roles-challenge-container {
+    margin: 5px 0;
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.challenge-icon-big {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+}
+
+.roles-challenge-label {
+    color: var(--gold);
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    display: block;
+}
+
+.roles-screen-context .roles-challenge-text {
+    font-size: clamp(1.1rem, 5vw, 1.4rem);
+    font-weight: 800;
+    line-height: 1.3;
+    color: #ffffff;
+    padding: 0 5px;
+    margin: 0;
+    word-wrap: break-word;
+    text-align: center;
+    display: block;
+}
+
+/* ==========================================================================
+🎴 ROLES COVER CARD ELEMENT (غطاء الكارت القابل للسحب الطائر)
+========================================================================== */
+.free-scratch-page-layout .roles-cover-card-element {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #370e0e, #0e0a14);
+    border: 2px solid #000000;
+    border-radius: 24px;
+    z-index: 20;
+    cursor: grab;
+    touch-action: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 30px;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.cover-card-graphic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.cover-neon-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px var(--gold));
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.cover-main-title {
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+}
+
+.cover-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin: 0;
+}
+
+.swipe-arrow-indicator {
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 900;
+    display: inline-block;
+    direction: ltr;
+    animation: swipeHintLeft 1.5s infinite ease-in-out;
+    opacity: 0.8;
+}
+/* تضمن إن الـ SVG واخد حجم الفونت بالظبط */
+.swipe-arrow-indicator svg {
+    width: 2em;
+    height: 2em;
+    display: block;
+}
+
+.roles-cover-card-element.fly-away-left {
+    transform: translateX(-150%) rotate(-15deg) !important;
+    opacity: 0 !important;
+    transition: transform 0.12s ease-in, opacity 0.1s ease-in !important;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+🚀 ROLES DONE BUTTON (زرار "اللي بعده")
+========================================================================== */
+.roles-screen-context .roles-done-btn-trigger {
+    width: 50%;
+    max-width: 420px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    cursor: pointer;
+    background: linear-gradient(135deg, #4f4f4f, #262626);
+    color: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+    margin-top: 5px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==========================================================================
+🎬 ROLES KEYFRAMES
+========================================================================== */
+@keyframes peekInAfterReveal {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 10px) scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+@keyframes swipeHintLeft {
+    0% {
+        transform: translateX(0);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: translateX(-15px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 0.4;
+    }
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+    }
+
+    50% {
+        transform: scale(1.06);
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    }
+}
+
+/* file-4-screen-court*/
+
+/* ==========================================================================
+⚖️ COURT SCREEN CONTEXT (ساحة المحكمة السينمائية)
+========================================================================== */
+
+/* ==========================================================================
+🎬 CINEMATIC COUNTDOWN SCREEN (شاشة العد التنازلي قبل الجيم)
+========================================================================== */
+#screen-countdown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: #000000;
+    z-index: 9999 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.4s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#screen-countdown.show-countdown {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hidden-countdown {
+    display: none !important;
+}
+
+.countdown-wrapper {
+    text-align: center;
+}
+
+.countdown-title {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#countdown-number {
+    font-size: 6rem;
+    font-weight: 900;
+    color: #d4af37;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    font-family: monospace;
+    animation: zoomPulse 1s infinite ease-in-out;
+}
+
+/* ==========================================================================
+🌑 COURT BACKGROUND CHANGE (تغيير الخلفية للمحكمة)
+========================================================================== */
+.app-container:has(#screen-court:not(.hidden)) {
+    background-image: linear-gradient(to bottom, rgba(7, 4, 10, 0.94), rgb(13 6 6 / 88%)), url(../img/bbg.png) !important;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* ==========================================================================
+📦 COURT MAIN CONTAINER (الحاوية الأم)
+========================================================================== */
+.court-screen-context {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+📤 COURT BACK BOX CONTAINER (المربع الجانبي للسحب)
+========================================================================== */
+.court-back-box-container {
+    position: fixed;
+    top: 25px;
+    left: 0;
+    width: 75px;
+    height: 60px;
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    z-index: 100;
+    transform: translate3d(-50px, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease;
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.court-back-box-container:active {
+    cursor: grabbing;
+}
+
+.court-back-box-container.loaded {
+    opacity: 1;
+}
+
+.court-back-box-container.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+}
+
+.court-back-btn-element {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.court-back-box-container.open .court-back-btn-element {
+    pointer-events: auto;
+}
+
+.court-back-btn-element svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.court-back-box-container.open svg {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+🎯 COURT HEADER (الهيدر)
+========================================================================== */
+.court-screen-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    min-height: 40px;
+    flex-shrink: 0;
+}
+
+.court-screen-context .court-back-btn {
+    position: relative;
+    top: 20px;
+    right: 0px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2.2rem;
+    font-family: sans-serif;
+    cursor: pointer;
+    z-index: 10;
+    line-height: 1;
+    padding: 5px 10px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.court-screen-context .court-back-btn:active {
+    transform: scale(0.88);
+    color: var(--crimson, #ff5252);
+    text-shadow: 0 0 8px rgba(255, 82, 82, 0.5);
+}
+
+/* ==========================================================================
+📦 COURT BODY (شريط المنتصف الديناميكي)
+========================================================================== */
+.court-screen-body {
+    width: 100%;
+    max-width: 380px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    min-height: 0;
+    padding: 4px 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    transform: translateY(-3vh);
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+📜 COURT CASE CONTAINER (كارت القضية الجنائية)
+========================================================================== */
+.court-screen-context .court-case-container {
+    position: relative;
+    width: 96%;
+    background: linear-gradient(145deg, rgba(20, 12, 18, 0.85), rgba(12, 5, 8, 0.6));
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-radius: 20px;
+    padding: clamp(14px, 3vh, 20px) 16px;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+    flex-shrink: 1;
+    max-height: 32vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.4s;
+}
+
+.court-screen-context .court-case-container.move-up {
+    transform: scale(0.98);
+    border-color: rgba(153, 0, 0, 0.35);
+}
+
+.court-screen-context .court-case-container h3 {
+    color: #d4af37;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 8px 0;
+    opacity: 0.85;
+}
+
+.court-screen-context .court-case-text-content {
+    font-size: clamp(0.85rem, 2.2vh, 1.15rem);
+    line-height: 1.3;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+.court-screen-context .court-case-text-content::after {
+    content: '|';
+    animation: blinkCursor 0.8s infinite;
+    color: #d4af37;
+    margin-right: 4px;
+}
+
+.court-screen-context .court-case-text-content.typing-done::after {
+    display: none;
+}
+
+.court-screen-context .court-speakers-badge {
+    margin-top: 10px;
+    font-size: clamp(0.75rem, 1.8vh, 0.85rem);
+    font-weight: 600;
+    color: #f5f5f7;
+    background: rgba(153, 0, 0, 0.2);
+    border: 1px solid rgba(153, 0, 0, 0.3);
+    padding: 6px 14px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 90%;
+    transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+🕒 THE CINEMATIC COURT TIMER (التايمر السينمائي الفخم)
+========================================================================== */
+.court-timer-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 1;
+    width: clamp(130px, 26vh, 180px);
+    height: clamp(130px, 26vh, 180px);
+    margin: 5px auto;
+    padding: 0;
+    box-shadow: none !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.court-timer-section.hidden-element {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+}
+
+.timer-circle-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+}
+
+.timer-particles-holder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none !important;
+    z-index: 1;
+    overflow: visible;
+}
+
+.time-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    animation: particleOutwardFloat var(--p-duration, 1s) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.timer-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.timer-bg-circle {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.03);
+    stroke-width: 4;
+}
+
+.timer-progress-circle {
+    fill: none;
+    stroke: #d4ac0d;
+    filter: drop-shadow(0 0 2px rgba(212, 172, 13, 0.4));
+    stroke-width: 5px;
+    stroke-linecap: round;
+    stroke-dasharray: 283;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s ease, filter 0.5s ease;
+}
+
+.timer-progress-circle.chaos-mode {
+    stroke: #e67e22 !important;
+    filter: drop-shadow(0 0 2px rgba(230, 126, 34, 0.55)) !important;
+}
+
+.timer-progress-circle.danger {
+    stroke: #7d0c1a !important;
+    filter: drop-shadow(0 0 2px rgba(125, 12, 26, 0.8)) !important;
+    animation: dangerPulseGlow 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.court-timer-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(1.8rem, 5vh, 2.2rem);
+    font-weight: 800;
+    font-family: monospace !important;
+    color: #ffffff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+🛑 OBJECTION BUTTON (زرار الاعتراض السينمائي)
+========================================================================== */
+.court-screen-context #btn-objection {
+    width: clamp(260px, 92%, 360px);
+    padding: clamp(10px, 2.5vh, 14px) 16px;
+    font-size: clamp(0.9rem, 2vh, 1.1rem);
+    border: 1px solid rgba(255, 69, 58, 0.4);
+    border-radius: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(135deg, #660000, #2c0000);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(102, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 99 !important;
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+.court-screen-context #btn-objection:active:not(:disabled) {
+    transform: scale(0.96);
+    background: linear-gradient(135deg, #4d0000, #1a0000);
+}
+
+/* ==========================================================================
+📢 CHAOS VOTE BUTTON (زرار إنهاء الجلسة والتصويت السريع)
+========================================================================== */
+.chaos-vote-btn {
+    width: clamp(260px, 50%, 360px);
+    padding: clamp(10px, 2.5vh, 14px) 16px;
+    font-size: clamp(0.9rem, 2vh, 1.1rem);
+    border: 1px solid rgba(26, 23, 23, 0.4);
+    border-radius: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(135deg, #491313f0, #3f0e0e);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(33, 31, 31, 0.3);
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 99 !important;
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+🗳️ EXPEL ACTION BUTTONS (أزرار التصويت السريع)
+========================================================================== */
+#btn-vote-no.expel-action-btn {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #4a0000, #8a0000) !important;
+    border: 2px solid #b30000 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(235, 12, 12, 0.3) !important;
+}
+
+#btn-vote-yes.expel-action-btn {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #053b1e, #0f753d) !important;
+    border: 2px solid #17a554 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(23, 165, 84, 0.3) !important;
+}
+
+/* ==========================================================================
+🎬 COURT KEYFRAMES
+========================================================================== */
+@keyframes zoomPulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    20% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    80% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes blinkCursor {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes particleOutwardFloat {
+    0% {
+        transform: translate(var(--p-start-x), var(--p-start-y)) scale(1);
+        opacity: 0.9;
+        box-shadow: 0 0 3px var(--p-color);
+    }
+
+    100% {
+        transform: translate(var(--p-end-x), var(--p-end-y)) scale(0.1);
+        opacity: 0;
+    }
+}
+
+@keyframes dangerPulseGlow {
+    0% {
+        filter: drop-shadow(0 0 2px rgba(125, 12, 26, 0.6));
+        stroke-width: 5px;
+    }
+
+    100% {
+        filter: drop-shadow(0 0 4px rgba(125, 12, 26, 0.95));
+        stroke-width: 5.8px;
+    }
+}
+
+@keyframes objectionPopIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes voteButtonPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 6px 20px rgba(102, 0, 0, 0.3), 0 0 12px rgba(255, 69, 58, 0.2);
+        border-color: rgba(255, 69, 58, 0.4);
+    }
+
+    100% {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(102, 0, 0, 0.5), 0 0 22px rgba(255, 69, 58, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 69, 58, 0.8);
+    }
+}
+
+@keyframes timerUrgentPulse {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(204, 0, 0, 0.4));
+    }
+
+    100% {
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 12px rgba(204, 0, 0, 0.8));
+    }
+}
+
+.objection-appear {
+    animation: objectionPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.hidden-element {
+    display: none !important;
+}
+
+
+/* file-5-screen-results*/
+
+/* ==========================================================================
+🌌 شاشة عرض المتصدرين المودرن (Cyber Podium & Strips Dock) 🌌
+========================================================================== */
+
+/* الحاوية الكلية - كل حاجة في النص عمودياً وأفقياً */
+.results-screen-context {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 🔥 كل حاجة في النص عمودياً */
+    gap: clamp(12px, 2.5vh, 20px);
+    padding: clamp(20px, 4vh, 30px) 15px; /* 🔥 نفس البادينج فوق وتحت */
+    box-sizing: border-box;
+    min-height: 100%;
+}
+
+/* 👑 حاوية منصة التتويج الثلاثية */
+.podium-top3-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(6px, 2vw, 12px);
+    width: 100%;
+    margin: 0; /* 🔥 شيلنا أي margin غير متماثل */
+}
+
+/* الكارت الفردي لكل بطل */
+.podium-rank-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 31%;
+    position: relative;
+    animation: podiumPopUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes podiumPopUp {
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.podium-rank-card.rank-1 {
+    width: 35%;
+    z-index: 5;
+}
+
+/* 🖼️ غلاف الأفاتار */
+.podium-avatar-wrapper {
+    position: relative;
+    width: clamp(48px, 13vw, 70px);
+    height: clamp(48px, 13vw, 70px);
+    border-radius: 50%;
+    border: 2px solid transparent;
+    padding: 2px;
+    background: #090a10;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    margin-bottom: clamp(4px, 1vh, 8px);
+}
+
+.podium-rank-card.rank-1 .podium-avatar-wrapper {
+    width: clamp(62px, 17vw, 85px);
+    height: clamp(62px, 17vw, 85px);
+}
+
+.podium-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.podium-crown-badge {
+    position: absolute;
+    top: clamp(-14px, -2vh, -10px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(1.1rem, 3.8vw, 1.4rem);
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+}
+
+.podium-player-name {
+    color: #fff;
+    font-size: clamp(0.75rem, 2.4vw, 0.9rem);
+    font-weight: 800;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 2px;
+}
+
+.podium-player-score {
+    font-size: clamp(0.65rem, 2vw, 0.8rem);
+    font-weight: 900;
+    margin-bottom: clamp(4px, 1vh, 8px);
+}
+
+/* 🟥 كتل القواعد */
+.podium-step-block {
+    width: 100%;
+    background: linear-gradient(180deg, #141622 0%, #090a10 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px 12px 6px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(6px, 1vh, 12px) 4px;
+    box-sizing: border-box;
+}
+
+.podium-rank-card.rank-1 .podium-step-block { 
+    height: clamp(75px, 12vh, 110px); 
+    border-color: rgba(255, 215, 0, 0.25); 
+}
+.podium-rank-card.rank-2 .podium-step-block { 
+    height: clamp(60px, 9.5vh, 90px); 
+    border-color: rgba(192, 192, 192, 0.2); 
+}
+.podium-rank-card.rank-3 .podium-step-block { 
+    height: clamp(48px, 7.5vh, 75px); 
+    border-color: rgba(205, 127, 50, 0.15); 
+}
+
+.podium-number {
+    font-size: clamp(1.4rem, 5.5vw, 2.1rem);
+    font-weight: 900;
+    font-family: 'Impact', sans-serif;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+/* 👥 قائمة باقي اللاعبين */
+.results-runners-wrapper {
+    width: 100%;
+    max-height: clamp(140px, 45vh, 50vh);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1vh, 8px);
+    padding: 4px;
+    box-sizing: border-box;
+    scrollbar-width: none;
+}
+
+.results-runners-wrapper::-webkit-scrollbar { display: none; }
+
+.runner-cyber-strip {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: clamp(8px, 1.5vh, 12px) clamp(10px, 3vw, 14px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    transition: transform 0.2s;
+}
+
+.strip-left-section {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 2vw, 10px);
+}
+
+.strip-rank-number {
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    font-weight: 800;
+    color: #a0aec0;
+    min-width: 16px;
+}
+
+.strip-avatar {
+    width: clamp(24px, 6.5vw, 28px);
+    height: clamp(24px, 6.5vw, 28px);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.strip-player-name {
+    color: #fff;
+    font-size: clamp(0.8rem, 2.3vw, 0.95rem);
+    font-weight: 700;
+}
+
+.strip-right-section {
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, 1.5vw, 8px);
+}
+
+.strip-score-badge {
+    background: #1a1d29;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 2px clamp(6px, 1.5vw, 10px);
+    border-radius: 8px;
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+    font-weight: 900;
+    color: #ffd700;
+}
+
+/* 🚨 لوحة حماية اللاعب المطرود */
+.strip-player-expelled {
+    background: rgba(255, 82, 82, 0.02) !important;
+    border-color: rgba(255, 82, 82, 0.2) !important;
+    border-left: 3px solid #ff5252 !important;
+}
+
+.strip-player-expelled .strip-player-name { 
+    color: #718096 !important; 
+    text-decoration: line-through; 
+}
+
+.strip-player-expelled .strip-score-badge { 
+    background: #2d3748 !important; 
+    color: #a0aec0 !important; 
+    border: none; 
+}
+
+.podium-dead { 
+    filter: grayscale(80%); 
+    opacity: 0.5; 
+}
+
+/* ==========================================================================
+🎮 أزرار الإجراءات - داخل المحتوى (مش ثابتة)
+========================================================================== */
+.results-actions-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 2.5vw, 12px);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto; /* 🔥 مفيش margin علوي أو سفلي */
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* التنسيق الأساسي للأزرار */
+.results-btn-cyber {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, 1.5vw, 8px);
+    padding: clamp(10px, 1.8vh, 14px) 8px;
+    font-size: clamp(0.78rem, 2.2vw, 0.92rem);
+    font-weight: 700;
+    font-family: inherit;
+    color: #e2e8f0;
+    background: rgba(15, 17, 26, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.results-btn-cyber .btn-icon {
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    opacity: 0.85;
+    transition: transform 0.3s ease;
+}
+
+/* 🟡 زرار "إعادة باللاعبين" */
+.results-btn-cyber.btn-matte-gold { 
+    border-color: rgba(212, 175, 55, 0.2); 
+}
+
+.results-btn-cyber.btn-matte-gold:hover {
+    background: rgba(212, 175, 55, 0.08);
+    border-color: rgba(212, 175, 55, 0.6);
+    color: #ffd700;
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.results-btn-cyber.btn-matte-gold:hover .btn-icon { 
+    transform: rotate(180deg); 
+}
+
+/* 🔴 زرار "الرئيسية" */
+.results-btn-cyber.btn-matte-crimson { 
+    border-color: rgba(255, 71, 87, 0.15); 
+}
+
+.results-btn-cyber.btn-matte-crimson:hover {
+    background: rgba(255, 71, 87, 0.06);
+    border-color: rgba(255, 71, 87, 0.5);
+    color: #ff4757;
+    box-shadow: 0 6px 16px rgba(255, 71, 87, 0.15);
+    transform: translateY(-1px);
+}
+
+.results-btn-cyber.btn-matte-crimson:hover .btn-icon { 
+    transform: translateX(-2px); 
+}
+
+.results-btn-cyber:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+📱 Responsive - للشاشات القصيرة جداً
+========================================================================== */
+@media (max-height: 600px) {
+    .results-screen-context {
+        padding: clamp(15px, 3vh, 20px) 15px;
+        gap: clamp(10px, 2vh, 15px);
+    }
+    
+    .podium-rank-card.rank-1 .podium-step-block { 
+        height: clamp(60px, 10vh, 90px); 
+    }
+    .podium-rank-card.rank-2 .podium-step-block { 
+        height: clamp(50px, 8vh, 75px); 
+    }
+    .podium-rank-card.rank-3 .podium-step-block { 
+        height: clamp(40px, 6vh, 60px); 
+    }
+}
+
+/* الحاوية الكبيرة للأزرار */
+.results-actions-wrapper {
+    display: flex;
+    justify-content: center;  /* سنترة الأزرار في نص الشاشة */
+    align-items: center;
+    gap: 12px;                /* مسافة مناسبة ومريحة بين الزرارين */
+    width: 100%;
+    max-width: 400px;         /* حجم محكوم ومثالي للموبايل */
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+/* الكلاس الموحد للزرار السايبر */
+.results-btn-cyber {
+    flex: 1;                  /* يخلي الزرارين قد بعض بالظبط في العرض */
+    display: inline-flex;     /* تفعيل الفليكس لسنترة المحتويات داخلياً */
+    align-items: center;      /* سنترة الأيقونة والنص رأسياً بالملي */
+    justify-content: center;  /* سنترة المحتوى أفقياً جوة الزرار */
+    gap: 8px;                 /* مسافة ثابتة ومتناسقة بين الأيقونة والكلمة */
+    padding: 12px 16px;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem); /* حجم خط مرن للموبايل */
+    font-weight: 700;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;      /* يمنع النص من النزول في سطر جديد */
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+}
+
+/* سنترة وضبط عنصر الأيقونة */
+.results-btn-cyber .btn-icon {
+    display: inline-flex;     /* لضمان عدم وجود هوامش وهمية للـ span */
+    align-items: center;      /* سنترة محاذاة الأيقونة داخلياً */
+    justify-content: center;
+}
+
+/* التحكم في حجم الـ SVG مباشرة */
+.results-btn-cyber .btn-icon svg {
+    width: 1.25em;            /* حجم مثالي ومريح للعين بالنسبة للخط */
+    height: 1.25em;
+    display: block;           /* يقتل أي سلوك نصي افتراضي للـ SVG */
+    flex-shrink: 0;           /* يمنع انكماش أو تشوه الأيقونة */
+}
+
+/* تظبيط عنصر النص */
+.results-btn-cyber .btn-text {
+    display: inline-block;
+    line-height: 1;           /* يمنع أي padding علوي أو سفلي وهمي يرحل الكلمة */
+}
+
+/* ----------------------------------------------------------------- */
+/* الألوان والثيمات (الذهبي الكاتم والكريمسون الكاتم) لتماشي لوحة التحكم */
+
+/* المات الذهبي */
+.btn-matte-gold {
+    background: #907530;
+    color: #0f111a;           /* نص غامق عشان يقرأ فوق الذهبي */
+    box-shadow: 0 4px 15px rgba(197, 168, 92, 0.2);
+}
+
+.btn-matte-gold:active {
+    transform: scale(0.98);   /* تأثير الضغطة على الموبايل */
+    background: #907530;
+}
+
+/* المات الكريمسون */
+.btn-matte-crimson {
+    background: #541014;
+    color: #ffffff;           /* نص أبيض واضح */
+    box-shadow: 0 4px 15px rgba(184, 50, 57, 0.2);
+}
+
+.btn-matte-crimson:active {
+    transform: scale(0.98);
+    background: #541014;
+}
+
+
+/* file-6-screen-vote*/
+
+/* ==========================================================================
+🗳️ VOTE SCREEN CONTEXT (شاشة التصويت والأركيد)
+========================================================================== */
+
+/* 🌑 تغيير الخلفية تلقائياً لما شاشة التصويت تفتح */
+.app-container.vote-active {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.88), rgba(15, 5, 5, 0.82)), url(../img/bbg.png);
+}
+
+/* ==========================================================================
+🌌 منظومة الأركيد والنيون الأسطورية (The Cyber-Glow Dock)
+========================================================================== */
+.arcade-court-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 96%;
+    /* 🔥 التعديل الجوهري: تجميع كل العناصر في السنتر بالملي 🔥 */
+    justify-content: center;
+    align-items: center;
+
+    /* المسافة بين (العنوان -> البوابة -> الأزرار) متناسقة وقريبة */
+    gap: clamp(15px, 3.5vh, 30px);
+
+    padding: clamp(20px, 4vh, 40px) clamp(15px, 5vw, 30px);
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background: transparent;
+}
+
+/* ==========================================================================
+📢 عنوان الإعلان عن الدور أو السؤال
+========================================================================== */
+.vote-announcer-box {
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+    /* توحيد العرض مع البوابة والأزرار للشياكة */
+    margin: 0;
+}
+
+.target-player-title {
+    font-size: clamp(1.1rem, 4.5vw, 1.45rem);
+    color: #fff;
+    line-height: 1.4;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================================
+🎭 البوابة المركزية للتحدي السري (Neon Gate System)
+========================================================================== */
+.neon-gate-system {
+    width: 100%;
+    max-width: 380px;
+    height: clamp(190px, 32vh, 260px);
+    margin: 0;
+    /* شيلنا الـ auto عشان ميطيرش فوق وتحت */
+    background: #090a10;
+    border: 2px solid #1a1d29;
+    border-radius: 24px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation: handoverBreathingGlow 2.5s infinite ease-in-out !important;
+}
+
+@keyframes handoverBreathingGlow {
+    0% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(255, 42, 95, 0.25),
+            inset 0 0 15px rgba(255, 42, 95, 0.15);
+        border-color: #67001a;
+    }
+
+    50% {
+        /* الكارت بياخد نفس (يكبر 2% والـ Glow الأحمر يفرش وينور أكتر) */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6),
+            0 0 35px rgba(204, 35, 35, 0.3),
+            inset 0 0 25px rgba(255, 42, 95, 0.3);
+        border-color: #ab0000;
+        /* البوردر ينور أحمر صريح */
+    }
+
+    100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(255, 42, 95, 0.25),
+            inset 0 0 15px rgba(255, 42, 95, 0.15);
+        border-color: #67001a;
+    }
+}
+
+/* حالة البوابة المغلقة (البداية) */
+.neon-gate-system.gate-closed {
+    border-color: #5f0b18;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.15), inset 0 0 15px rgba(255, 0, 85, 0.05);
+}
+
+/* حالة البوابة لما تفتح وتنفجر */
+.neon-gate-system.gate-open {
+    border-color: #ab0000;
+    box-shadow: 0 0 40px rgba(204, 35, 35, 0.3), inset 0 0 25px rgba(204, 35, 35, 0.3);
+}
+
+/* ==========================================================================
+🔑 قاعدة الزرار الثابتة الشيك (Master Scan Button)
+========================================================================== */
+.master-scan-btn {
+    position: absolute;
+    width: clamp(95px, 25vw, 120px);
+    height: clamp(95px, 25vw, 120px);
+    border-radius: 50%;
+    /* تدرج غامق وفخم نيون مطابق لروح اللعبة */
+    background: linear-gradient(135deg, #11131c 0%, #090a10 100%);
+    border: 2px solid rgb(74 11 22);
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.05);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* تأثير الضغطة: ضغطة داخلية خفيفة جداً للزرار بدون تغيير الحجم */
+.master-scan-btn:active {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8), inset 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+👁️ أنيميشن العين النيون (Finger Print Neon)
+========================================================================== */
+.finger-print-neon {
+    font-size: clamp(2rem, 5.5vw, 2.5rem);
+    /* كبرنا مقاس العين سنة عشان تبان عظمتها */
+    color: #ffffff;
+    /* لون النيون الأساسي للعين */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0 0 8px rgba(213, 213, 213, 0.6));
+    transition: color 0.3s, filter 0.3s;
+    /* 🔥 تشغيل أنيميشن النبض والحياة على العين نفسها 🔥 */
+    animation: pulseEye 2.5s ease-in-out infinite alternate;
+}
+
+/* لما نوقف بالماوس على الزرار.. العين بتقلب نيون أحمر وتزيد إضاءتها */
+.master-scan-btn:hover .finger-print-neon {
+    color: #ab0000;
+    filter: drop-shadow(0 0 12px rgba(204, 35, 35, 0.3));
+}
+
+/* ✨ أنيميشن حركة ونبض العين الشيك والمودرن */
+@keyframes pulseEye {
+    0% {
+        transform: scale(0.95);
+        filter: drop-shadow(0 0 6px rgba(255, 0, 85, 0.5));
+    }
+
+    100% {
+        transform: scale(1.08);
+        /* العين بتكبر وتصغر ببطء ونعومة جوه الدائرة الثابتة */
+        filter: drop-shadow(0 0 15px rgba(255, 0, 85, 0.9));
+    }
+}
+
+/* ==========================================================================
+📝 النص السفلي الصغير (Scan Text)
+========================================================================== */
+.scan-text {
+    font-size: clamp(0.55rem, 1.6vw, 0.65rem);
+    font-weight: 900;
+    color: #a0aec0;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.3s;
+}
+
+.master-scan-btn:hover .scan-text {
+    color: #fff;
+}
+
+/* ==========================================================================
+🔓 لوحة التحدي السرية الداخلية الفسفورية (Hidden Challenge Board)
+========================================================================== */
+.hidden-challenge-board {
+    width: 100%;
+    height: 100%;
+    padding: clamp(15px, 3vh, 25px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+    transition: all 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* بوب الأنيميشن النظيف عند فتح البوابة */
+.neon-gate-system.gate-open .hidden-challenge-board {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* اختفاء الزرار بنعومة شديدة عند الفتح */
+.neon-gate-system.gate-open .master-scan-btn {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.6);
+}
+
+.target-name-tag {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: #a0aec0;
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+    font-weight: bold;
+    margin-bottom: clamp(10px, 2vh, 15px);
+    letter-spacing: 0.5px;
+}
+
+.challenge-neon-text {
+    font-size: clamp(1rem, 3.8vw, 1.25rem);
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+    line-height: 1.4;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1), 0 0 25px rgb(255 255 255 / 30%);
+}
+
+/* ==========================================================================
+🎬 أنيميشن ضربة المقصلة العنيفة عند حسم الدور
+========================================================================== */
+.guillotine-slam-animation {
+    animation: slamShake 0.4s ease-in-out forwards;
+}
+
+@keyframes slamShake {
+    0% {
+        transform: translateY(0);
+        filter: brightness(1.8);
+    }
+
+    15% {
+        transform: translateY(-12px);
+    }
+
+    30% {
+        transform: translateY(20px) scaleY(0.92);
+        border-color: #ff0055;
+    }
+
+    50% {
+        transform: translate(-6px, -4px);
+    }
+
+    70% {
+        transform: translate(5px, 3px);
+    }
+
+    100% {
+        transform: translate(0) scaleY(1);
+    }
+}
+
+/* ==========================================================================
+🎬 كلاسات أنيميشن حركة الكارت (Slide Out/In)
+========================================================================== */
+/* 1. عند الانتقال للدور التالي: الكارت الحالي ينزل تحت بمرونة ويختفي */
+.neon-gate-system.slide-out {
+    animation: gateSlideOut 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+/* 2. الكارت الجديد ينزل من فوق فوراً لمكانه الطبيعي */
+.neon-gate-system.slide-in {
+    animation: gateSlideIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+@keyframes gateSlideOut {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(40px) scale(0.92);
+        /* ينزل لتحت ويصغر خفيف */
+        opacity: 0;
+    }
+}
+
+@keyframes gateSlideIn {
+    0% {
+        transform: translateY(-50px) scale(0.95);
+        /* يبدأ من فوق الكادر سنة */
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        /* يستقر في مكانه السنتر بالملي */
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+🗳️ لوحة أزرار السايبر الشيك والمودرن (Arcade Voting Dock)
+========================================================================== */
+.arcade-voting-dock {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 1.6vh, 12px);
+    /* تقليل الفراغات بين الزراير عشان الكتلة تلم وتبقى شيك */
+    width: 100%;
+    max-width: 380px;
+    /* قفل العرض عشان متفرشش على الشاشات الكبيرة */
+    margin: 0;
+}
+
+/* التنسيق الأساسي الموحد والمطابق لزرار اللعبة */
+.arcade-btn {
+    position: relative;
+    width: 100%;
+    padding: clamp(11px, 2.2vh, 16px) !important;
+    border-radius: 12px;
+    font-size: clamp(1.05rem, 4.2vw, 1.25rem) !important;
+    font-weight: 900;
+    cursor: pointer;
+    color: #ffffff;
+    overflow: hidden;
+    transform: translate3d(0px, 0px, 0px);
+    box-sizing: border-box;
+    text-align: center;
+    white-space: nowrap;
+    transition: transform 0.1s, filter 0.2s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.arcade-btn .btn-top {
+    display: inline;
+    padding: 0;
+    background: transparent;
+    border: none;
+    transform: none;
+    box-shadow: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* 🟢 زرار الصادق والناجح */
+.arcade-success {
+    background: linear-gradient(135deg, rgb(12, 85, 42), rgb(8, 15, 12));
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    animation: 2.5s ease-in-out 0s infinite alternate none running greenGlowPulse;
+}
+
+/* 🔴 زرار الكذب والفشل */
+.arcade-failed {
+    background: linear-gradient(135deg, rgb(125, 12, 26), rgb(15, 10, 18));
+    border: 1px solid rgba(255, 82, 82, 0.25);
+    animation: 2.5s ease-in-out 0.2s infinite alternate none running redGlowPulse;
+}
+
+/* 🔘 زرار الشك والمواجهة (رمادي سايبر فخم) */
+.arcade-caught {
+    /* تدرج رمادي ميتاليك غامق لايق على الأركيد النظيف */
+    background: linear-gradient(135deg, rgb(45, 48, 56), rgb(18, 19, 23));
+    /* حدود رمادية فوسفورية هادية */
+    border: 1px solid rgba(160, 174, 192, 0.3);
+    /* تشغيل نبض الوميض الرمادي */
+    animation: 2.5s ease-in-out 0.4s infinite alternate none running grayGlowPulse;
+}
+
+/* ==========================================================================
+✨ النبضات الضوئية الفاخرة لكل زرار (Glow Pulses)
+========================================================================== */
+@keyframes redGlowPulse {
+    0% {
+        box-shadow: 0 0 4px rgba(255, 82, 82, 0.15), inset 0 0 4px rgba(255, 82, 82, 0.05);
+    }
+
+    100% {
+        box-shadow: 0 0 14px rgba(255, 82, 82, 0.35), inset 0 0 8px rgba(255, 82, 82, 0.1);
+    }
+}
+
+@keyframes greenGlowPulse {
+    0% {
+        box-shadow: 0 0 4px rgba(46, 204, 113, 0.15), inset 0 0 4px rgba(46, 204, 113, 0.05);
+    }
+
+    100% {
+        box-shadow: 0 0 14px rgba(46, 204, 113, 0.35), inset 0 0 8px rgba(46, 204, 113, 0.1);
+    }
+}
+
+@keyframes grayGlowPulse {
+    0% {
+        box-shadow: 0 0 4px rgba(160, 174, 192, 0.15), inset 0 0 4px rgba(160, 174, 192, 0.05);
+    }
+
+    100% {
+        box-shadow: 0 0 14px rgba(160, 174, 192, 0.35), inset 0 0 8px rgba(160, 174, 192, 0.1);
+    }
+}
+
+/* ==========================================================================
+💥 تأثيرات الضغط على أزرار الأركيد
+========================================================================== */
+.arcade-success:active {
+    transform: scale(0.96) translate3d(0, 2px, 0);
+    /* يغطس لتحت وسنة لجوه */
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.85),
+        inset 0 0 5px rgba(46, 204, 113, 0.6) !important;
+    /* انفجار نيون أخضر داخلي وخارجي */
+    filter: brightness(1.4);
+    /* الزرار ينور جامد لحظة الضغطة */
+    transition: transform 0.05s ease, box-shadow 0.05s ease;
+    /* سرعة استجابة فائقة */
+}
+
+/* التأثير عند الضغط (Active State) لزرار كاذب (الأحمر) */
+.arcade-failed:active {
+    transform: scale(0.96) translate3d(0, 2px, 0);
+    /* يغطس لتحت وسنة لجوه */
+    box-shadow: 0 0 10px rgba(255, 82, 82, 0.85),
+        inset 0 0 5px rgba(255, 82, 82, 0.6) !important;
+    /* انفجار نيون أحمر داخلي وخارجي */
+    filter: brightness(1.4);
+    /* الزرار ينور جامد لحظة الضغطة */
+    transition: transform 0.05s ease, box-shadow 0.05s ease;
+    /* سرعة استجابة فائقة */
+}
+
+/* ==========================================================================
+🗳️ حاوية شاشة التصويت الكاملة (Vote Container)
+========================================================================== */
+.vote-container {
+    width: 90%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+/* ==========================================================================
+📦 صندوق اسم اللاعب اللي عليه الدور
+========================================================================== */
+.vote-target-box {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.vote-player-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    line-height: 1.6;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+📥 زرار سحب الدرج السري الفخم
+========================================================================== */
+.btn-action-pull {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    font-family: 'Cairo', sans-serif;
+    color: #000;
+    background: linear-gradient(135deg, #ab0000, #ab0000);
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 255, 204, 0.2);
+    transition: all 0.25s ease;
+}
+
+.btn-action-pull:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 5px rgba(0, 255, 204, 0.1);
+}
+
+/* ==========================================================================
+🗄️ الدرج السري المنزلق (Secret Drawer)
+========================================================================== */
+.secret-drawer-box {
+    max-height: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    border: 0 solid rgba(255, 255, 255, 0.0);
+    border-radius: 16px;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease, border 0.3s ease;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* لما الدرج يتفتح بالـ JS */
+.secret-drawer-box.open {
+    max-height: 200px;
+    padding: 15px;
+    border: 1px solid rgba(214, 175, 55, 0.3);
+    background: rgba(20, 15, 25, 0.7);
+    margin-bottom: 10px;
+    box-shadow: inset 0 0 15px rgba(214, 175, 55, 0.05);
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.drawer-header h3 {
+    font-size: 0.95rem;
+    color: #d4af37;
+    margin: 0;
+    font-weight: 700;
+}
+
+.btn-close-drawer {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+}
+
+.btn-close-drawer:hover {
+    color: #fff;
+}
+
+.drawer-challenge-content {
+    font-size: 1.1rem;
+    color: #eee;
+    margin: 0;
+    line-height: 1.5;
+    text-align: right;
+}
+
+/* ==========================================================================
+⚖️ جريد أزرار التصويت (Voting Options Grid)
+========================================================================== */
+.voting-options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+}
+
+/* الستايل الموحد للأزرار الكبيرة */
+.vote-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    text-align: right;
+}
+
+.vote-option-btn:active {
+    transform: scale(0.97);
+}
+
+.vote-icon {
+    font-size: 1.6rem;
+}
+
+.vote-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    flex-grow: 1;
+}
+
+.vote-option-btn small {
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+🎨 ألوان أزرار التصويت المنفصلة
+========================================================================== */
+.vote-option-btn.success {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.15), rgba(46, 204, 113, 0.05));
+    border-color: rgba(46, 204, 113, 0.2);
+}
+
+.vote-option-btn.success small {
+    color: #2ecc71;
+}
+
+.vote-option-btn.failed {
+    background: linear-gradient(135deg, rgba(149, 165, 166, 0.15), rgba(149, 165, 166, 0.05));
+    border-color: rgba(149, 165, 166, 0.2);
+}
+
+.vote-option-btn.failed small {
+    color: #bdc3c7;
+}
+
+/* ==========================================================================
+🚨 زرار "حد قفشني" التحذيري بالنبض والأنيميشن
+========================================================================== */
+.vote-option-btn.caught {
+    background: linear-gradient(135deg, #4a0000, #200000);
+    border-color: rgba(255, 69, 58, 0.25);
+    animation: pulse-danger-border 2.5s infinite ease-in-out;
+}
+
+.vote-option-btn.caught small {
+    color: #ff5252;
+    font-weight: bold;
+}
+
+.vote-option-btn.caught .action-required {
+    color: #ff5252;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: block;
+    margin-top: 2px;
+}
+
+/* أنيميشن نبض الأزرار التحذيرية */
+@keyframes pulse-danger-border {
+    0% {
+        border-color: rgba(255, 69, 58, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    50% {
+        border-color: rgba(255, 69, 58, 0.5);
+        box-shadow: 0 4px 20px rgba(255, 69, 58, 0.15);
+    }
+
+    100% {
+        border-color: rgba(255, 69, 58, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ==========================================================================
+🪪 كروت اختيار اللاعبين (Listener Select Cards)
+========================================================================== */
+.listener-select-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.listener-select-card:hidden {
+    display: none;
+}
+
+/* حركة التوهج الشيك لما تختار كارت */
+.listener-select-card:has(input[type="radio"]:checked) {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+    transform: translateY(-2px);
+}
+
+.listener-card-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.listener-card-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    flex-grow: 1;
+}
+
+/* إخفاء دائرة الراديو القديمة ليكون الشكل مودرن والكارت نفسه هو الزرار */
+.listener-select-card input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.listener-select-card input[type="radio"]:checked {
+    background-color: #d4af37;
+    border-color: #d4af37;
+    box-shadow: inset 0 0 0 3px #0e0a14;
+}
+
+/* ==========================================================================
+🎬 أنيميشن ظهور المودال (Objection Pop)
+========================================================================== */
+.objection-appear {
+    animation: objectionPop 0.5s ease-out forwards;
+}
+
+@keyframes objectionPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.7) translateY(15px);
+    }
+
+    70% {
+        opacity: 1;
+        transform: scale(1.08) translateY(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* كارت اللاعب الميت في التصويت */
+.listener-select-card.dead-player {
+    background: rgba(40, 40, 40, 0.4) !important; /* خلفية رمادية غامقة */
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    opacity: 0.4; /* شفافية تخليه مطفي */
+    cursor: not-allowed !important; /* شكل الماوس يتغير لمنع الضغط */
+    pointer-events: none; /* إلغاء أي أكشن أو ضغط على الكارت نهائياً */
+    filter: grayscale(100%); /* بيقلب صورة الأفاتار والاسم للأبيض والأسود تماماً صياعة زيااادة */
+}
+
+/* ستايل شاشة النتائج للاعب المطرود */
+.result-row.result-expelled {
+    background: rgba(255, 82, 82, 0.05);
+    border-left: 4px solid #ff5252; /* خط أحمر في الجنب يوضح إنه مطرود */
+}
+
+.result-row .status-badge {
+    background: #ff5252;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+
+/* file-7-screen-settings*/
+/* ==========================================================================
+⚙️ SETTINGS SCREEN CONTEXT (شاشة الإعدادات)
+========================================================================== */
+
+/* 🌑 توماتيك أول ما شاشة الإعدادات تفتح، الخلفية تسود وتغمق بالكامل */
+.app-container:has(#screen-settings:not(.hidden)) {
+    background-image: linear-gradient(rgb(0 0 0 / 90%), rgba(10, 5, 12, 0.90)), url(../img/bbg.png) !important;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    transition: background-image 0.4s ease-in-out;
+}
+
+/* ==========================================================================
+📦 SETTINGS MAIN CONTAINER (الحاوية الكبيرة للشاشة)
+========================================================================== */
+.settings-screen-context {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0px 8px;
+    box-sizing: border-box;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+}
+
+/* ==========================================================================
+🎯 SETTINGS HEADER (الهيدر: العنوان + المربع الجانبي)
+========================================================================== */
+.settings-header-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    padding: 20px 15px 10px 15px;
+    box-sizing: border-box;
+}
+
+/* العنوان الأساسي (الإعدادات) */
+.settings-screen-context .settings-main-title {
+    font-size: clamp(1.4rem, 5.5vw, 1.8rem) !important;
+    font-weight: 900;
+    color: #ffffff !important;
+    margin: 0;
+    width: 100% !important;
+    text-align: right !important;
+    padding-right: 10px !important;
+    box-sizing: border-box;
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+📤 SETTINGS BACK BOX (المربع الجانبي للسحب)
+========================================================================== */
+.settings-back-box-container {
+    position: fixed;
+    top: 25px;
+    left: 0;
+    width: 75px;
+    height: 60px;
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: none;
+    border-radius: 0 16px 16px 0;
+    z-index: 100;
+    transform: translate3d(-50px, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease;
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.settings-back-box-container:active:not(.open) {
+    cursor: grabbing;
+}
+
+.settings-back-box-container.loaded {
+    opacity: 1;
+}
+
+.settings-back-box-container.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+}
+
+/* الزرار الداخلي */
+.settings-back-btn-element {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.settings-back-box-container.open .settings-back-btn-element {
+    pointer-events: auto;
+}
+
+.settings-back-btn-element svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.settings-back-box-container.open svg {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+📋 SETTINGS OPTIONS LIST (قائمة الخيارات)
+========================================================================== */
+.settings-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 15px 5px 15px 5px !important;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.settings-options-list::-webkit-scrollbar,
+::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* ==========================================================================
+🎴 SETTINGS OPTION ITEM (كارت الخيار الفخم)
+========================================================================== */
+.settings-option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    background: radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%), rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+}
+
+.settings-option-item:active {
+    transform: scale(0.99);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(20, 20, 20, 0.7);
+}
+
+/* جانب المعلومات (العنوان + الوصف) */
+.option-info-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* عنوان الخيار */
+.option-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 700;
+    color: #ffffff !important;
+}
+
+/* وصف الخيار */
+.option-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55) !important;
+    line-height: 1.5;
+}
+
+/* سهم الانتقال */
+.action-arrow-indicator {
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.settings-option-item:active .action-arrow-indicator {
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+🎨 SVG ICONS (أيقونات الإعدادات)
+========================================================================== */
+.theme-svg-icon {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.mind-svg-icon {
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.sound-svg-icon {
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.Vibrate-svg-icon {
+    width: 21px !important;
+    height: 21px !important;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.Lightbulb-svg-icon {
+    width: 22px !important;
+    height: 22px !important;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.support-svg-icon {
+    width: 22px !important;
+    height: 22px !important;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+🎛️ MODERN TOGGLE SWITCH (التوجل السويتش)
+========================================================================== */
+.switch-toggle-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.switch-toggle-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* منزلق التوجل */
+.custom-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 34px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 3px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* التوجل لما يكون شغال */
+.switch-toggle-wrapper input:checked+.custom-toggle-slider {
+    background: linear-gradient(135deg, #ff2a5f 0%, #c1133f 100%);
+    border-color: rgba(255, 42, 95, 0.3);
+    box-shadow: 0 0 12px rgba(255, 42, 95, 0.45);
+}
+
+.switch-toggle-wrapper input:checked+.custom-toggle-slider::before {
+    transform: translateX(22px);
+    background-color: #ffffff;
+}
+
+/* ==========================================================================
+🎨 THEME PICKER VERTICAL CARD (اختيار الثيم)
+========================================================================== */
+.settings-option-item.theme-vertical-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    cursor: default;
+}
+
+.settings-option-item.theme-vertical-card:active {
+    transform: none;
+}
+
+.theme-picker-container {
+    display: flex;
+    gap: clamp(8px, 4.5vw, 18px);
+    width: 100%;
+    justify-content: center;
+    padding-top: 4px;
+    flex-wrap: wrap;
+}
+
+.theme-dot {
+    display: block;
+    width: clamp(25px, 7.5vw, 29px);
+    height: clamp(25px, 7.5vw, 29px);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 1;
+}
+
+.theme-dot:hover {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* إخفاء الراديو التقليدي */
+.theme-circle-wrapper input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+}
+
+/* ألوان الثيمات */
+.color-crimson {
+    background: #ff2a5f;
+}
+
+.color-blue {
+    background: #3498db;
+}
+
+.color-green {
+    background: #2ecc71;
+}
+
+.color-purple {
+    background: #9b59b6;
+}
+
+.color-gold {
+    background: #f1c40f;
+}
+
+/* حالة الاختيار */
+.theme-circle-wrapper input[type="radio"]:checked+.theme-dot {
+    transform: scale(1.2);
+    border-color: #ffffff;
+}
+
+/* توهج الألوان عند الاختيار */
+.theme-circle-wrapper input[type="radio"]:checked+.color-crimson {
+    box-shadow: 0 0 16px rgba(255, 42, 95, 0.75);
+}
+
+.theme-circle-wrapper input[type="radio"]:checked+.color-blue {
+    box-shadow: 0 0 16px rgba(52, 152, 219, 0.75);
+}
+
+.theme-circle-wrapper input[type="radio"]:checked+.color-green {
+    box-shadow: 0 0 16px rgba(46, 204, 113, 0.75);
+}
+
+.theme-circle-wrapper input[type="radio"]:checked+.color-purple {
+    box-shadow: 0 0 16px rgba(155, 89, 182, 0.75);
+}
+
+.theme-circle-wrapper input[type="radio"]:checked+.color-gold {
+    box-shadow: 0 0 16px rgba(241, 196, 15, 0.75);
+}
+
+/* ==========================================================================
+❓ HELP BUTTON (زرار المساعدة)
+========================================================================== */
+#help-btn-trigger {
+    color: #ffffff !important;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+}
+
+/* ==========================================================================
+🟢 MOOD BADGE (شارة المزاج)
+========================================================================== */
+.mood {
+    position: absolute;
+    top: 65px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    border-radius: 20px;
+    font-family: 'Cairo';
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+    padding: 4px 10px;
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    max-width: 85%;
+    text-align: center;
+}
+
+/* file-8-screen-specialist-challenges*/
+
+
+/* ==========================================================================
+🕵️ CRIMSON SPECIALIST SCREEN STYLES (FLEXIBLE & CENTERED)
+========================================================================== */
+
+/* 🌑 توماتيك أول ما شاشة المتخصص تفتح، الخلفية تتدرج للون الداكن */
+.app-container:has(#screen-specialist-challenges:not(.hidden)) {
+    background-image: linear-gradient(rgb(0 0 0 / 80%), rgba(12, 4, 8, 80%)), url(../img/bbg.png) !important;
+}
+
+/* 🚫 قفل السكرول الخارجي على شاشة المتخصص فقط */
+#screen-specialist-challenges {
+    overflow: hidden !important;
+}
+
+/* ==========================================================================
+📦 SPECIALIST MAIN CONTAINER (الحاوية الأم - توسيط الكارت)
+========================================================================== */
+.specialist-screen-context {
+    width: 100%;
+    min-height: 100vh;
+    /* واخدة كامل طول الشاشة */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* بيخلي الكارت يجي في النص بالظبط بالطول */
+    align-items: center;
+    /* بيخلي الكارت يجي في النص بالظبط بالعرض */
+    padding: clamp(10px, 4vh, 24px) 15px;
+    /* بادينج مرن يتكيف مع طول الشاشة */
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+🌍 SPECIALIST GLOBAL HEADER (الهيدر الحر اللي بره الكارت فوق خالص)
+========================================================================== */
+.specialist-global-header {
+    position: absolute;
+    top: clamp(15px, 3vh, 30px);
+    left: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    /* 🔓 تفعيل اللمس للهيدر بشكل طبيعي لضمان وصول الإشارات */
+    pointer-events: auto !important;
+}
+
+.specialist-main-title {
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
+    font-weight: 800;
+    margin: 0;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    font-family: 'Cairo', sans-serif;
+}
+
+/* ==========================================================================
+📤 SPECIALIST BACK BOX CONTAINER (المربع الخارجي الجانبي المطور للسحب)
+========================================================================== */
+.specialist-back-box-container {
+    position: fixed;
+    top: 25px;
+    /* نقطة البداية الافتراضية */
+    left: 0;
+    width: 75px;
+    height: 60px;
+    background:
+        radial-gradient(circle, rgb(134 134 134 / 14%) 0%, rgb(64 64 64 / 40%) 100%),
+        rgb(120 120 120 / 6%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    z-index: 999999;
+    /* نخلي 15px ظاهرين كمقبض */
+    transform: translate3d(-50px, 0, 0);
+    /* 🚀 التعديل: الأنميشن والترانزيشن على الـ transform فقط للفتح والقفل، والـ top حر تماماً طلقة أثناء السحب */
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    opacity: 1;
+    cursor: grab;
+    /* شكل اليد المفتوحة الجاهزة للسحب */
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* حماية من تحديد العناصر والنصوص بشكل عشوائي أثناء السحب العمودي السريع */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* شكل اليد وهي مغلقة أثناء السحب الفعلي للزر */
+.specialist-back-box-container:active {
+    cursor: grabbing;
+}
+
+/* حالة الفتح */
+.specialist-back-box-container.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+    /* الاحتفاظ بشكل يد السحب حتى وهو مفتوح */
+}
+
+/* ==========================================================================
+🔘 SPECIALIST BACK BUTTON ELEMENT (الزرار الداخلي الصافي)
+========================================================================== */
+.specialist-back-btn-element {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    /* 🔒 قفل اللمس وهو مقفول عشان الإشارة تروح للحاوية بالكامل */
+    pointer-events: none;
+}
+
+.specialist-back-box-container.open .specialist-back-btn-element {
+    pointer-events: auto;
+}
+
+.specialist-back-btn-element svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.specialist-back-box-container.open svg {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+🛡️ SPECIALIST MAIN CARD (الكارت المركزي العظيم)
+========================================================================== */
+.specialist-main-card {
+    width: 100%;
+    max-width: 390px;
+    /* ملموم وجامد جداً في العرض */
+    /* 📐 استجابة ذكية للطول: الكارت بيلم نفسه لو الشاشة قصيرة عشان م يضربش تحت */
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    /* سكرول داخلي احتياطي لو الموبايل ميكروسكوبي */
+    scrollbar-width: none;
+    /* إخفاء السكرول المزعج */
+    background: linear-gradient(145deg, rgba(20, 6, 10, 0.96) 0%, rgba(5, 2, 3, 0.98) 100%);
+    border: 2px solid rgba(255, 42, 95, 0.15);
+    border-radius: 24px;
+    padding: clamp(18px, 4vh, 28px) 20px;
+    /* بادينج داخلي مرن بالطول */
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 42, 95, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 2.5vh, 20px);
+    /* المسافات بين العناصر بتكش وتكبر مع الشاشة توماتيك */
+    box-sizing: border-box;
+    animation: scaleInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.specialist-main-card::-webkit-scrollbar {
+    display: none;
+    /* إخفاء سكرول الويب كيت */
+}
+
+/* ==========================================================================
+🔴 SPECIALIST ALERT BADGE (Badge عداد التحديات)
+========================================================================== */
+.specialist-alert-badge {
+    align-self: center;
+    /* خلفية شفافة من الأحمر القاتم لتندمج مع الـ Gradient */
+    background: rgba(125, 12, 26, 0.15);
+    /* حدود واضحة بلون الـ Crimson (#7d0c1a) مع شفافية */
+    border: 1px solid rgba(125, 12, 26, 0.4);
+    /* لون النص أحمر نيون هادي وقابل للقراءة ومريح على الخلفية الغامقة */
+    color: #ffffff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: clamp(0.8rem, 3.4vw, 0.9rem);
+    font-family: 'Cairo', sans-serif;
+    /* توهج خفيف نابع من نفس الدرجة */
+    box-shadow: 0 0 15px rgba(125, 12, 26, 0.25);
+}
+
+/* 🔢 المربع الداخلي الصغير للرقم جوه الـ Badge */
+.badge-num {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    /* خلفية صريحة من الأحمر القاتم عشان تبرز الرقم */
+    background: rgba(125, 12, 26, 0.6);
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin: 0 4px;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+💬 SPECIALIST HINT TEXT (النص التوضيحي)
+========================================================================== */
+.specialist-hint-text {
+    margin: 0;
+    /* لون رمادي مائل للبنفسجي الداكن الخافت المأخوذ من درجة (#0f0a12) عشان يندمج كـ نص فرعي */
+    color: #a49ba3;
+    text-align: right;
+    font-size: clamp(0.8rem, 3.2vw, 0.85rem);
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+📥 SPECIALIST INPUT GROUP (حاوية الحقول)
+========================================================================== */
+.specialist-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* 💡 Inputs جوه الجروب */
+.specialist-input-group input,
+.specialist-input-group textarea {
+    background: rgba(15, 10, 18, 0.7) !important;
+    /* واخدة من أرضية الـ Gradient الغامقة */
+    border: 1px solid rgba(125, 12, 26, 0.3) !important;
+    /* حدود حمراء خافتة */
+    color: #fff !important;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* تأثير التركيز (Focus) عند الكتابة جوه الـ Input */
+.specialist-input-group input:focus,
+.specialist-input-group textarea:focus {
+    border-color: #7d0c1a !important;
+    /* يبرز الأحمر الصريح */
+    box-shadow: 0 0 10px rgba(125, 12, 26, 0.3) !important;
+    outline: none;
+}
+
+/* ==========================================================================
+📝 DYNAMIC INPUT (خانة الإدخال المرعبة)
+========================================================================== */
+.dynamic-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(255, 42, 95, 0.2) !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    text-align: right;
+    transition: all 0.3s ease;
+}
+
+.dynamic-input:focus {
+    border-color: #ff2a5f !important;
+    box-shadow: 0 0 12px rgba(255, 42, 95, 0.25);
+}
+
+/* ==========================================================================
+📤 SPECIALIST FOOTER ACTIONS (الفوتر)
+========================================================================== */
+.specialist-footer-actions {
+    width: 100%;
+    padding-top: 5px;
+}
+
+/* ==========================================================================
+🚀 GLOW CRIMSON BUTTON (زرار الإرسال - النسخة الأولى المطفية)
+========================================================================== */
+.glow-crimson {
+    /* 🎨 الجراديانت الدموي الداكن المخملي (بدون أي توهج أو نبض) */
+    background: linear-gradient(135deg, #7d0c1a, #0f0a12) !important;
+    color: #ffffff !important;
+    /* 🛡️ الحدود ونعومة الحواف الفخمة */
+    border: 1px solid rgba(255, 82, 82, 0.25) !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    /* حجم خط أصغر وأشيك */
+    /* 📐 التعديل السحري: ملموم وفي السنتر ومش فارد الشاشة */
+    width: auto !important;
+    /* بياخد مساحة على قد الكلام بس */
+    min-width: 140px;
+    /* حد أدنى عشان يحافظ على هيبته */
+    align-self: center;
+    /* بيخليه يجي في نص الكارت بالظبط توماتيك */
+    /* بادينج صغير ورشيق */
+    padding: 10px 20px !important;
+    margin: 5px 0 0 0 !important;
+    /* 💥 أداء سريع وثابت */
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    /* ❌ شيلنا أنيميشن الـ Glow Pulse تماماً عشان يفضل مطفي وهادي */
+    animation: none !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+    /* ظل أسود عادي للأرضية */
+    transition: transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 🔥 تأثير الضغط اللحظي كبس لجوه */
+.glow-crimson:active {
+    transform: scale(0.95) !important;
+}
+
+/* ==========================================================================
+🚀 GLOW CRIMSON BUTTON (النسخة الثانية - الهمجي العظيم)
+========================================================================== */
+/* ⚠️ ملاحظة: النسخة دي بتتغلب على اللي فوقها في الخصائص المتعارضة (حسب ترتيب CSS) */
+.glow-crimson {
+    background: linear-gradient(135deg, #800026 0%, #b3003b 100%);
+    color: #fff;
+    border: 1px solid rgba(255, 42, 95, 0.2);
+    box-shadow: 0 4px 15px rgba(179, 0, 59, 0.4);
+    cursor: pointer;
+}
+
+.glow-crimson:active {
+    transform: scale(0.97);
+    background: linear-gradient(135deg, #59001a 0%, #800026 100%);
+}
+
+/* ==========================================================================
+🛑 GLOW CRIMSON DISABLED STATE (حالة القفل الموحدة)
+========================================================================== */
+.glow-crimson.disabled-btn,
+.glow-crimson:disabled {
+    background: #1a0f12 !important;
+    color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 42, 95, 0.05) !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+🎮 BTN START GAME (زرار ابدأ توزيع الكروت)
+========================================================================== */
+.btn-start-game {
+    width: 100%;
+    padding: clamp(12px, 3.5vw, 15px);
+    border-radius: 12px;
+    border: none;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 🎨 الألوان الجديدة المتناسقة مع المود الجديد */
+    background: linear-gradient(135deg, #7d0c1a 0%, #170d1a 100%) !important;
+    color: #fff !important;
+    /* ✨ توهج أحمر قاتم شيك جداً بدل الفاقع القديم */
+    box-shadow: none !important;
+}
+
+/* زرار مقفول مطفي تماماً */
+.btn-start-game.disabled-btn {
+    background: #1a0f12 !important;
+    color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 42, 95, 0.05);
+    cursor: not-allowed;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+/* ضبط السنترة والحجم للـ SVG جوة الزرار */
+.btn-start-game svg {
+    display: block;            /* يلغي أي هوامش نصية افتراضية حول الـ SVG */
+    font-size: 1.15rem;        /* حجم متناسق جداً مع طول النص */
+    flex-shrink: 0;            /* يمنع انكماش الأيقونة */
+}
+
+/* تأثير لو الزرار مقفول (Disabled) */
+.btn-start-game:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+/* ==========================================================================
+🎬 SPECIALIST KEYFRAMES
+========================================================================== */
+@keyframes scaleInUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* file-9-objection-modal*/
+/* ==========================================================================
+🚨 OBJECTION MODAL (مودال الاعتراض - اختيار المستمع اللي اتكلم)
+========================================================================== */
+
+/* ==========================================================================
+🎴 OBJECTION MODAL CARD (الكارت الرئيسي للمودال)
+========================================================================== */
+.objection-modal-card {
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    /* لضمان ثبات أي عنصر absolute جواه */
+    border: 1px solid rgba(255, 82, 82, 0.4) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 82, 82, 0.1);
+    padding: 25px 15px 15px 15px;
+    /* مساحة داخلية مريحة */
+    display: flex;
+    flex-direction: column;
+    /* الـ Styles القديمة بتاعتك زي ما هي، ضيف عليها دول بس للتأمين: */
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* تأثير ارتداد مطاطي شيك جداً (Pop effect) */
+}
+
+/* لما يكون مخفي، الكارت يكش لجوه شوية عشان لما يفتح يعمل زووم خفيف */
+.modal-overlay.hidden .objection-modal-card {
+    transform: scale(0.85) !important;
+}
+
+/* ==========================================================================
+❌ CLOSE X BUTTON (زرار الإغلاق)
+========================================================================== */
+.objection-close-x {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    background: none;
+    border: none;
+    color: #ff5252;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: transform 0.2s;
+}
+
+.objection-close-x:active {
+    transform: scale(0.85);
+    color: #ff0000;
+}
+
+/* ==========================================================================
+🌟 LISTENERS SCROLL GRID (شبكة كروت المستمعين)
+========================================================================== */
+.listeners-scroll-grid {
+    max-height: 280px;
+    overflow-y: auto;
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 كروت بالظبط في السطر */
+    gap: 10px;
+    padding: 5px;
+    direction: rtl;
+}
+
+/* تخصيص السكرول بار */
+.listeners-scroll-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.listeners-scroll-grid::-webkit-scrollbar-thumb {
+    background: #ff0055;
+    border-radius: 10px;
+}
+
+/* ==========================================================================
+🪪 LISTENER SELECT CARD (كارت اختيار المستمع - النسخة الخاصة بالاعتراض)
+========================================================================== */
+.listeners-scroll-grid .listener-select-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    text-align: center;
+}
+
+/* تأثير التمرير (Hover) */
+.listeners-scroll-grid .listener-select-card:hover {
+    background: rgba(255, 82, 82, 0.04);
+    border-color: rgba(255, 82, 82, 0.2);
+}
+
+/* 🔥 لما الكارت يربط براديو متعلّم عليه (ينور بالكامل) */
+.listeners-scroll-grid .listener-select-card:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, rgba(122, 0, 0, 0.35) 0%, rgba(204, 35, 35, 0.15) 100%);
+    border-color: #ff453a;
+    box-shadow: 0 0 15px rgba(255, 69, 58, 0.3);
+    transform: scale(1.03);
+}
+
+/* الصورة الافتراضية المدورة الصغيره جوه الكارت */
+.listeners-scroll-grid .listener-card-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: #1a1a1a;
+    transition: border-color 0.2s;
+}
+
+.listeners-scroll-grid .listener-select-card:has(input[type="radio"]:checked) .listener-card-avatar {
+    border-color: #ff453a;
+    box-shadow: 0 0 8px rgba(255, 69, 58, 0.4);
+}
+
+/* اسم اللاعب تحت الصورة */
+.listeners-scroll-grid .listener-card-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.listeners-scroll-grid .listener-select-card:has(input[type="radio"]:checked) .listener-card-name {
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* إخفاء الراديو الدائري البيخ تماماً */
+.listeners-scroll-grid .listener-select-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+🚷 EXPEL ACTION BUTTON (زرار الطرد)
+========================================================================== */
+.expel-action-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, #cc2323, #7a0000);
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(204, 35, 35, 0.3);
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.expel-action-btn:disabled {
+    background: #3a383c;
+    color: #777;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+.expel-action-btn:not(:disabled):active {
+    transform: scale(0.97);
+}
+
+
+/* file-10-vote-confirm-modal*/
+/* ==========================================================================
+🗳️ VOTE CONFIRM MODAL (مودال تأكيد التصويت النهائي)
+========================================================================== */
+
+/* ==========================================================================
+🌑 MODAL OVERLAY (الطبقة الخلفية الشفافة)
+========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    /* خلفية سوداء شفافة بنسبة 70% */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    /* عشان يغطي أي حاجة ويبقى فوق الكل */
+    /* 🚀 الترنزيشن الناعم للأب */
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* 🔒 الحالة السحرية لما المودال يكون مقفول ومخفي (.hidden) */
+.modal-overlay.hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    /* تمنع اللمس نهائياً وهو مخفي */
+}
+
+/* ==========================================================================
+🎴 MODAL CARD BODY (الكارت الرئيسي للمودال)
+========================================================================== */
+.modal-card-body.glass-modal {
+    /* 📐 العرض السحري:
+  - الحد الأدنى: 290px (عشان ميكشش أوي في الـ 300dp)
+  - الحجم المرن: 90vw (بياخد 90% من عرض الشاشة توماتيك)
+  - الحد الأقصى: 420px (عشان ميفردش بزيادة في الشاشات الكبيرة ويبقى شبه المستطيل الميت) */
+    width: clamp(290px, 95vw, 420px) !important;
+    /* 🚀 الطول والبادينج المرن: هو ده اللي هيخليه يطول ويكش توماتيك مع حجم الموبايل */
+    padding: clamp(15px, 4vh, 0px) !important;
+
+    /* ⚠️ صلحنا الفونت: اديله مقاس مرن برضه بالـ clamp بدل الـ 0rem */
+    font-size: clamp(0.95rem, 3.5vw, 1.2rem) !important;
+
+    border-radius: 16px;
+    box-sizing: border-box;
+    text-align: center;
+    height: auto !important;
+    /* خليه مرن عشان يلم نفسه على قد الشاشة */
+}
+
+/* ==========================================================================
+🎴 VOTE CONFIRM MODAL CARD (الكارت الخاص بمودال التصويت)
+========================================================================== */
+.objection-modal-card {
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    /* لضمان ثبات أي عنصر absolute جواه */
+    border: 1px solid rgba(255, 82, 82, 0.4) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 82, 82, 0.1);
+    padding: 25px 15px 15px 15px;
+    /* مساحة داخلية مريحة */
+    display: flex;
+    flex-direction: column;
+    /* الـ Styles القديمة بتاعتك زي ما هي، ضيف عليها دول بس للتأمين: */
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* تأثير ارتداد مطاطي شيك جداً (Pop effect) */
+}
+
+/* لما يكون مخفي، الكارت يكش لجوه شوية عشان لما يفتح يعمل زووم خفيف */
+.modal-overlay.hidden .objection-modal-card {
+    transform: scale(0.85) !important;
+}
+
+/* ==========================================================================
+❌ CLOSE X BUTTON (زرار الإغلاق)
+========================================================================== */
+.objection-close-x {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    background: none;
+    border: none;
+    color: #ff5252;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: transform 0.2s;
+}
+
+.objection-close-x:active {
+    transform: scale(0.85);
+    color: #ff0000;
+}
+
+/* ==========================================================================
+📝 MODAL TEXT CONTENT (النصوص جوه المودال)
+========================================================================== */
+.game-description {
+    color: #d1d1d1;
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+🗳️ VOTE BUTTONS GROUP (مجموعة أزرار التصويت)
+========================================================================== */
+.vote-buttons-group {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* ==========================================================================
+🟢 VOTE SUCCESS BUTTON (زرار "آه، يلا بينا!")
+========================================================================== */
+.vote-action-btn.vote-success {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #053b1e, #0f753d) !important;
+    border: 2px solid #17a554 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(23, 165, 84, 0.3) !important;
+}
+
+/* ==========================================================================
+🔴 VOTE DANGER BUTTON (زرار "لا، لسه")
+========================================================================== */
+.vote-action-btn.vote-danger {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #4a0000, #8a0000) !important;
+    border: 2px solid #b30000 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(235, 12, 12, 0.3) !important;
+}
+
+/* تأثير الـ Hover على الأزرار */
+.vote-action-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* ==========================================================================
+🎬 MODAL ANIMATIONS
+========================================================================== */
+@keyframes cyberModalPop {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes objectionPopIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.objection-appear {
+    animation: objectionPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+
+
+/* file-11-expel-toast*/
+/* ==========================================================================
+⚠️ EXPEL TOAST NOTIFICATIONS (إشعارات الطرد والتحذيرات)
+========================================================================== */
+
+/* إشعار التحذير والخطأ التوست المطور */
+.custom-toast-error {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 400px;
+    background: linear-gradient(135deg, rgba(255, 165, 0, 0.95), rgba(40, 30, 5, 0.98));
+    color: #ffffff;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 165, 0, 0.25);
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    direction: rtl;
+    z-index: 99999;
+    animation: toastSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: top 0.4s ease, opacity 0.4s ease;
+}
+
+.custom-toast-error.hide {
+    animation: toastSlideUp 0.4s ease forwards;
+}
+
+/* ==========================================================================
+🎬 TOAST KEYFRAMES
+========================================================================== */
+@keyframes toastSlideDown {
+    0% {
+        top: -100px;
+        opacity: 0;
+    }
+
+    100% {
+        top: 25px;
+        opacity: 1;
+    }
+}
+
+@keyframes toastSlideUp {
+    0% {
+        top: 25px;
+        opacity: 1;
+    }
+
+    100% {
+        top: -100px;
+        opacity: 0;
+    }
+}
+
+
+/* file-12-custom-confirm-modal*/
+
+/* ==========================================================================
+🎯 CUSTOM CONFIRM MODAL (مودال التأكيد المخصص - "ليه هتخرجو؟")
+========================================================================== */
+
+/* ==========================================================================
+🎴 CUSTOM CONFIRM MODAL CARD (الكارت الرئيسي للمودال)
+========================================================================== */
+#custom-confirm-modal .modal-card-body {
+    max-width: 400px;
+    width: 80%;
+    border: 2px solid rgba(255, 42, 95, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 42, 95, 0.15);
+}
+
+#custom-confirm-modal .text-center {
+    text-align: center;
+}
+
+/* ==========================================================================
+🗳️ VOTE BUTTONS GROUP (مجموعة أزرار التصويت المصغرة)
+========================================================================== */
+#custom-confirm-modal .vote-buttons-group button,
+#custom-confirm-modal .vote-buttons-group .expel-action-btn {
+    height: 60px;
+    flex: initial !important;
+    /* بيلغي تمدد الزرار الإجباري عشان يقبل المقاس الجديد */
+    width: 100% !important;
+    max-width: 120px !important;
+    /* 📐 صغرنا العرض الأقصى للزرار */
+    padding: 10px 16px !important;
+    /* ↕️ صغرنا الارتفاع والمساحة الداخلية للزرار */
+    font-size: 0.95rem !important;
+    /* ✍️ صغرنا الخط سنة عشان يليق مع الحجم الجديد */
+}
+
+/* ==========================================================================
+🔴 VOTE DANGER BUTTON (زرار "لا، لسه" - أحمر مرعب)
+========================================================================== */
+#custom-confirm-modal .vote-action-btn.vote-danger {
+    flex: 1 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #4a0000, #8a0000) !important;
+    border: 2px solid #b30000 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(235, 12, 12, 0.3) !important;
+}
+
+/* ==========================================================================
+🟢 VOTE SUCCESS BUTTON (زرار "آه، يلا بينا!" - أخضر فخم)
+========================================================================== */
+#custom-confirm-modal .vote-action-btn.vote-success {
+    flex: 1 !important;
+    padding: 1px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #053b1e, #0f753d) !important;
+    border: 2px solid #17a554 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(23, 165, 84, 0.3) !important;
+}
+
+/* ==========================================================================
+✨ HOVER EFFECT (تأثير الـ Hover على الأزرار)
+========================================================================== */
+#custom-confirm-modal .vote-action-btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+}
+
+/* ==========================================================================
+📝 GAME DESCRIPTION (النص التوضيحي)
+========================================================================== */
+.game-description {
+    color: #d1d1d1;
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+🎭 ROLES EXPLANATION GRID (جريد شرح الأدوار - مودال المساعدة)
+========================================================================== */
+.roles-explanation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.role-box {
+    padding: 15px 10px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.role-box.listener {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+.role-box.speaker {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.4);
+}
+
+.role-title {
+    display: block;
+    font-weight: 900;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.role-desc {
+    font-size: 0.85rem;
+    color: #e0e0e0;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ==========================================================================
+📋 HELP STEPS CONTAINER (خطوات المساعدة)
+========================================================================== */
+.help-steps-container {
+    text-align: right;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.help-step {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-step .step-num {
+    background: var(--crimson);
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    box-shadow: 0 0 8px var(--crimson-glow);
+}
+
+/* ==========================================================================
+🔒 CLOSE MODAL BUTTON (زرار إغلاق المودال)
+========================================================================== */
+.close-modal-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--gold);
+    border: 1px solid rgba(214, 175, 55, 0.3);
+    transition: background 0.2s;
+}
+
+.close-modal-btn:active {
+    background: rgba(214, 175, 55, 0.15);
+}
+
+/* ==========================================================================
+🎬 SWIPE OUT EFFECT (أنيميشن الخروج)
+========================================================================== */
+.swipe-out-effect {
+    animation: swipeOutRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+@keyframes swipeOutRight {
+    0% {
+        opacity: 1;
+        -webkit-transform: translate3d(0, 0, 0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        -webkit-transform: translate3d(150%, 0, 0) scale(0.9);
+        transform: translate3d(150%, 0, 0) scale(0.9);
+    }
+}
+
+
+/* file-13-confrontation-modal*/
+/* ==========================================================================
+🕵️‍♂️ CONFRONTATION MODAL (مودال المواجهة - مين اللي قفشك؟)
+========================================================================== */
+
+/* ==========================================================================
+🌑 MODAL LAYER CONTEXT (الطبقة الخلفية الشفافة المغطية للشاشة)
+========================================================================== */
+.modal-layer-context {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(5 6 10 / 80%);
+    /* سواد أركيد معتم شيك جداً */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(15px, 4vw, 25px);
+    box-sizing: border-box;
+    z-index: 2000;
+    /* رفع قيمة الـ z-index لضمان الظهور فوق كل شيء */
+}
+
+/* ==========================================================================
+🎴 GLASS MODAL & CARD BODY (جسم المودال الرئيسي الموحد - The Master Cyber Box)
+========================================================================== */
+.modal-layer-context .glass-modal,
+.modal-layer-context .modal-card-body {
+    width: 100%;
+    max-width: 380px;
+    /* توحيد العرض مع البوابة والأزرار للشياكة */
+    background: rgba(26, 26, 26, 0.65) !important;
+    border: 2px solid #28282888 !important;
+    border-radius: 24px !important;
+    padding: clamp(20px, 4vh, 30px) clamp(15px, 5vw, 25px) !important;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9),
+                0 0 30px rgba(255, 42, 95, 0.2) !important;
+    /* توهج قرمزي هادي ومتناسق مع اللعبة */
+    -webkit-transform-origin: center;
+    transform-origin: center;
+    animation: cyberModalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ==========================================================================
+🎬 MODAL POP ANIMATION (أنيميشن بوب نظيف وسريع يفتح النفس)
+========================================================================== */
+@keyframes cyberModalPop {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+📢 MODAL CARD TITLE (عنوان المودال - الخط واللون الذهبي السيبراني النظيف)
+========================================================================== */
+.modal-card-title {
+    color: #ffd700;
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
+    font-weight: 900;
+    margin: 0 0 20px 0;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+👥 MODAL LISTENERS LIST WRAPPER (جريد كروت اللعيبة - 3 في السطر)
+========================================================================== */
+.modal-listeners-list-wrapper,
+#confrontation-listeners-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 🔥 3 كروت في السطر */
+    gap: 10px;
+    max-height: 320px; /* كبرنا شوية عشان يستوعب أكتر */
+    overflow-y: auto;
+    padding: 10px;
+    margin: 15px 0;
+}
+
+/* تخصيص السكرول بار */
+.modal-listeners-list-wrapper::-webkit-scrollbar,
+#confrontation-listeners-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-listeners-list-wrapper::-webkit-scrollbar-thumb,
+#confrontation-listeners-container::-webkit-scrollbar-thumb {
+    background: #ff0055;
+    border-radius: 10px;
+}
+
+/* ==========================================================================
+🪪 LISTENER SELECT CARD (كارت اللاعب المصغر - عمودي)
+========================================================================== */
+.modal-listeners-list-wrapper .listener-select-card,
+#confrontation-listeners-container .listener-select-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 10px 8px; /* تخفيف البادينج */
+    display: flex;
+    flex-direction: column; /* 🔥 عمودي: صورة فوق، اسم تحت */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    text-align: center;
+    min-height: 95px; /* ارتفاع ثابت للكروت */
+}
+
+/* تأثير الـ Hover */
+.modal-listeners-list-wrapper .listener-select-card:hover,
+#confrontation-listeners-container .listener-select-card:hover {
+    background: rgba(255, 0, 85, 0.08);
+    border-color: rgba(255, 0, 85, 0.4);
+    transform: translateY(-2px);
+}
+
+/* 🔥 لما الكارت يتختار (ينور بالكامل) */
+.modal-listeners-list-wrapper .listener-select-card:has(input[type="radio"]:checked),
+#confrontation-listeners-container .listener-select-card:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, rgba(122, 0, 0, 0.35) 0%, rgba(204, 35, 35, 0.15) 100%);
+    border-color: #ff453a;
+    box-shadow: 0 0 15px rgba(255, 69, 58, 0.3);
+    transform: scale(1.05);
+}
+
+/* الصورة المصغرة */
+.modal-listeners-list-wrapper .listener-card-avatar,
+#confrontation-listeners-container .listener-card-avatar {
+    width: 42px; /* 🔥 تصغير الصورة */
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: #1a1a1a;
+    transition: border-color 0.2s;
+}
+
+/* الصورة لما الكارت يتختار */
+.modal-listeners-list-wrapper .listener-select-card:has(input[type="radio"]:checked) .listener-card-avatar,
+#confrontation-listeners-container .listener-select-card:has(input[type="radio"]:checked) .listener-card-avatar {
+    border-color: #ff453a;
+    box-shadow: 0 0 10px rgba(255, 69, 58, 0.5);
+}
+
+/* الاسم المصغر */
+.modal-listeners-list-wrapper .listener-card-name,
+#confrontation-listeners-container .listener-card-name {
+    font-size: 0.8rem; /* 🔥 تصغير الخط */
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    max-width: 80px; /* منع الاسم من التمدد */
+}
+
+/* الاسم لما الكارت يتختار */
+.modal-listeners-list-wrapper .listener-select-card:has(input[type="radio"]:checked) .listener-card-name,
+#confrontation-listeners-container .listener-select-card:has(input[type="radio"]:checked) .listener-card-name {
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* إخفاء الراديو */
+.modal-listeners-list-wrapper .listener-select-card input[type="radio"],
+#confrontation-listeners-container .listener-select-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+🔘 MODAL ACTIONS WRAPPER (الأزرار جنب بعض - Row انسيابي)
+========================================================================== */
+.modal-actions-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+🔴 CONTROL BUTTONS (القواعد الأساسية الموحدة للأزرار)
+========================================================================== */
+.lobby-return-btn, 
+#btn-cancel-confrontation, 
+#btn-confirm-confrontation-player {
+    flex: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 16px !important;
+    border-radius: 14px;
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    font-weight: 800;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0 !important; /* بيمنع أي مارجن خارجي يبوظ الـ Row */
+    text-decoration: none;
+    outline: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* استايل زرار الإلغاء / التراجع الأساسي */
+.lobby-return-btn, 
+#btn-cancel-confrontation {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #a0aec0 !important;
+    cursor: pointer !important;
+}
+
+/* تأثير الـ Hover لزرار الإلغاء */
+.lobby-return-btn:hover, 
+#btn-cancel-confrontation:hover {
+    background: rgba(255, 82, 82, 0.15) !important;
+    border-color: #ff5252 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(255, 82, 82, 0.25);
+}
+
+/* ==========================================================================
+🟢 CONFIRM BUTTON ACTIVE STATE (زرار التأكيد النشط - لما تختار لاعب)
+========================================================================== */
+#btn-confirm-confrontation-player:not([disabled]) {
+    background: linear-gradient(135deg, rgb(12, 85, 42), rgb(8, 15, 12)) !important;
+    border: 1px solid rgba(46, 204, 113, 0.4) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.25);
+    opacity: 1 !important;
+    cursor: pointer !important;
+}
+
+/* تأثير الـ Hover لزرار التأكيد النشط */
+#btn-confirm-confrontation-player:not([disabled]):hover {
+    background: linear-gradient(135deg, rgb(18, 116, 59), rgb(11, 23, 18)) !important;
+    border-color: rgb(46, 204, 113) !important;
+    box-shadow: 0 0 25px rgba(46, 204, 113, 0.5);
+    filter: brightness(1.2);
+}
+
+/* ==========================================================================
+🔒 CONFIRM BUTTON DISABLED STATE (حالة القفل - لما ميكونش فيه لاعب متحدد)
+========================================================================== */
+#btn-confirm-confrontation-player:disabled {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: rgba(255, 255, 255, 0.25) !important;
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+💥 CLICK EFFECT (تأثير الضغط المرن للزرار الشغال)
+========================================================================== */
+.lobby-return-btn:active, 
+#btn-cancel-confrontation:active, 
+#btn-confirm-confrontation-player:not([disabled]):active {
+    transform: scale(0.96);
+}

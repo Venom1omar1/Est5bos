@@ -1,0 +1,60 @@
+/* ==========================================================================
+⚠️ EXPEL TOAST NOTIFICATIONS (إشعارات الطرد والتحذيرات)
+========================================================================== */
+
+/* إشعار التحذير والخطأ التوست المطور */
+.custom-toast-error {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 400px;
+    background: linear-gradient(135deg, var(--toast-warning-bg), var(--toast-warning-bg-dark));
+    color: var(--text-white);
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--toast-warning-border);
+    box-shadow: 0 10px 30px var(--shadow-dark), 0 0 15px var(--toast-warning-glow);
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    direction: rtl;
+    z-index: 99999;
+    animation: toastSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: top 0.4s ease, opacity 0.4s ease;
+}
+
+.custom-toast-error.hide {
+    animation: toastSlideUp 0.4s ease forwards;
+}
+
+/* ==========================================================================
+🎬 TOAST KEYFRAMES
+========================================================================== */
+@keyframes toastSlideDown {
+    0% {
+        top: -100px;
+        opacity: 0;
+    }
+
+    100% {
+        top: 25px;
+        opacity: 1;
+    }
+}
+
+@keyframes toastSlideUp {
+    0% {
+        top: 25px;
+        opacity: 1;
+    }
+
+    100% {
+        top: -100px;
+        opacity: 0;
+    }
+}
+
+

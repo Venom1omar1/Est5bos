@@ -1,0 +1,141 @@
+body {
+  margin: 0;
+  background: #ddd;
+  font-family: Arial
+}
+
+.window {
+  height: 28px;
+  background: linear-gradient(#5b6775, #36414d);
+  color: #fff;
+  padding: 4px 10px
+}
+
+.wrap {
+  width: 65%;
+  margin: 25px auto
+}
+
+.info {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 12px
+}
+
+button {
+  padding: 5px 8px
+}
+
+table {
+  font-weight: bold;
+  scale: 0.85;
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .35)
+}
+
+th {
+  background: #35a9b4;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 10px
+}
+
+td {
+  border: 3px solid #666;
+  padding: 9px
+}
+
+.term {
+  background: #f8b54b;
+  font-weight: bold;
+  text-align: center
+}
+
+.y {
+  background: #f4ef59
+}
+
+.g1 {
+  background: #b8ef5a
+}
+
+.g2 {
+  background: #6de656
+}
+
+.note {
+  text-align: center;
+  color: #00f;
+  font-weight: bold;
+  margin: 30px
+}
+
+.ths {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  font-weight: bold !important;
+  background: #fff !important;
+  font-size: 14px !important;
+  color: #000 !important;
+}
+
+.ths td {
+  border: 1px solid #baaaa7 !important;
+  padding: 4px 8px !important;
+  height: 28px !important;
+  vertical-align: middle !important;
+}
+
+.ths tr td {
+  white-space: nowrap !important;
+}
+
+.shad {
+  box-shadow: 0 0 6px rgba(0, 0, 0, .35) !important;
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, .35) !important;
+  -moz-box-shadow: 0 0 6px rgba(0, 0, 0, .35) !important;
+}
+
+#cont_win_3_Table1 {
+  width: 65% !important;
+  margin: auto !important;
+  border: 1px solid #baaaa7 !important;
+  border-collapse: collapse !important;
+  background: #fff !important;
+}
+
+#cont_win_3_Table1 td {
+  border: 1px solid #baaaa7 !important;
+  padding: 4px 6px !important;
+  height: 26px !important;
+  font-size: 13px !important;
+}
+
+#cont_win_3_Table1 tr:first-child td {
+  background: #31a2ac !important;
+  color: #fff !important;
+  text-align: center !important;
+}
+
+#cont_win_3_Table1 tr[style*="#FFb745"] td {
+  background: #FFB745 !important;
+  text-align: center !important;
+  font-weight: bold !important;
+}
+
+#cont_win_3_Table1 tr[style*="#EDEF5C"] td {
+  background: #EDEF5C !important;
+}
+
+#cont_win_3_Table1 tr[style*="#B6EF5C"] td {
+  background: #B6EF5C !important;
+}
+
+#cont_win_3_Table1 tr[style*="#6DE656"] td {
+  background: #6DE656 !important;
+}

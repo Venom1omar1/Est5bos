@@ -1,0 +1,478 @@
+/* ==========================================================================
+🎮 LOBBY SCREEN CONTEXT (ROOM & TIME PICKER)
+========================================================================== */
+
+.lobby-screen-context {
+    flex-direction: column !important;
+    width: 100%;
+    height: 100vh !important;
+    padding: clamp(10px, 2vh, 15px) 15px !important;
+    box-sizing: border-box;
+    overflow: hidden !important;
+    justify-content: flex-start !important;
+    gap: clamp(8px, 1.5vh, 14px) !important;
+}
+
+.app-container:has(#screen-lobby:not(.hidden)) .lobby-screen-context {
+    display: flex !important;
+}
+
+/* ==========================================================================
+📤 LOBBY BACK BOX (المربع الجانبي للسحب)
+========================================================================== */
+.lobby-back-box {
+    position: fixed;
+    top: 25px;
+    left: 0;
+    width: 75px;
+    height: 60px;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--glass-border);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    z-index: 100;
+    transform: translate3d(-50px, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease;
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.lobby-back-box:active {
+    cursor: grabbing;
+}
+
+.lobby-back-box.loaded {
+    opacity: 1;
+}
+
+.lobby-back-box.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+}
+
+.lobby-back-btn {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.lobby-back-box.open .lobby-back-btn {
+    pointer-events: auto;
+}
+
+.lobby-back-btn svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.lobby-back-box.open svg {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+🎯 LOBBY HEADER (الهيدر: العنوان + زرار الرجوع)
+========================================================================== */
+.lobby-screen-context .lobby-header-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100%;
+    height: clamp(45px, 6vh, 55px) !important;
+    padding: 5px 0 0 0 !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-screen-title {
+    font-size: clamp(1.2rem, 4.5vw, 1.6rem) !important;
+    font-weight: 900;
+    width: 100% !important;
+    text-align: right !important;
+    padding-right: 5px !important;
+    color: var(--text-white);
+    text-shadow: 0 4px 10px var(--btn-shadow);
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-back-btn {
+    position: absolute !important;
+    left: 0px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    color: var(--text-white);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: clamp(1.3rem, 5vw, 1.6rem) !important;
+    cursor: pointer;
+    padding: 10px !important;
+    margin: 0;
+    z-index: 10;
+    transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.lobby-screen-context .lobby-back-btn svg {
+    display: block;
+}
+
+.lobby-screen-context .lobby-back-btn:active {
+    transform: translateY(-50%) scale(0.85) !important;
+    color: var(--crimson);
+}
+
+/* ==========================================================================
+➕ ADD PLAYER BOX (صندوق إضافة اللاعب)
+========================================================================== */
+.lobby-screen-context .lobby-add-player-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 0 !important;
+}
+
+.lobby-screen-context .lobby-player-input {
+    flex: 1;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--input-border);
+    padding: clamp(8px, 1.2vh, 12px) clamp(10px, 3vw, 15px) !important;
+    border-radius: 12px;
+    color: var(--text-white);
+    font-size: clamp(0.9rem, 3.5vw, 1rem) !important;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-player-input:focus {
+    background: var(--input-focus-bg);
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 15px var(--input-focus-shadow);
+}
+
+/* .lobby-screen-context .lobby-add-btn-trigger {
+    width: clamp(40px, 11vw, 46px) !important;
+    height: clamp(40px, 11vw, 46px) !important;
+    background: linear-gradient(135deg, var(--btn-expel-grad-start), var(--btn-expel-grad-end));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-white);
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px var(--btn-expel-shadow);
+    transition: transform 0.1s ease;
+} */
+
+.lobby-screen-context .lobby-add-btn-trigger:active {
+    transform: scale(0.9);
+}
+
+/* ==========================================================================
+📜 SCROLLABLE LIST (الكارت المظلم للّستة)
+========================================================================== */
+.lobby-screen-context .lobby-scrollable-list {
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    flex-grow: 1 !important;
+    height: auto !important;
+    min-height: 150px !important;
+    border-radius: 16px;
+    padding: 10px !important;
+    margin-bottom: 0 !important;
+    position: relative;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--input-focus-bg);
+    box-shadow: inset 0 0 20px var(--input-focus-shadow), 0 12px 36px var(--btn-shadow);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-scrollable-list::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* ==========================================================================
+👤 PLAYER CHIP (كارت اللاعب)
+========================================================================== */
+/* .lobby-screen-context .player-chip {
+    padding: clamp(6px, 1.2vh, 10px) 12px !important;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--player-chip-bg);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    border: 1px solid var(--player-chip-border);
+    border-right: 4px solid var(--btn-expel-grad-start);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+} */
+
+.lobby-screen-context .player-info-side {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lobby-screen-context .player-avatar {
+    width: clamp(34px, 9vw, 40px) !important;
+    height: clamp(34px, 9vw, 40px) !important;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--player-avatar-bg);
+    border: 1.5px solid var(--avatar-border);
+    display: block;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .player-name-text {
+    font-size: clamp(0.9rem, 3.8vw, 1.1rem) !important;
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+.lobby-screen-context .remove-player-btn {
+    position: relative;
+    scale: 1.5;
+    background: none;
+    border: none;
+    color: var(--btn-remove-color);
+    font-size: 1rem !important;
+    cursor: pointer;
+    padding: 0 4px;
+    top: 0 !important;
+    transition: color 0.2s ease;
+}
+
+.lobby-screen-context .remove-player-btn:active {
+    color: var(--btn-close-x-color);
+}
+
+/* ==========================================================================
+💥 SUPER SMOOTH REMOVE PLAYER ANIMATION
+========================================================================== */
+.lobby-screen-context .player-chip.removing {
+    animation: zeroStutterSlideOut 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    pointer-events: none;
+    will-change: transform, opacity, margin, max-height;
+}
+
+@keyframes zeroStutterSlideOut {
+    0% {
+        transform: translateX(0) scaleY(1);
+        opacity: 1;
+        max-height: 120px;
+        margin-bottom: 6px;
+    }
+    
+    40% {
+        transform: translateX(-105%) scaleY(1);
+        opacity: 0;
+        max-height: 120px;
+        margin-bottom: 6px;
+    }
+    
+    100% {
+        transform: translateX(-105%) scaleY(0);
+        opacity: 0;
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+/* ==========================================================================
+📊 FOOTER BOX (عداد اللاعبين + اختيار الوقت + زرار البداية)
+========================================================================== */
+.lobby-screen-context .lobby-footer-box {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vh, 12px) !important;
+    margin-top: 0 !important;
+}
+
+.lobby-screen-context .lobby-counter-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(8px, 1.2vh, 12px) 15px !important;
+    border-radius: 12px;
+    width: 100%;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--input-focus-bg);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .lobby-counter-badge .badge-title {
+    font-size: clamp(0.95rem, 3.8vw, 1.1rem) !important;
+    font-weight: 700;
+    color: var(--text-badge-title);
+}
+
+.lobby-screen-context .lobby-counter-badge .lobby-count-highlight {
+    font-size: clamp(1rem, 3.8vw, 1.15rem) !important;
+    font-weight: 900;
+    color: var(--title-gold);
+    text-shadow: 0 0 10px var(--title-gold-shadow);
+}
+
+/* ==========================================================================
+⏱️ TIME PICKER (اختيار وقت التحدي)
+========================================================================== */
+.lobby-screen-context .lobby-time-picker-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+}
+
+.lobby-screen-context .time-picker-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-badge-title);
+    padding-right: 5px;
+}
+
+.lobby-screen-context .lobby-time-chips {
+    display: flex;
+    gap: clamp(6px, 3vw, 12px) !important;
+    width: 100%;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.lobby-screen-context .time-chip {
+    flex: 1;
+    padding: clamp(8px, 1.5vh, 12px) 4px !important;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--input-focus-bg);
+    border-radius: 10px;
+    color: var(--text-time-chip);
+    font-size: clamp(0.8rem, 3.2vw, 0.95rem) !important;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lobby-screen-context .time-chip:active {
+    transform: scale(0.95);
+}
+
+.lobby-screen-context .time-chip.active {
+    background: linear-gradient(135deg, var(--time-chip-active-grad-start), var(--time-chip-active-grad-end)) !important;
+    color: var(--text-white) !important;
+    font-weight: bold;
+    transform: scale(1.04);
+    animation: borderLaserGlow 1.8s infinite ease-in-out;
+}
+
+/* ==========================================================================
+🚀 START BUTTON (زرار جاهزين؟)
+========================================================================== */
+/* .lobby-screen-context .lobby-start-btn-trigger {
+    width: 100%;
+    padding: clamp(10px, 1.8vh, 14px) !important;
+    border: 1px solid var(--objection-modal-border);
+    border-radius: 12px;
+    font-size: clamp(1rem, 4vw, 1.25rem) !important;
+    font-weight: 900;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--btn-action-grad-start), var(--btn-action-grad-end));
+    color: var(--text-white);
+    box-shadow: 0 6px 10px var(--btn-expel-shadow);
+    box-sizing: border-box;
+    text-align: center;
+    white-space: nowrap;
+    transition: transform 0.1s ease, border-color 0.2s ease;
+} */
+
+.lobby-screen-context .lobby-start-btn-trigger:active {
+    transform: scale(0.97);
+}
+
+/* ==========================================================================
+🎬 LOBBY KEYFRAMES
+========================================================================== */
+@keyframes borderLaserGlow {
+    0% {
+        border-color: var(--laser-glow-border) !important;
+        box-shadow: 0 0 10px var(--laser-glow-shadow), inset 0 0 4px var(--laser-glow-inset);
+    }
+
+    50% {
+        border-color: var(--laser-glow-active-border) !important;
+        box-shadow: 0 0 12px 1px var(--laser-glow-active-shadow), inset 0 0 8px var(--laser-glow-active-inset);
+    }
+
+    100% {
+        border-color: var(--laser-glow-border) !important;
+        box-shadow: 0 0 10px var(--laser-glow-shadow), inset 0 0 4px var(--laser-glow-inset);
+    }
+}
+
+@keyframes removePlayerSwipe {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+        max-height: 80px;
+    }
+
+    40% {
+        background: var(--remove-swipe-bg) !important;
+    }
+
+    100% {
+        transform: translateX(-120%);
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        border-color: transparent;
+    }
+}

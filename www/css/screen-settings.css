@@ -1,0 +1,382 @@
+/* ==========================================================================
+⚙️ SETTINGS SCREEN CONTEXT (شاشة الإعدادات)
+========================================================================== */
+
+.app-container:has(#screen-settings:not(.hidden)) {
+    background-image: linear-gradient(var(--settings-bg-grad-start), var(--settings-bg-grad-end)), url(../img/bbg.png) !important;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    transition: background-image 0.4s ease-in-out;
+}
+
+.settings-screen-context {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0px 8px;
+    box-sizing: border-box;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+}
+
+.settings-header-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    padding: 20px 15px 10px 15px;
+    box-sizing: border-box;
+}
+
+.settings-screen-context .settings-main-title {
+    font-size: clamp(1.4rem, 5.5vw, 1.8rem) !important;
+    font-weight: 900;
+    color: var(--text-white) !important;
+    margin: 0;
+    width: 100% !important;
+    text-align: right !important;
+    padding-right: 10px !important;
+    box-sizing: border-box;
+    letter-spacing: -0.5px;
+}
+
+.settings-back-box-container {
+    position: fixed;
+    top: 25px;
+    left: 0;
+    width: 75px;
+    height: 60px;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--glass-border);
+    border-left: none;
+    border-radius: 0 16px 16px 0;
+    z-index: 100;
+    transform: translate3d(-50px, 0, 0);
+    transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease;
+    will-change: transform, top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.settings-back-box-container:active:not(.open) {
+    cursor: grabbing;
+}
+
+.settings-back-box-container.loaded {
+    opacity: 1;
+}
+
+.settings-back-box-container.open {
+    transform: translate3d(0, 0, 0);
+    justify-content: center;
+    padding-right: 0;
+    cursor: grab;
+}
+
+.settings-back-btn-element {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.settings-back-box-container.open .settings-back-btn-element {
+    pointer-events: auto;
+}
+
+.settings-back-btn-element svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.settings-back-box-container.open svg {
+    transform: scale(1.05);
+}
+
+.settings-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 15px 5px 15px 5px !important;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.settings-options-list::-webkit-scrollbar,
+::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.settings-option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
+    border: 1px solid var(--option-item-border);
+    border-radius: 18px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--option-item-inset-shadow);
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+}
+
+.settings-option-item:active {
+    transform: scale(0.99);
+    background: linear-gradient(135deg, var(--option-item-inset-shadow) 0%, var(--option-active-grad-end) 100%), var(--option-active-bg);
+}
+
+.option-info-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.option-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 700;
+    color: var(--text-white) !important;
+}
+
+.option-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--option-desc-color) !important;
+    line-height: 1.5;
+}
+
+.action-arrow-indicator {
+    color: var(--arrow-indicator-color) !important;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.settings-option-item:active .action-arrow-indicator {
+    color: var(--text-white) !important;
+}
+
+/* ==========================================================================
+🎨 SVG ICONS
+========================================================================== */
+.theme-svg-icon {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.mind-svg-icon,
+.sound-svg-icon,
+.Vibrate-svg-icon,
+.Lightbulb-svg-icon,
+.support-svg-icon {
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.mind-svg-icon, .sound-svg-icon { width: 20px !important; height: 20px !important; }
+.Vibrate-svg-icon { width: 21px !important; height: 21px !important; }
+.Lightbulb-svg-icon, .support-svg-icon { width: 22px !important; height: 22px !important; }
+
+/* ==========================================================================
+🎛️ MODERN TOGGLE SWITCH
+========================================================================== */
+.switch-toggle-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.switch-toggle-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.custom-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--toggle-bg);
+    border: 1px solid var(--option-item-inset-shadow);
+    border-radius: 34px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 3px;
+    background-color: var(--toggle-knob);
+    border-radius: 50%;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.switch-toggle-wrapper input:checked+.custom-toggle-slider {
+    background: linear-gradient(135deg, var(--epic-glow-active-border) 0%, var(--toggle-active-end) 100%);
+    border-color: var(--toggle-active-border);
+    box-shadow: 0 0 12px var(--toggle-active-glow);
+}
+
+.switch-toggle-wrapper input:checked+.custom-toggle-slider::before {
+    transform: translateX(22px);
+    background-color: var(--text-white);
+}
+
+/* ==========================================================================
+🎨 THEME PICKER VERTICAL CARD
+========================================================================== */
+.settings-option-item.theme-vertical-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    cursor: default;
+}
+
+.settings-option-item.theme-vertical-card:active {
+    transform: none;
+}
+
+.theme-picker-container {
+    display: flex;
+    gap: clamp(8px, 4.5vw, 18px);
+    width: 100%;
+    justify-content: center;
+    padding-top: 4px;
+    flex-wrap: wrap;
+}
+
+.theme-dot {
+    display: block;
+    width: clamp(25px, 7.5vw, 29px);
+    height: clamp(25px, 7.5vw, 29px);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--theme-dot-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 1;
+}
+
+.theme-dot:hover {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.theme-circle-wrapper input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+}
+
+/* ألوان الثيمات */
+.color-crimson { background: var(--epic-glow-active-border); }
+.color-blue { background: var(--theme-crimson); }
+.color-green { background: var(--theme-green); }
+.color-purple { background: var(--theme-purple); }
+.color-gold { background: var(--theme-gold); }
+
+.theme-circle-wrapper input[type="radio"]:checked+.theme-dot {
+    transform: scale(1.2);
+    border-color: var(--text-white);
+}
+
+.theme-circle-wrapper input[type="radio"]:checked+.color-crimson {
+    box-shadow: 0 0 16px var(--theme-crimson-glow);
+}
+.theme-circle-wrapper input[type="radio"]:checked+.color-blue {
+    box-shadow: 0 0 16px var(--theme-blue-glow);
+}
+.theme-circle-wrapper input[type="radio"]:checked+.color-green {
+    box-shadow: 0 0 16px var(--theme-green-glow);
+}
+.theme-circle-wrapper input[type="radio"]:checked+.color-purple {
+    box-shadow: 0 0 16px var(--theme-purple-glow);
+}
+.theme-circle-wrapper input[type="radio"]:checked+.color-gold {
+    box-shadow: 0 0 16px var(--theme-gold-glow);
+}
+
+/* ==========================================================================
+❓ HELP BUTTON
+========================================================================== */
+#help-btn-trigger {
+    color: var(--text-white) !important;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+}
+
+/* ==========================================================================
+🟢 MOOD BADGE
+========================================================================== */
+.mood {
+    position: absolute;
+    top: 65px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    border-radius: 20px;
+    font-family: 'Cairo';
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+    padding: 4px 10px;
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    max-width: 85%;
+    text-align: center;
+}
+
+
