@@ -1775,7 +1775,7 @@ if (btnMasterReveal) {
             document.getElementById('initial-actions-group').style.display = 'none';
             document.getElementById('verify-actions-group').style.display = 'grid';
             const votingTargetEl = document.getElementById('voting-target-player');
-            if (votingTargetEl) votingTargetEl.innerHTML = `شوفو التحدي! هل نفذه وقالو صح?`;
+            if (votingTargetEl) votingTargetEl.innerHTML = `شوفو التحدي! هل نفذه وقالو صح؟`;
         }
     };
 }
@@ -1856,7 +1856,7 @@ function showSpierGuessStep() {
 function revealChallengeAndJudge(targetPlayerName, spierName) {
     const currentVoteData = gameSettings.roles[caughtPlayerIndex];
     const votingTargetEl = document.getElementById('voting-target-player');
-    if (votingTargetEl) votingTargetEl.innerHTML = `هل تخمين <span style="color:#e67e22; font-weight:900;">${spierName}</span> طلع صح ومطابق؟`;
+    if (votingTargetEl) votingTargetEl.innerHTML = `هل تخمين <span style="color:#e67e22; font-weight:900;">${spierName}</span> طلع صح؟`;
     const voteContainer = document.querySelector('.arcade-court-container');
     let judgeGrid = document.getElementById('judge-options-grid');
     if (!judgeGrid) {

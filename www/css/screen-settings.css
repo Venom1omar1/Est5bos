@@ -15,7 +15,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0px 8px;
+    padding: 0px clamp(6px, 2vw, 10px); /* ✅ بدل padding: 0px 8px */
     box-sizing: border-box;
     height: auto !important;
     min-height: 100% !important;
@@ -28,7 +28,7 @@
     justify-content: center;
     position: relative;
     width: 100%;
-    padding: 20px 15px 10px 15px;
+    padding: clamp(15px, 3vh, 20px) clamp(12px, 3vw, 15px) clamp(8px, 2vh, 10px) clamp(12px, 3vw, 15px); /* ✅ بدل padding: 20px 15px 10px 15px */
     box-sizing: border-box;
 }
 
@@ -39,17 +39,17 @@
     margin: 0;
     width: 100% !important;
     text-align: right !important;
-    padding-right: 10px !important;
+    padding-right: clamp(8px, 2vw, 10px) !important; /* ✅ بدل padding-right: 10px */
     box-sizing: border-box;
     letter-spacing: -0.5px;
 }
 
 .settings-back-box-container {
     position: fixed;
-    top: 25px;
+    top: clamp(15px, 3vh, 25px); /* ✅ بدل top: 25px */
     left: 0;
-    width: 75px;
-    height: 60px;
+    width: clamp(60px, 15vw, 75px); /* ✅ بدل width: 75px */
+    height: clamp(50px, 8vh, 60px); /* ✅ بدل height: 60px */
     background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
     border: 1px solid var(--glass-border);
     border-left: none;
@@ -64,7 +64,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-right: 12px;
+    padding-right: clamp(10px, 2vw, 12px); /* ✅ بدل padding-right: 12px */
     opacity: 0;
     user-select: none;
     -webkit-user-select: none;
@@ -104,8 +104,8 @@
 }
 
 .settings-back-btn-element svg {
-    width: 24px;
-    height: 24px;
+    width: clamp(20px, 5vw, 24px); /* ✅ بدل width: 24px */
+    height: clamp(20px, 5vw, 24px); /* ✅ بدل height: 24px */
     transition: transform 0.2s ease;
 }
 
@@ -116,11 +116,11 @@
 .settings-options-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: clamp(10px, 2vh, 14px); /* ✅ بدل gap: 14px */
     width: 100%;
     height: auto !important;
     overflow: visible !important;
-    padding: 15px 5px 15px 5px !important;
+    padding: clamp(12px, 2.5vh, 15px) clamp(4px, 1vw, 5px) clamp(12px, 2.5vh, 15px) clamp(4px, 1vw, 5px) !important; /* ✅ بدل padding: 15px 5px 15px 5px */
     box-sizing: border-box;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -137,13 +137,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    gap: clamp(10px, 3vw, 15px); /* ✅ بدل gap: 15px */
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
     border: 1px solid var(--option-item-border);
     border-radius: 18px;
-    padding: 16px 20px;
+    padding: clamp(12px, 2vh, 16px) clamp(15px, 3vw, 20px); /* ✅ بدل padding: 16px 20px */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 var(--option-item-inset-shadow);
     transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
 }
@@ -156,14 +156,14 @@
 .option-info-side {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: clamp(4px, 1vh, 6px); /* ✅ بدل gap: 6px */
 }
 
 .option-title {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 1.1rem;
+    gap: clamp(4px, 1vw, 5px); /* ✅ بدل gap: 5px */
+    font-size: clamp(1rem, 3.5vw, 1.1rem); /* ✅ بدل font-size: 1.1rem */
     margin: 0;
     font-weight: 700;
     color: var(--text-white) !important;
@@ -171,14 +171,14 @@
 
 .option-desc {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 2.8vw, 0.85rem); /* ✅ بدل font-size: 0.85rem */
     color: var(--option-desc-color) !important;
     line-height: 1.5;
 }
 
 .action-arrow-indicator {
     color: var(--arrow-indicator-color) !important;
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 3.5vw, 1.1rem); /* ✅ بدل font-size: 1.1rem */
     transition: transform 0.2s ease, color 0.2s ease;
 }
 
@@ -190,8 +190,8 @@
 🎨 SVG ICONS
 ========================================================================== */
 .theme-svg-icon {
-    width: 24px !important;
-    height: 24px !important;
+    width: clamp(20px, 5vw, 24px) !important; /* ✅ بدل width: 24px */
+    height: clamp(20px, 5vw, 24px) !important; /* ✅ بدل height: 24px */
     display: inline-block;
     vertical-align: middle;
     flex-shrink: 0;
@@ -206,9 +206,20 @@
     flex-shrink: 0;
 }
 
-.mind-svg-icon, .sound-svg-icon { width: 20px !important; height: 20px !important; }
-.Vibrate-svg-icon { width: 21px !important; height: 21px !important; }
-.Lightbulb-svg-icon, .support-svg-icon { width: 22px !important; height: 22px !important; }
+.mind-svg-icon, .sound-svg-icon { 
+    width: clamp(18px, 4.5vw, 20px) !important; /* ✅ بدل width: 20px */
+    height: clamp(18px, 4.5vw, 20px) !important; /* ✅ بدل height: 20px */
+}
+
+.Vibrate-svg-icon { 
+    width: clamp(19px, 4.8vw, 21px) !important; /* ✅ بدل width: 21px */
+    height: clamp(19px, 4.8vw, 21px) !important; /* ✅ بدل height: 21px */
+}
+
+.Lightbulb-svg-icon, .support-svg-icon { 
+    width: clamp(20px, 5vw, 22px) !important; /* ✅ بدل width: 22px */
+    height: clamp(20px, 5vw, 22px) !important; /* ✅ بدل height: 22px */
+}
 
 /* ==========================================================================
 🎛️ MODERN TOGGLE SWITCH
@@ -216,8 +227,8 @@
 .switch-toggle-wrapper {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 28px;
+    width: clamp(45px, 12vw, 50px); /* ✅ بدل width: 50px */
+    height: clamp(25px, 6vw, 28px); /* ✅ بدل height: 28px */
     flex-shrink: 0;
     pointer-events: none;
 }
@@ -244,8 +255,8 @@
 .custom-toggle-slider::before {
     content: "";
     position: absolute;
-    height: 20px;
-    width: 20px;
+    height: clamp(18px, 4.5vw, 20px); /* ✅ بدل height: 20px */
+    width: clamp(18px, 4.5vw, 20px); /* ✅ بدل width: 20px */
     left: 4px;
     bottom: 3px;
     background-color: var(--toggle-knob);
@@ -271,7 +282,7 @@
 .settings-option-item.theme-vertical-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: clamp(12px, 2.5vh, 16px); /* ✅ بدل gap: 16px */
     cursor: default;
 }
 
@@ -284,7 +295,7 @@
     gap: clamp(8px, 4.5vw, 18px);
     width: 100%;
     justify-content: center;
-    padding-top: 4px;
+    padding-top: clamp(2px, 0.5vh, 4px); /* ✅ بدل padding-top: 4px */
     flex-wrap: wrap;
 }
 
@@ -349,7 +360,7 @@
 #help-btn-trigger {
     color: var(--text-white) !important;
     font-family: 'Cairo', sans-serif;
-    font-size: 1.7rem;
+    font-size: clamp(1.5rem, 4.5vw, 1.7rem); /* ✅ بدل font-size: 1.7rem */
     font-weight: 700;
     display: inline-flex;
     justify-content: center;
@@ -362,7 +373,7 @@
 ========================================================================== */
 .mood {
     position: absolute;
-    top: 65px;
+    top: clamp(55px, 8vh, 65px); /* ✅ بدل top: 65px */
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -373,10 +384,8 @@
     font-family: 'Cairo';
     font-weight: bold;
     box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
-    padding: 4px 10px;
+    padding: clamp(3px, 0.8vh, 4px) clamp(8px, 2vw, 10px); /* ✅ بدل padding: 4px 10px */
     font-size: clamp(0.7rem, 2.5vw, 0.85rem);
     max-width: 85%;
     text-align: center;
 }
-
-

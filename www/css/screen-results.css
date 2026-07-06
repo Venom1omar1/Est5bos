@@ -277,7 +277,7 @@
 
 .podium-player-name {
     color: #ffffff;
-    font-size: clamp(0.75rem, 2.4vw, 0.9rem);
+    font-size: clamp(0.75rem, 4vw, 2rem);
     font-weight: 800;
     text-align: center;
     letter-spacing: 0.3px;
@@ -290,6 +290,7 @@
 }
 
 .podium-player-score {
+    margin-bottom: 10px;
     font-size: clamp(0.6rem, 2vw, 0.8rem);
     font-weight: 900;
     padding: 2px clamp(6px, 1.8vw, 10px);
@@ -679,3 +680,35 @@ button:active {
         font-size: 1.1rem;
     }
 }
+
+
+.results-btn-cyber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: clamp(1rem, 2.8vw, 1.2rem);
+    font-weight: 700;
+}
+
+.results-btn-cyber .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.15em;
+    height: 2em;
+    flex-shrink: 0;
+}
+
+.results-btn-cyber .btn-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: currentColor;
+}
+
+.results-btn-cyber .btn-text {
+    line-height: 1;
+} 

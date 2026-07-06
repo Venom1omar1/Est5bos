@@ -5,8 +5,9 @@
 .lobby-screen-context {
     flex-direction: column !important;
     width: 100%;
-    height: 100vh !important;
-    padding: clamp(10px, 2vh, 15px) 15px !important;
+    height: 100vh !important; /* Fallback */
+    height: 100dvh !important; /* ✅ الحل السحري لمشكلة شريط العنوان في الموبايل */
+    padding: clamp(10px, 2vh, 15px) clamp(12px, 4vw, 20px) !important; /* ✅ تعديل الـ padding الجانبي */
     box-sizing: border-box;
     overflow: hidden !important;
     justify-content: flex-start !important;
@@ -22,10 +23,10 @@
 ========================================================================== */
 .lobby-back-box {
     position: fixed;
-    top: 25px;
+    top: clamp(15px, 3vh, 25px); /* ✅ بدل top: 25px; */
     left: 0;
-    width: 75px;
-    height: 60px;
+    width: clamp(60px, 15vw, 75px); /* ✅ بدل width: 75px; */
+    height: clamp(50px, 8vh, 60px); /* ✅ بدل height: 60px; */
     background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
     border: 1px solid var(--glass-border);
     border-left: none;
@@ -204,9 +205,9 @@
     overflow-y: auto !important;
     flex-grow: 1 !important;
     height: auto !important;
-    min-height: 150px !important;
+    min-height: clamp(120px, 25vh, 200px) !important; /* ✅ بدل min-height: 150px */
     border-radius: 16px;
-    padding: 10px !important;
+    padding: clamp(8px, 2vw, 16px) !important; /* ✅ بدل padding: 10px */
     margin-bottom: 0 !important;
     position: relative;
     background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
@@ -332,7 +333,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(8px, 1.2vh, 12px) 15px !important;
+    padding: clamp(8px, 1.2vh, 12px) clamp(12px, 3vw, 20px) !important; /* ✅ بدل padding: ... 15px */
     border-radius: 12px;
     width: 100%;
     background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
@@ -384,7 +385,7 @@
 
 .lobby-screen-context .time-chip {
     flex: 1;
-    padding: clamp(8px, 1.5vh, 12px) 4px !important;
+    padding: clamp(8px, 1.5vh, 12px) clamp(4px, 1vw, 8px) !important; /* ✅ بدل padding: ... 4px */
     background: radial-gradient(circle, var(--lobby-box-grad-start) 0%, var(--lobby-box-grad-end) 100%), var(--lobby-box-bg-overlay);
     border: 1px solid var(--input-focus-bg);
     border-radius: 10px;
