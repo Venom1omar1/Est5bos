@@ -77,7 +77,7 @@
     z-index: 2; 
     margin: 0;
     text-align: center;
-    animation: winnerFloat 3s ease-in-out infinite alternate;
+    animation: winnerFloat-2 3s ease-in-out infinite alternate;
 }
 
 /* ==========================================================================
@@ -559,6 +559,16 @@ button:active {
 }
 
 @keyframes winnerFloat {
+    0% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    100% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+@keyframes winnerFloat-2 {
     0% {
         transform: translateY(0);
     }
