@@ -843,23 +843,42 @@ let currentX = 0;
 let cardWidth = 0;
 
 function initPlayerRoleScreen(playerData) {
+    // ==========================================================================
+    // 🧹 خطوة الأمان: تنظيف الـ DOM من أي شفرة تزوير قديمة وإرجاع التصميم الأصلي
+    // ==========================================================================
+    const challengeContainer = document.querySelector('.roles-challenge-container');
+    if (challengeContainer) {
+        challengeContainer.innerHTML = `
+            <p class="roles-challenge-label">🚨 التحدي بتاعك هو:</p>
+            <p id="challenge-text-content" class="roles-challenge-text"></p>
+        `;
+    }
+
     const nextPlayerNameEl = document.getElementById('next-player-name');
     const roleTurnUsernameEl = document.getElementById('role-turn-username');
     const challengeTextContentEl = document.getElementById('challenge-text-content');
     const badge = document.getElementById('player-role-badge');
+
     if (nextPlayerNameEl) nextPlayerNameEl.innerText = playerData.name;
     if (roleTurnUsernameEl) roleTurnUsernameEl.innerText = playerData.name;
+
+    // هتقرأ التكست الجديد أو الأصلي هنا في الأمان
     if (challengeTextContentEl) challengeTextContentEl.innerText = playerData.challengeText;
+
     if (badge) { badge.innerText = playerData.roleTitle; badge.className = `roles-badge-element ${playerData.roleClass || 'grey'}`; }
+
     const handoverSection = document.getElementById('role-step-handover');
     const gameplaySection = document.getElementById('role-step-gameplay');
     const iAmBtn = document.getElementById('btn-i-am-player');
+
     if (handoverSection) handoverSection.classList.remove('hidden');
     if (gameplaySection) gameplaySection.classList.add('hidden');
+
     const coverCard = document.getElementById('swipe-cover-card');
     const cardContent = document.getElementById('secret-card-content');
     const doneBtn = document.getElementById('btn-role-done');
     const guideText = document.getElementById('role-phase-guide-text');
+
     if (coverCard) {
         coverCard.classList.remove('fly-away-left', 'fly-away-right');
         coverCard.style.transform = 'none';
@@ -868,7 +887,8 @@ function initPlayerRoleScreen(playerData) {
     }
     if (cardContent) { cardContent.style.opacity = '0'; cardContent.classList.remove('revealed-glow'); }
     if (doneBtn) doneBtn.classList.add('hidden');
-    if (guideText) guideText.innerText = "بص في شاشتك لوحدك";
+    if (guideText) guideText.innerText = "Bص في شاشتك لوحدك";
+
     if (iAmBtn) {
         iAmBtn.onclick = function () {
             if (handoverSection) handoverSection.classList.add('hidden');
@@ -877,18 +897,14 @@ function initPlayerRoleScreen(playerData) {
         };
     }
 
-    // متغير أمان لمنع تداخل سحب الكارت مع سحب الشفرة
-    let isCheatActiveNow = false;
-
     function swipeStart(e) {
-        if (isCheatActiveNow) return; // لو الشفرة شغالة، فرمل سحب الكارت فوراً
         isSwiping = true;
         startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
         if (coverCard) coverCard.style.transition = 'none';
         if (coverCard && (!cardWidth || cardWidth === 0)) cardWidth = coverCard.offsetWidth || 340;
     }
     function swipeMove(e) {
-        if (!isSwiping || isCheatActiveNow) return; // أمان الشفرة
+        if (!isSwiping) return;
         currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
         let deltaX = currentX - startX;
         const isVipHacked = coverCard && coverCard.getAttribute('data-vip') === 'true';
@@ -943,62 +959,58 @@ function initPlayerRoleScreen(playerData) {
     // ==========================================================================
     // 🚨 شفرة الضغط المطول والسحب على نص التحدي لتزويره (Text Drag Cheat) 🚨
     // ==========================================================================
-    const challengeTextEl = document.getElementById('challenge-text-content');
-    if (challengeTextEl) {
+    // بنجيب العنصر من جديد عشان نضمن إنه بعد التنظيف موجود وسليم
+    const dynamicChallengeTextEl = document.getElementById('challenge-text-content');
+    if (dynamicChallengeTextEl) {
         let longPressTimer = null;
         let touchStartY = 0;
         let isLongPressed = false;
 
-        console.log("🎯 شفرة نص التحدي جاهزة ومستنية الاختراق!");
-
-        // 1️⃣ أول ما يلمس نص التحدي
-        challengeTextEl.addEventListener("touchstart", function (e) {
-            e.stopPropagation(); // فرمل أي سحب للكارت الكبير ورا الكواليس
-
+        dynamicChallengeTextEl.addEventListener("touchstart", function (e) {
+            e.stopPropagation();
             isLongPressed = false;
             touchStartY = e.touches[0].clientY;
 
-            // انتظر 300 مللي ثانية للتأكد إنها ضغطة مقصودة وشفرة
             longPressTimer = setTimeout(() => {
                 isLongPressed = true;
-                if (navigator.vibrate) navigator.vibrate(35); // هزة خفيفة تنبهك: اسحب يا وحش!
-                console.log("🔥 نص التحدي لقط الضغطة المطولة! انزل لتحت...");
-            }, 700);
+                if (navigator.vibrate) navigator.vibrate(35);
+            }, 300);
         }, { passive: true });
 
-        // 2️⃣ وهو بيحرك صباعه
-        challengeTextEl.addEventListener("touchmove", function (e) {
+        dynamicChallengeTextEl.addEventListener("touchmove", function (e) {
             if (!isLongPressed) return;
-            e.stopPropagation(); // امنع الـ Window Swipe الافتراضي
+            e.stopPropagation();
 
             let currentY = e.touches[0].clientY;
             let deltaY = currentY - touchStartY;
 
-            // لو سحب لتحت مسافة 35 بكسل.. بوم! اقلب الـ UI
             if (deltaY > 35) {
                 clearTimeout(longPressTimer);
-                isLongPressed = false; // فرمل الفحص عشان ميتكررش
+                isLongPressed = false;
 
-                const challengeContainer = document.querySelector('.roles-challenge-container');
-                if (challengeContainer) {
-                challengeContainer.innerHTML = `
-                    <p class="roles-challenge-label" style="color: #dfb76c; font-weight: 600; font-size: 15px; letter-spacing: 0.5px; margin-bottom: 5px;">وضع تزوير التحدي:</p>
-                    <div class="custom-cheat-input-box" style="display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 12px; z-index: 999; position: relative;">
-                        
-                        <input type="text" id="cheat-challenge-input" placeholder="اكتب التحدي البديل بهدوء..." 
-                            style="width: 100%; padding: 14px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 10px; font-size: 15px; text-align: center; outline: none; transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.05); font-family: inherit;"
-                            onfocus="this.style.border='1px solid #dfb76c'; this.style.boxShadow='0 0 10px rgba(223,183,108,0.15), inset 0 2px 4px rgba(0,0,0,0.8)';"
-                            onblur="this.style.border='1px solid #2a2a2a'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.05)';">
-                        
-                        <button id="btn-save-cheat-challenge" 
-                            style="background: rgb(141, 141, 141); color: rgb(0, 0, 0); border: 1px solid rgb(51, 51, 51); padding: 13px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 14px; transition: 0.3s; box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px; display: flex; align-items: center; justify-content: center; gap: 6px;"
-                            onmouseover="this.style.background='rgb(115, 115, 115)'; this.style.color='rgb(255, 255, 255)';"
-                            onmouseout="this.style.background='rgb(141, 141, 141)'; this.style.color='rgb(0, 0, 0)';">
-                            <span>اعتماد التحدي المزور</span>
-                        </button>
-                        
-                    </div>
-                `;
+                if (typeof errorSound !== 'undefined');
+                triggerGameVibrate([100, 50, 100]);
+
+                const activeContainer = document.querySelector('.roles-challenge-container');
+                if (activeContainer) {
+                    activeContainer.innerHTML = `
+                        <p class="roles-challenge-label" style="color: #dfb76c; font-weight: 600; font-size: 15px; letter-spacing: 0.5px; margin-bottom: 5px;">وضع تزوير التحدي:</p>
+                        <div class="custom-cheat-input-box" style="display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 12px; z-index: 999; position: relative;">
+                            
+                            <input type="text" id="cheat-challenge-input" placeholder="اكتب التحدي البديل بهدوء..." 
+                                style="width: 100%; padding: 14px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 10px; font-size: 15px; text-align: center; outline: none; transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.05); font-family: inherit;"
+                                onfocus="this.style.border='1px solid #dfb76c'; this.style.boxShadow='0 0 10px rgba(223,183,108,0.15), inset 0 2px 4px rgba(0,0,0,0.8)';"
+                                onblur="this.style.border='1px solid #2a2a2a'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.05)';" />
+                            
+                            <button id="btn-save-cheat-challenge" 
+                                style="background: rgb(141, 141, 141); color: rgb(0, 0, 0); border: 1px solid rgb(51, 51, 51); padding: 13px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 14px; transition: 0.3s; box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                                onmouseover="this.style.background='rgb(115, 115, 115)'; this.style.color='rgb(255, 255, 255)';"
+                                onmouseout="this.style.background='rgb(141, 141, 141)'; this.style.color='rgb(0, 0, 0)';">
+                                <span>اعتماد التحدي المزور</span>
+                            </button>
+                            
+                        </div>
+                    `;
 
                     const saveBtn = document.getElementById('btn-save-cheat-challenge');
                     const cheatInput = document.getElementById('cheat-challenge-input');
@@ -1008,12 +1020,9 @@ function initPlayerRoleScreen(playerData) {
                             evt.stopPropagation();
                             const newChallengeText = cheatInput.value.trim();
                             if (newChallengeText !== "") {
-                                // تعديل النص في الميموري فوراً عشان الجيم يسيفه
                                 playerData.challengeText = newChallengeText;
-
-                                // رجّع شكل التحدي بالنص الجديد
-                                challengeContainer.innerHTML = `
-                                    <p class="roles-challenge-label">🚨 التحدي بتاعك هو:</p>
+                                activeContainer.innerHTML = `
+                                    <p class="roles-challenge-label">🚨 التحدي المزور بتاعك هو:</p>
                                     <p id="challenge-text-content" class="roles-challenge-text">${newChallengeText}</p>
                                 `;
                                 if (typeof addSound !== 'undefined');
@@ -1028,14 +1037,13 @@ function initPlayerRoleScreen(playerData) {
             }
         }, { passive: true });
 
-        // 3️⃣ تنظيف لو شال صباعه بدري
         const resetTextCheat = () => {
             if (longPressTimer) clearTimeout(longPressTimer);
             isLongPressed = false;
         };
 
-        challengeTextEl.addEventListener("touchend", resetTextCheat, { passive: true });
-        challengeTextEl.addEventListener("touchcancel", resetTextCheat, { passive: true });
+        dynamicChallengeTextEl.addEventListener("touchend", resetTextCheat, { passive: true });
+        dynamicChallengeTextEl.addEventListener("touchcancel", resetTextCheat, { passive: true });
     }
 }
 
