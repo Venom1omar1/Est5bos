@@ -1719,8 +1719,9 @@ function triggerChaosMode() {
     playGameSound(zeroingSound);
     triggerGameVibrate([100, 100, 100, 100, 100, 100, 100, 100, 100]);
     isChaosActive = true;
-
-    // 🚨 شيلنا خطوة إيقاف العداد الأساسي (isTimerPaused = true) عشان يكمل برة طبيعي!
+    
+    // 🚨 رجعنا فرملة العداد الأساسي برة عشان يقف طول ما الفوضى شغالة
+    isTimerPaused = true; 
 
     const randomIndex = Math.floor(Math.random() * chaosOrders.length);
     const selectedOrder = chaosOrders[randomIndex];
@@ -1765,7 +1766,10 @@ function triggerChaosMode() {
 function clearChaosUI() {
     if (chaosInterval) { clearInterval(chaosInterval); chaosInterval = null; }
     isChaosActive = false;
-    // 🚨 شيلنا تفعيل العداد من هنا لأنه أصلاً مكنش واقف
+    
+    // 🚨 شغل العداد الأساسي تاني فوراً بعد انتهاء الفوضى
+    isTimerPaused = false; 
+
     document.body.classList.remove("chaos-alert-active");
     const appContainer = document.querySelector('.app-container');
     if (appContainer) appContainer.classList.remove('chaos-dark-mode');
@@ -1782,7 +1786,7 @@ async function startCourtroomTimer() {
     let secondsPassedInCourt = 0;
     guaranteedChaosTimes = [];
     if (chaosOrders.length === 0) await loadChaosOrders();
-    
+
     if (isChaosModeEnabled) {
         if (gameSettings.timeLimit !== "unlimited") {
             const totalSecs = Number(gameSettings.timeLimit) * 60;
@@ -1794,8 +1798,8 @@ async function startCourtroomTimer() {
 
             // 🛡️ حماية لو الجيم كله دقيقتين أو أقل.. بنصغر ليميت الأمان عشان الفوضى تلحق تشتغل
             if (totalSecs <= 120) {
-                minSafeTime = 20; 
-                maxSafeTime = totalSecs - 20; 
+                minSafeTime = 20;
+                maxSafeTime = totalSecs - 20;
             }
 
             for (let i = 0; i < calculatedEvents; i++) {
@@ -1850,13 +1854,27 @@ async function startCourtroomTimer() {
                     const randomIndex = Math.floor(Math.random() * currentRoundEvents.length);
                     const pulledEvent = currentRoundEvents.splice(randomIndex, 1)[0];
                     const caseTextEl = document.getElementById("court-case-text");
+
                     if (caseTextEl) {
                         caseTextEl.innerText = pulledEvent;
                         caseTextEl.setAttribute("data-target-case", pulledEvent);
                         console.log(`🔥 [ثانية ${secondsPassedInCourt}] نزل حدث جديد. المتبقي: ${currentRoundEvents.length}`, pulledEvent);
                     }
+
+                    // 🎵 1️⃣ تشغيل صوت الصفارة الحامسية
+                    try {
+                        playGameSound(whistleSound);
+                        whistleSound.play().catch(e => console.log("🔊 الأوتو بلاي بتاع المتصفح غلس، محتاج ضغطة من المستخدم أول الجيم: ", e));
+                    } catch (err) {
+                        console.error("❌ مشكلة في تحميل ملف الصوت whistle.mp3", err);
+                    }
+
                     if (typeof triggerGameVibrate === 'function') triggerGameVibrate([200, 100, 200]);
-                    if (typeof showCustomToast === 'function') showCustomToast("🚨 عاجل: تطورات جديدة وغير متوقعة في القضية!");
+
+                    // 🚨 2️⃣ التنبيه الشيك: بعتنالها كلاس 'chaos-toast' عشان نغير لونه براحتنا في الـ CSS
+                    if (typeof showCustomToast === 'function') {
+                        showCustomToast("🚨 عاجل: تطورات جديدة وغير متوقعة في القضية!");
+                    }
                 }
             }
 
