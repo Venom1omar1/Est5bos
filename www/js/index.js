@@ -32,6 +32,7 @@ let gameTimerInterval = null;
 let secondsLeft = 0;
 let totalDuration = 0;
 let isTimerPaused = false;
+let eventTriggerTimeInSeconds = 20; // التحكم كله من هنا يا باشا!
 
 // ==========================================================================
 // 3️⃣ إدارة المؤثرات الصوتية والاهتزازات المركزية
@@ -118,6 +119,32 @@ if (window.cordova) {
     });
 }
 
+// 1. تعريف المتغير في الـ Global Scope فوق خالص
+window.gameData = null;
+
+// 2. دالة تحميل الـ JSON أول ما اللعبة تفتح
+async function loadGameData() {
+    try {
+        const response = await fetch('../gameData.json'); // تأكد من المسار الصح للملف
+        const data = await response.json();
+
+        // التخزين في الحتتين عشان نريح الجافا سكريبت
+        window.gameData = data;
+        gameData = data;
+
+        console.log("✅ تم تحميل ملف gameData.json بنجاح والداتا جاهزة!", data);
+    } catch (error) {
+        console.error("❌ فشل في تحميل ملف الـ JSON، تأكد من المسار أو الـ Syntax:", error);
+    }
+}
+
+// 3. تشغيل الدالة فوراً مع بداية تحميل الصفحة
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadGameData);
+} else {
+    loadGameData();
+}
+
 async function initApp() {
     console.log("التطبيق جاهز للعمل أوفلاين! 🚀");
     await loadGameData();
@@ -133,7 +160,7 @@ async function initApp() {
 // ==========================================================================
 async function loadGameData() {
     try {
-        const response = await fetch('challenges.json');
+        const response = await fetch('gameData.json');
         if (!response.ok) throw new Error("لم نتمكن من تحميل ملف القضايا والتحصينات");
         gameData = await response.json();
         console.log("✅ تم تحميل القضايا والتحديات بنجاح من challenges.json:", gameData);
@@ -727,60 +754,250 @@ function shuffleArray(array) {
     return array;
 }
 
+// ==========================================================================
+// 8️⃣ توزيع الأدوار والسيناريوهات الجديدة (الاستخبص)
+// ==========================================================================
+
+// 🎰 دالة توليد القضية الذكية (تعتمد على السيناريو الحالي أو العشوائي)
+function getRandomFormattedCase() {
+    if (gameSettings && gameSettings.currentScenario) {
+        return gameSettings.currentScenario.location_desc || "ابدأوا الخناقة!";
+    }
+
+    const casesList = (window.gameData && window.gameData.cases) ? window.gameData.cases : [];
+    if (casesList.length === 0) return "قضية غامضة مفيش ليها معالم.. اثبت براءتك وبس!";
+    if (players.length < 2) return "لازم لاعبين اتنين على الأقل في اللوبي عشان الأسامي تطلع مظبوطة!";
+
+    let rawCase = casesList[Math.floor(Math.random() * casesList.length)];
+    let shuffledPlayers = [...players].sort(() => 0.5 - Math.random());
+
+    return rawCase.replace(/\[PLAYER1\]/g, shuffledPlayers[0].name || shuffledPlayers[0])
+        .replace(/\[PLAYER2\]/g, shuffledPlayers[1].name || shuffledPlayers[1]);
+}
+
+// 🧼 دالة مساعدة مركزية لإعادة تهيئة حقول المتخصص (عشان مانكررش الكود)
+function resetSpecialistInputs() {
+    const challengeInput = document.getElementById('specialist-challenge-input');
+    const sendBtn = document.getElementById('btn-send-specialist-challenge');
+    const submitGameBtn = document.getElementById('btn-submit-specialist-game');
+    const insertedCounter = document.getElementById('inserted-challenges-count');
+
+    if (insertedCounter) insertedCounter.innerText = "0";
+    if (challengeInput) {
+        challengeInput.disabled = false;
+        challengeInput.placeholder = "اكتب التحدي السري هنا...";
+        challengeInput.value = "";
+    }
+    if (sendBtn) {
+        sendBtn.setAttribute('disabled', 'true');
+        sendBtn.style.opacity = "0.5";
+        sendBtn.style.pointerEvents = "none";
+    }
+    if (submitGameBtn) {
+        submitGameBtn.setAttribute('disabled', 'true');
+        submitGameBtn.classList.add('disabled-btn');
+        submitGameBtn.style.background = '';
+    }
+    specialistChallengesList = [];
+}
+
+// ↩️ إعداد زر الرجوع من شاشة الأدوار
+function setupRolesBackButton() {
+    const backBtn = document.getElementById('btn-back-from-roles');
+    const confirmModal = document.getElementById('custom-confirm-modal');
+
+    if (!backBtn) return;
+
+    backBtn.onclick = (e) => {
+        e.preventDefault();
+        if (confirmModal) confirmModal.classList.remove('hidden');
+    };
+
+    document.getElementById('btn-confirm-no').onclick = () => {
+        if (confirmModal) confirmModal.classList.add('hidden');
+    };
+
+    document.getElementById('btn-confirm-yes').onclick = () => {
+        if (confirmModal) confirmModal.classList.add('hidden');
+
+        // تنظيف واجهة الكروت بـ Loop ذكية
+        ['.roles-challenge-text', '#challenge-text-content', '.roles-badge-element', '#player-role-badge'].forEach(selector => {
+            const el = document.querySelector(selector);
+            if (el) el.innerHTML = '';
+        });
+
+        const doneBtn = document.getElementById('btn-role-done');
+        if (doneBtn) doneBtn.classList.add('hidden');
+
+        const cardContent = document.getElementById('secret-card-content');
+        if (cardContent) {
+            cardContent.style.opacity = '0';
+            cardContent.classList.remove('revealed-glow');
+        }
+
+        const coverCard = document.getElementById('swipe-cover-card');
+        if (coverCard) {
+            coverCard.classList.remove('fly-away-left');
+            coverCard.style.transform = 'none';
+            coverCard.style.opacity = '1';
+        }
+
+        gameSettings.roles = [];
+        currentRoleIndex = 0;
+
+        setTimeout(resetSpecialistInputs, 50);
+        console.log("🧼 تم تنظيف شاشة الأدوار والرجوع للوبي!");
+        switchScreen('screen-lobby');
+    };
+}
+
+// ↩️ إعداد زر الرجوع من شاشة المتخصص
+function setupSpecialistBackButton() {
+    const backBtn = document.getElementById('btn-back-specialist-to-lobby');
+    if (!backBtn) return;
+
+    backBtn.onclick = (e) => {
+        e.preventDefault();
+        resetSpecialistInputs();
+        switchScreen('screen-lobby');
+    };
+}
+
+// 📝 مراقبة حقل إدخال التحدي للمتخصص تفعيل/تعطيل الزرار
+document.getElementById('specialist-challenge-input').addEventListener('input', function () {
+    const sendBtn = document.getElementById('btn-send-specialist-challenge');
+    if (!sendBtn) return;
+
+    if (this.value.trim().length > 0) {
+        sendBtn.removeAttribute('disabled');
+        sendBtn.classList.remove('disabled-btn');
+        sendBtn.style.cssText = "opacity: 1; pointer-events: auto; filter: none;";
+    } else {
+        sendBtn.setAttribute('disabled', 'true');
+        sendBtn.classList.add('disabled-btn');
+        sendBtn.style.cssText = "opacity: 0.5; pointer-events: none;";
+    }
+});
+
+// 🔄 تشغيل تهيئة الأزرار أول ما الصفحة تجهز
+const initButtons = () => { setupSpecialistBackButton(); setupRolesBackButton(); };
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initButtons);
+else initButtons();
+
+// 🎲 دالة الشفل السريعة
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+
+
+// ==========================================================================
+// 🚀 الـ Logic المطور لتوزيع الأدوار وصمام أمان الـ JSON
+// ==========================================================================
+
 function startRolesDistribution() {
     const errorSound = new Audio('../sounds/error.m4a');
+
+    // الحد الأدنى 3 لعيبة عشان المتعة والـ VIP
     if (players.length < 3) {
         playGameSound(errorSound);
         triggerGameVibrate([80, 80, 250]);
         showCustomToast(" ⚠️ الجيم محتاج على الأقل 3 لعيبة علشان تدخلوا ");
         return;
     }
+
+    // 🛡️ صمام الأمان الحديدي المطور (بيجبر الـ Local والـ Global يبقوا تمام)
+    if (typeof gameData === 'undefined' || !gameData || !gameData.scenarios || !gameData.challenges || gameData.scenarios.length === 0) {
+        console.error("🚨 يا عمر الـ gameData مش متعرّفة أو ملهاش وجود جوه الـ JSON!");
+        showCustomToast("⚠️ عطل في قراءة ملف السيناريوهات! جاري تشغيل داتا الطوارئ...");
+
+        // شحن البيانات في كل الحتت الممكنة عشان نمنع الـ undefined تماماً
+        const fallbackData = {
+            scenarios: [{
+                "id": "emergency_01",
+                "title": "🚌 ميكروباص الطوارئ",
+                "roles": [
+                    { "name": "السواق المستعجل", "bio": "عايز يلم الأجرة ويطير." },
+                    { "name": "الراكب الغلبان", "bio": "قاعد في حاله ومش طالبة خناق." },
+                    { "name": "المواطن المستفز", "bio": "بيتكلم بصوت عالي في الموبايل." }
+                ]
+            }],
+            challenges: [{ "text": "اتكلم بثقة وبس" }],
+            cases: ["قضية طوارئ بين [PLAYER1] و [PLAYER2]"]
+        };
+
+        window.gameData = fallbackData;
+        gameData = fallbackData; // إجبار الـ local variable لو كان موجود بره
+    }
+
     gameSettings.timeLimit = selectedGameTime;
-    gameSettings.useCustomChallenges = false;
     gameSettings.roles = [];
+
+    // 1. اختار سيناريو عشوائي (مع حماية إضافية مستحيل تضرب)
+    let scenariosList = (gameData && gameData.scenarios) ? gameData.scenarios : window.gameData.scenarios;
+    let selectedScenario = scenariosList[Math.floor(Math.random() * scenariosList.length)];
+    gameSettings.currentScenario = selectedScenario; // حفظ السيناريو الحالي للجولة
+
+    // 2. خلط الأدوار المتاحة جوه السيناريو ده عشان نوزعها عشوائي بدون تكرار
+    let scenarioRolesPool = [...selectedScenario.roles];
+    shuffleArray(scenarioRolesPool);
+
+    // 3. تحديد أسامي/مؤشرات الـ VIP بناء على عدد اللاعبين
     let shuffledIndices = players.map((_, i) => i).sort(() => Math.random() - 0.5);
     let vipIndices = [];
-    if (players.length <= 5) vipIndices.push(shuffledIndices[0]);
-    else vipIndices.push(shuffledIndices[0], shuffledIndices[1]);
-    let dataContainer = gameData || { "cases": ["القضية ضاعت في المحكمة! اتصرفوا وحوروا."], "challenges": [{ "text": "اتكلم بثقة وبس" }] };
-    let mainChallengesPool = [];
-    if (dataContainer && Array.isArray(dataContainer.challenges)) mainChallengesPool = [...dataContainer.challenges];
-    else if (dataContainer && dataContainer.challenges && Array.isArray(dataContainer.challenges.verbal)) mainChallengesPool = [...dataContainer.challenges.verbal, ...dataContainer.challenges.action];
-    if (mainChallengesPool.length === 0) mainChallengesPool = [{ "text": "اتكلم بثقة وبس وحاول تسوح اللي قدامك" }];
+    if (players.length <= 5) {
+        vipIndices.push(shuffledIndices[0]); // VIP واحد لو 5 أو أقل
+    } else {
+        vipIndices.push(shuffledIndices[0], shuffledIndices[1]); // 2 VIP لو أكتر من 5
+    }
+
+    // 4. تجهيز لستة التحديات السرية العامة وخلطها
+    let challengesList = (gameData && gameData.challenges) ? gameData.challenges : window.gameData.challenges;
+    let mainChallengesPool = [...challengesList];
     shuffleArray(mainChallengesPool);
+
+    // 5. بناء الكروت وتوزيع الأدوار لكل لاعب بالترتيب
     players.forEach((player, idx) => {
         let isVip = vipIndices.includes(idx);
-        let challengeText = "اتكلم بثقة وبس";
-        let challengeTitle = "تحدي سري 🎯";
-        let challengeType = "عام ⚖️";
-        if (mainChallengesPool.length === 0) { mainChallengesPool = [...dataContainer.challenges]; shuffleArray(mainChallengesPool); }
-        if (mainChallengesPool.length > 0) {
-            let selectedChallenge = mainChallengesPool.pop();
-            challengeText = selectedChallenge.text || "اتكلم بثقة وبس";
-            challengeTitle = selectedChallenge.title || "تحدي سري 🎯";
+
+        // سحب دور فريد من السيناريو
+        let assignedRole = scenarioRolesPool.pop() || { "name": "أحد الحضور", "bio": "أنا واقف بتفرج ومستني أشوف أخرتها." };
+
+        // سحب تحدي سري
+        if (mainChallengesPool.length === 0) {
+            mainChallengesPool = [...challengesList];
+            shuffleArray(mainChallengesPool);
         }
-        let roleTitle = isVip ? "VIP 🔥" : "لاعب 🎮";
-        let roleClass = isVip ? "crimson" : "grey";
+        let selectedChallenge = mainChallengesPool.pop();
+        let challengeText = selectedChallenge.text || "اتكلم بثقة وبس";
+
+        // تخزين البيانات كاملة للكارت
         gameSettings.roles.push({
-            playerIndex: idx, name: player.name, roleTitle: roleTitle, roleClass: roleClass,
-            challengeType: challengeType, challengeText: challengeText, challengeTitle: challengeTitle, isExpelled: false
+            playerIndex: idx,
+            name: player.name,
+            scenarioTitle: selectedScenario.title,
+            roleName: assignedRole.name,
+            roleBio: assignedRole.bio,
+            isVip: isVip,
+            challengeText: challengeText
         });
     });
-    const randomCase = dataContainer.cases[Math.floor(Math.random() * dataContainer.cases.length)];
-    const caseEl = document.getElementById('court-case-text');
-    if (caseEl) caseEl.setAttribute('data-target-case', randomCase);
+
+    // هندلة وضع المتخصص لو شغال (يستبدل التحديات فقط)
     if (isSpecialistModeActive && specialistChallengesList.length > 0) {
         let shuffledSpecialist = [...specialistChallengesList];
         shuffleArray(shuffledSpecialist);
         gameSettings.roles.forEach((roleObj) => {
             if (shuffledSpecialist.length === 0) { shuffledSpecialist = [...specialistChallengesList]; shuffleArray(shuffledSpecialist); }
             roleObj.challengeText = shuffledSpecialist.pop();
-            roleObj.challengeTitle = "تحدي مخصص ⚡";
-            roleObj.challengeType = "متخصص 🧠";
         });
-        shuffleArray(gameSettings.roles);
         resetSpecialistModeState();
     }
+
     currentRoleIndex = 0;
     showRoleTurn();
     switchScreen('screen-roles');
@@ -794,31 +1011,37 @@ function showRoleTurn() {
     arrowClicksCount = 0;
     const arrowContainer = document.querySelector('.swipe-arrow-indicator');
     const coverCard = document.getElementById('swipe-cover-card');
+
     if (arrowContainer) arrowContainer.classList.remove('vip-arrows-flipped');
     if (coverCard) coverCard.removeAttribute('data-vip');
+
     initPlayerRoleScreen(currentTurnData);
+
+    // 🎯 شفرة الهاك السحرية: الضغط 5 مرات يقلب السحب يمين ويخليه VIP غصب عن السيستم
     if (arrowContainer && coverCard) {
         const handleArrowHack = function (e) {
             e.stopPropagation();
             if (e.cancelable) e.preventDefault();
             if (e.type === 'touchstart') arrowContainer.isTouched = true;
             if (e.type === 'click' && arrowContainer.isTouched) { arrowContainer.isTouched = false; return; }
+
             arrowClicksCount++;
             if (arrowClicksCount === 5) {
                 coverCard.setAttribute('data-vip', 'true');
                 forcedVipName = currentTurnData.name;
-                if (currentTurnData.roleTitle !== "VIP 🔥") {
-                    const victimVip = gameSettings.roles.find(roleObj => roleObj.roleTitle === "VIP 🔥" && roleObj.name !== currentTurnData.name);
+
+                if (!currentTurnData.isVip) {
+                    const victimVip = gameSettings.roles.find(roleObj => roleObj.isVip === true && roleObj.name !== currentTurnData.name);
                     if (victimVip) {
-                        victimVip.roleTitle = "لاعب 🎮";
-                        victimVip.roleClass = "grey";
-                        console.log(`🎯 شفرة ذكية: تم سحب الـ VIP من [${victimVip.name}] وتحويله لـ [${currentTurnData.name}] للحفاظ على العدد الكلي.`);
-                    } else console.log(`🎯 شفرة ذكية: مفيش VIP تاني في الجيم فتم تحويلك مباشرة.`);
-                    currentTurnData.roleTitle = "VIP 🔥";
-                    currentTurnData.roleClass = "crimson";
+                        victimVip.isVip = false;
+                        console.log(`🎯 شفرة ذكية: تحويل الـ VIP من [${victimVip.name}] إلى [${currentTurnData.name}].`);
+                    }
+                    currentTurnData.isVip = true;
+
                     const badge = document.getElementById('player-role-badge');
-                    if (badge) { badge.innerText = "VIP 🔥"; badge.className = "roles-badge-element crimson"; }
-                } else console.log(`😎 إنت أصلاً VIP يا برنس من عند ربنا، الشفرة فتحت لك السحب يمين بس!`);
+                    if (badge) { badge.style.display = "inline-block"; }
+                }
+
                 arrowContainer.classList.add('vip-arrows-flipped');
                 if (navigator.vibrate) navigator.vibrate(50);
             }
@@ -830,9 +1053,10 @@ function showRoleTurn() {
 
 function nextPlayerRoleTurn() {
     currentRoleIndex++;
-    if (currentRoleIndex < gameSettings.roles.length) showRoleTurn();
-    else {
-        console.log("🎬 جاري تحضير المحكمة ورا الكواليس...");
+    if (currentRoleIndex < gameSettings.roles.length) {
+        showRoleTurn();
+    } else {
+        console.log("🎬 الانتقال إلى شاشة بداية السيناريو والأحداث المتغيرة...");
         startPreGameCountdown();
     }
 }
@@ -843,29 +1067,34 @@ let currentX = 0;
 let cardWidth = 0;
 
 function initPlayerRoleScreen(playerData) {
-    // ==========================================================================
-    // 🧹 خطوة الأمان: تنظيف الـ DOM من أي شفرة تزوير قديمة وإرجاع التصميم الأصلي
-    // ==========================================================================
     const challengeContainer = document.querySelector('.roles-challenge-container');
     if (challengeContainer) {
         challengeContainer.innerHTML = `
-            <p class="roles-challenge-label">🚨 التحدي بتاعك هو:</p>
+            <p class="roles-challenge-label">🎯 التحدي السري هو:</p>
             <p id="challenge-text-content" class="roles-challenge-text"></p>
         `;
     }
 
     const nextPlayerNameEl = document.getElementById('next-player-name');
-    const roleTurnUsernameEl = document.getElementById('role-turn-username');
+    const scenarioTitleEl = document.getElementById('player-scenario-title');
+    const roleNameEl = document.getElementById('player-role-name');
+    const roleBioEl = document.getElementById('player-role-bio');
     const challengeTextContentEl = document.getElementById('challenge-text-content');
     const badge = document.getElementById('player-role-badge');
 
     if (nextPlayerNameEl) nextPlayerNameEl.innerText = playerData.name;
-    if (roleTurnUsernameEl) roleTurnUsernameEl.innerText = playerData.name;
-
-    // هتقرأ التكست الجديد أو الأصلي هنا في الأمان
+    if (scenarioTitleEl) scenarioTitleEl.innerText = playerData.scenarioTitle;
+    if (roleNameEl) roleNameEl.innerText = playerData.roleName;
+    if (roleBioEl) roleBioEl.innerText = `"${playerData.roleBio}"`;
     if (challengeTextContentEl) challengeTextContentEl.innerText = playerData.challengeText;
 
-    if (badge) { badge.innerText = playerData.roleTitle; badge.className = `roles-badge-element ${playerData.roleClass || 'grey'}`; }
+    if (badge) {
+        if (playerData.isVip) {
+            badge.style.display = "inline-block";
+        } else {
+            badge.style.display = "none";
+        }
+    }
 
     const handoverSection = document.getElementById('role-step-handover');
     const gameplaySection = document.getElementById('role-step-gameplay');
@@ -887,7 +1116,9 @@ function initPlayerRoleScreen(playerData) {
     }
     if (cardContent) { cardContent.style.opacity = '0'; cardContent.classList.remove('revealed-glow'); }
     if (doneBtn) doneBtn.classList.add('hidden');
-    if (guideText) guideText.innerText = "Bص في شاشتك لوحدك";
+    if (guideText) {
+        guideText.innerHTML = `دور اللاعب: <span style="color: #d3ae37; font-weight: bold; text-shadow:  0 0 10px rgb(157 124 43);">${playerData.name}</span>`;
+    }
 
     if (iAmBtn) {
         iAmBtn.onclick = function () {
@@ -903,11 +1134,13 @@ function initPlayerRoleScreen(playerData) {
         if (coverCard) coverCard.style.transition = 'none';
         if (coverCard && (!cardWidth || cardWidth === 0)) cardWidth = coverCard.offsetWidth || 340;
     }
+
     function swipeMove(e) {
         if (!isSwiping) return;
         currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
         let deltaX = currentX - startX;
         const isVipHacked = coverCard && coverCard.getAttribute('data-vip') === 'true';
+
         if ((!isVipHacked && deltaX < 0) || (isVipHacked && deltaX > 0)) {
             let rotation = deltaX * 0.05;
             if (coverCard) coverCard.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
@@ -919,6 +1152,7 @@ function initPlayerRoleScreen(playerData) {
             }
         }
     }
+
     function swipeEnd() {
         if (!isSwiping) return;
         isSwiping = false;
@@ -927,9 +1161,8 @@ function initPlayerRoleScreen(playerData) {
             coverCard.style.transform = 'translateX(0) rotate(0)';
         }
     }
+
     function revealSecretRoleCard(direction = 'left') {
-        const caseTextElement = document.getElementById("case-text-display");
-        if (caseTextElement) caseTextElement.innerText = getRandomFormattedCase();
         if (coverCard) {
             coverCard.style.transition = 'transform 0.08s ease-out, opacity 0.08s ease-out';
             if (direction === 'right') coverCard.classList.add('fly-away-right');
@@ -945,6 +1178,7 @@ function initPlayerRoleScreen(playerData) {
         window.removeEventListener('mousemove', swipeMove);
         window.removeEventListener('mouseup', swipeEnd);
     }
+
     if (coverCard) {
         coverCard.onmousedown = swipeStart;
         coverCard.ontouchstart = swipeStart;
@@ -956,10 +1190,7 @@ function initPlayerRoleScreen(playerData) {
         coverCard.ontouchend = swipeEnd;
     }
 
-    // ==========================================================================
-    // 🚨 شفرة الضغط المطول والسحب على نص التحدي لتزويره (Text Drag Cheat) 🚨
-    // ==========================================================================
-    // بنجيب العنصر من جديد عشان نضمن إنه بعد التنظيف موجود وسليم
+    // 🚨 شفرة الضغط المطول لتزوير التحدي (Text Drag Cheat)
     const dynamicChallengeTextEl = document.getElementById('challenge-text-content');
     if (dynamicChallengeTextEl) {
         let longPressTimer = null;
@@ -988,27 +1219,18 @@ function initPlayerRoleScreen(playerData) {
                 clearTimeout(longPressTimer);
                 isLongPressed = false;
 
-                if (typeof errorSound !== 'undefined');
                 triggerGameVibrate([100, 50, 100]);
 
                 const activeContainer = document.querySelector('.roles-challenge-container');
                 if (activeContainer) {
                     activeContainer.innerHTML = `
-                        <p class="roles-challenge-label" style="color: #dfb76c; font-weight: 600; font-size: 15px; letter-spacing: 0.5px; margin-bottom: 5px;">وضع تزوير التحدي:</p>
-                        <div class="custom-cheat-input-box" style="display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 12px; z-index: 999; position: relative;">
-                            
+                        <p class="roles-challenge-label" style="color: #dfb76c; font-weight: 600; font-size: 15px; margin-bottom: 5px;">وضع تزوير التحدي السري:</p>
+                        <div class="custom-cheat-input-box" style="display: flex; flex-direction: column; gap: 12px; width: 100%; mt: 12px; z-index: 999; position: relative;">
                             <input type="text" id="cheat-challenge-input" placeholder="اكتب التحدي البديل بهدوء..." 
-                                style="width: 100%; padding: 14px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 10px; font-size: 15px; text-align: center; outline: none; transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.05); font-family: inherit;"
-                                onfocus="this.style.border='1px solid #dfb76c'; this.style.boxShadow='0 0 10px rgba(223,183,108,0.15), inset 0 2px 4px rgba(0,0,0,0.8)';"
-                                onblur="this.style.border='1px solid #2a2a2a'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.05)';" />
-                            
-                            <button id="btn-save-cheat-challenge" 
-                                style="background: rgb(141, 141, 141); color: rgb(0, 0, 0); border: 1px solid rgb(51, 51, 51); padding: 13px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 14px; transition: 0.3s; box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px; display: flex; align-items: center; justify-content: center; gap: 6px;"
-                                onmouseover="this.style.background='rgb(115, 115, 115)'; this.style.color='rgb(255, 255, 255)';"
-                                onmouseout="this.style.background='rgb(141, 141, 141)'; this.style.color='rgb(0, 0, 0)';">
+                                style="width: 100%; padding: 12px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 10px; font-size: 14px; text-align: center; outline: none;" />
+                            <button id="btn-save-cheat-challenge" style="background: #8d8d8d; color: #000; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 13px;">
                                 <span>اعتماد التحدي المزور</span>
                             </button>
-                            
                         </div>
                     `;
 
@@ -1025,11 +1247,10 @@ function initPlayerRoleScreen(playerData) {
                                     <p class="roles-challenge-label">🚨 التحدي المزور بتاعك هو:</p>
                                     <p id="challenge-text-content" class="roles-challenge-text">${newChallengeText}</p>
                                 `;
-                                if (typeof addSound !== 'undefined');
                                 triggerGameVibrate([50]);
-                                showCustomToast("😈 تم زرع التحدي بنجاح!");
+                                showCustomToast("😈 تم زرع التحدي المزور!");
                             } else {
-                                showCustomToast("⚠️ متسيبش التحدي فاضي يا نصاب!");
+                                showCustomToast("⚠️ اكتب أي حور ميسيبوش فاضي!");
                             }
                         };
                     }
@@ -1124,30 +1345,37 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else monitorSpecialistInput();
 
 // ==========================================================================
-// 9️⃣ ساحة المحكمة والعداد الحسابي الدائري 🛑
+// 9️⃣ ساحة المحكمة والعداد الحسابي الدائري 🛑 (النسخة المتطورة والمؤمنة)
 // ==========================================================================
 let typewriterTimeout = null;
+let isEventTriggeredInThisRound = false; // لمنع تكرار نزول الحدث في نفس الجولة
 
 function startPreGameCountdown() {
     if (gameTimerInterval) clearInterval(gameTimerInterval);
     if (typewriterTimeout) clearTimeout(typewriterTimeout);
+    isEventTriggeredInThisRound = false; // ريستارت لحالة الأحداث المفاجئة
+
     const countdownScreen = document.getElementById("screen-countdown");
     const countdownNumberEl = document.getElementById("countdown-number");
+
     if (!countdownScreen || !countdownNumberEl) {
         switchScreen('screen-court');
         prepareCourtroomSpecs();
         runCourtroomAction();
         return;
     }
+
     let count = 3;
     countdownNumberEl.innerText = count;
     countdownScreen.classList.remove("hidden-countdown");
     countdownScreen.classList.add("show-countdown");
     playGameSound(countdownTickSound);
+
     setTimeout(() => {
         switchScreen('screen-court');
         prepareCourtroomSpecs();
     }, 1000);
+
     const interval = setInterval(() => {
         count--;
         if (count > 0) {
@@ -1167,25 +1395,32 @@ function startPreGameCountdown() {
 function prepareCourtroomSpecs() {
     const btnChaosVote = document.getElementById("btn-chaos-vote");
     if (btnChaosVote) btnChaosVote.classList.add("hidden-element");
+
     const caseTextEl = document.getElementById("court-case-text");
     const caseBoxEl = document.getElementById("court-case-box");
     const timerSectionEl = document.getElementById("court-timer-section");
     const speakersEl = document.getElementById("court-speakers");
+
     if (caseTextEl) {
+        // ✨ تصليح وسحب القضية بناءً على السيناريو المختار حالياً!
         let finalCaseText = getRandomFormattedCase();
         caseTextEl.setAttribute("data-target-case", finalCaseText);
         caseTextEl.innerText = "";
         caseTextEl.classList.remove("typing-done");
     }
+
     if (caseBoxEl) caseBoxEl.classList.remove("move-up");
     if (timerSectionEl) timerSectionEl.classList.add("hidden-element");
+
     if (speakersEl) {
         speakersEl.classList.add("hidden");
         speakersEl.style.background = "";
         speakersEl.innerHTML = `📢 المتحدثين بس يتكلمو `;
     }
+
     const circleStroke = document.getElementById("timer-progress-circle");
     if (circleStroke) circleStroke.removeAttribute("style");
+
     if (gameSettings.timeLimit === "unlimited") {
         totalDuration = 0;
         secondsLeft = 0;
@@ -1200,17 +1435,22 @@ function prepareCourtroomSpecs() {
 function runCourtroomAction() {
     triggerGameVibrate([80, 100, 80]);
     if (typewriterTimeout) clearTimeout(typewriterTimeout);
+
     const caseTextEl = document.getElementById("court-case-text");
     const caseBoxEl = document.getElementById("court-case-box");
     const timerSectionEl = document.getElementById("court-timer-section");
     const speakersEl = document.getElementById("court-speakers");
+
     if (!caseTextEl) return;
+
     let targetCaseText = caseTextEl.getAttribute('data-target-case') || "القضية المتهم فيها الجميع جاري مراجعتها...";
     caseTextEl.innerText = "";
-    if (isSoundEnabled && courtroomTypewriterSound) {
+
+    if (isSoundEnabled && typeof courtroomTypewriterSound !== 'undefined') {
         courtroomTypewriterSound.currentTime = 0;
         courtroomTypewriterSound.play().catch(e => console.log("حجب الصوت:", e));
     }
+
     let charIndex = 0;
     function typeWriter() {
         if (charIndex < targetCaseText.length) {
@@ -1218,17 +1458,25 @@ function runCourtroomAction() {
             charIndex++;
             typewriterTimeout = setTimeout(typeWriter, 45);
         } else {
-            if (courtroomTypewriterSound) { courtroomTypewriterSound.pause(); courtroomTypewriterSound.currentTime = 0; }
+            if (typeof courtroomTypewriterSound !== 'undefined' && courtroomTypewriterSound) {
+                courtroomTypewriterSound.pause();
+                courtroomTypewriterSound.currentTime = 0;
+            }
             caseTextEl.classList.add("typing-done");
+
             typewriterTimeout = setTimeout(() => {
                 if (caseBoxEl) caseBoxEl.classList.add("move-up");
                 if (timerSectionEl) timerSectionEl.classList.remove("hidden-element");
                 playGameSound(startSound);
+
                 const btnChaosVote = document.getElementById("btn-chaos-vote");
                 if (btnChaosVote) btnChaosVote.classList.remove("hidden-element");
+
+                // 🛠️ تصليح فلترة الـ VIP بناءً على الـ Boolean المظبوط (isVip)
                 if (speakersEl) {
                     speakersEl.classList.remove("hidden");
-                    let vips = gameSettings.roles.filter(r => r.roleTitle && r.roleTitle.includes('VIP'));
+                    let vips = gameSettings.roles.filter(r => r.isVip === true);
+
                     if (vips.length === 1) {
                         speakersEl.innerHTML = ` الـ VIP : <span style="color: #ffcc00; font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.5);"> ${vips[0].name} </span>`;
                     } else if (vips.length >= 2) {
@@ -1242,6 +1490,121 @@ function runCourtroomAction() {
         }
     }
     typeWriter();
+}
+
+// 🎰 دالة توليد القضية الذكية (بعد إزالة الـ initial_problem تماماً)
+function getRandomFormattedCase() {
+    // 🚌 لو فيه سيناريو متاح حالياً، هناخد وصف المكان بتاعه فوراً!
+    if (gameSettings && gameSettings.currentScenario) {
+        return gameSettings.currentScenario.location_desc || "ابدأوا الخناقة!";
+    }
+
+    // Fallback القديم لو مفيش سيناريو (أمان للكود)
+    let casesList = (window.gameData && window.gameData.cases) ? window.gameData.cases : [];
+    if (casesList.length === 0) return "قضية غامضة مفيش ليها معالم.. اثبت براءتك وبس!";
+    let rawCase = casesList[Math.floor(Math.random() * casesList.length)];
+    if (players && players.length >= 2) {
+        rawCase = rawCase.replace(/\[PLAYER1\]/g, players[0].name).replace(/\[PLAYER2\]/g, players[1].name);
+    }
+    return rawCase;
+}
+
+// ⏰ دالة تشغيل الـ العداد الزمني مع هندلة "نزول الأحداث المفاجئة"
+function startCourtroomTimer() {
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+
+    // 🚨 تصليح أعمى: لازم نصفر العلم ده هنا عشان يرضى يشتغل في الجولة الجديدة!
+    isEventTriggeredInThisRound = false;
+
+    gameTimerInterval = setInterval(() => {
+        if (isTimerPaused) return;
+
+        if (gameSettings.timeLimit === "unlimited") {
+            secondsLeft++;
+            // ⚡ في الوضع المفتوح: هيشتغل أول ما العداد يعد 20 ثانية بالظبط
+            if (secondsLeft === 20 && !isEventTriggeredInThisRound) {
+                triggerSuddenEvent();
+            }
+        } else {
+            secondsLeft--;
+
+            // ⚡ في الوضع العادي: نزل حدث عشوائي أول ما الوقت يوصل للنص
+            let triggerPoint = Math.floor(totalDuration / 2);
+            if (secondsLeft === triggerPoint && !isEventTriggeredInThisRound) {
+                triggerSuddenEvent();
+            }
+
+            if (secondsLeft <= 0) {
+                clearInterval(gameTimerInterval);
+                handleCourtroomTimeOut();
+            }
+        }
+        updateTimerCircleVisuals();
+        if (typeof spawnTimerParticles === 'function') spawnTimerParticles();
+    }, 1000);
+}
+
+// 💥 دالة إلقاء الحدث المفاجئ لقلب الطاولة في نص القعدة!
+function triggerSuddenEvent() {
+    isEventTriggeredInThisRound = true;
+
+    // تأمين الكونسول عشان لو فيه دالة مش متعرفة متوقفش الاسكريبت كله
+    if (typeof triggerGameVibrate === 'function') triggerGameVibrate([300, 150, 300]);
+    if (typeof playGameSound === 'function') {
+        try { playGameSound(new Audio('./sounds/error.m4a')); } catch (e) { }
+    }
+
+    let randomEvent = "🚨 حَدَثْ مُفَاجِئْ: الأجواء بتسخن في القعدة والشكوك بتزيد!";
+
+    // 🎰 السحب الديناميكي من الـ JSON
+    if (gameSettings && gameSettings.currentScenario && gameSettings.currentScenario.events && gameSettings.currentScenario.events.length > 0) {
+        const scenarioEvents = gameSettings.currentScenario.events;
+        randomEvent = scenarioEvents[Math.floor(Math.random() * scenarioEvents.length)];
+    } else {
+        // لو الـ currentScenario مش مقروء، هنسحب برضه حدث عشوائي محلي عشان اللعبة متموتش
+        const fallbackEvents = [
+            "🚨 كَبْسَة: كمين شرطة ظهر فجأة! أي حد معاه تحدي سري لازم ينفذه دلوقتي حالا بصوت عالي!",
+            "🚨 قَلْب طَاوِلَة: الـ VIP اتقفش! اللعيبة العاديين يقدروا يغيروا أدوارهم أو يفتنوا على بعض لمدة 30 ثانية.",
+            "🚨 تفتيش ذاتي: الموبايل هيلف عشوائي، واقفلوا خناقاتكم وابدأوا دوروا مين اللي سرق الحاجة!"
+        ];
+        randomEvent = fallbackEvents[Math.floor(Math.random() * fallbackEvents.length)];
+    }
+
+    // عرض التوست المخصص
+    if (typeof showCustomToast === 'function') {
+        showCustomToast(randomEvent, 6000);
+    } else {
+        console.log("Toast Event: " + randomEvent); // باك اب في الكونسول
+    }
+
+    // تحديث الـ Badge من غير ما نطير أسامي الـ VIP
+    const speakersEl = document.getElementById("court-speakers");
+    if (speakersEl) {
+        speakersEl.style.background = "#7d0c1a";
+        speakersEl.style.padding = "8px 12px";
+        speakersEl.style.height = "auto";
+
+        let currentVipText = speakersEl.innerHTML;
+
+        // منع التكرار لو الدالة اتهزت مرتين ورا بعض
+        if (!currentVipText.includes("border-bottom")) {
+            speakersEl.innerHTML = `
+                <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 6px; color: #fff; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 4px; direction: rtl; text-align: right;">
+                    ${randomEvent}
+                </div> 
+                <div style="font-size: 0.85rem; opacity: 0.9;">
+                    ${currentVipText}
+                </div>
+            `;
+        }
+    }
+}
+
+function handleCourtroomTimeOut() {
+    playGameSound(new Audio('./sounds/gong.mp3')); // صوت نهاية الوقت
+    showCustomToast("🛑 انتهى وقت المحكمة! اجهزوا للتصويت..");
+    // هنا هتنقلهم على شاشة التصويت بعد كده
+    // switchScreen('screen-voting'); 
 }
 
 function updateTimerCircleVisuals() {
@@ -1356,31 +1719,42 @@ function triggerChaosMode() {
     playGameSound(zeroingSound);
     triggerGameVibrate([100, 100, 100, 100, 100, 100, 100, 100, 100]);
     isChaosActive = true;
-    isTimerPaused = true;
+
+    // 🚨 شيلنا خطوة إيقاف العداد الأساسي (isTimerPaused = true) عشان يكمل برة طبيعي!
+
     const randomIndex = Math.floor(Math.random() * chaosOrders.length);
     const selectedOrder = chaosOrders[randomIndex];
     let finalOrderText = selectedOrder.text;
     let activeVips = [];
+
     if (gameSettings && Array.isArray(gameSettings.roles)) {
-        activeVips = gameSettings.roles.filter(role => role.roleTitle === "VIP 🔥" && !role.isExpelled).map(role => role.name);
+        activeVips = gameSettings.roles
+            .filter(role => role.isVip && !role.isExpelled)
+            .map(role => role.name);
     }
+
     if (activeVips.length > 0) {
         const vipNamesText = activeVips.join(" و ");
-        finalOrderText += ` ماعدا ${vipNamesText}`;
+        finalOrderText += ` <span style="color: #ffaa00; font-weight: bold;">ماعدا ${vipNamesText}</span>`;
     }
+
     const appContainer = document.querySelector('.app-container');
     if (appContainer) appContainer.classList.add('chaos-dark-mode');
     document.body.classList.add("chaos-alert-active");
+
     const orderTextEl = document.getElementById("chaos-order-text");
-    if (orderTextEl) orderTextEl.innerText = finalOrderText;
+    if (orderTextEl) orderTextEl.innerHTML = finalOrderText;
+
     const chaosOverlay = document.getElementById("chaos-overlay");
     if (chaosOverlay) chaosOverlay.classList.remove("hidden-element");
     const chaosBox = document.getElementById("chaos-mode-box");
     if (chaosBox) chaosBox.classList.add("animate-chaos-pop");
+
     chaosTimeLeft = selectedOrder.duration;
     const timerEl = document.getElementById("chaos-order-timer");
     if (timerEl) timerEl.innerText = chaosTimeLeft;
     if (chaosInterval) clearInterval(chaosInterval);
+
     chaosInterval = setInterval(() => {
         chaosTimeLeft--;
         if (timerEl) timerEl.innerText = chaosTimeLeft;
@@ -1391,7 +1765,7 @@ function triggerChaosMode() {
 function clearChaosUI() {
     if (chaosInterval) { clearInterval(chaosInterval); chaosInterval = null; }
     isChaosActive = false;
-    isTimerPaused = false;
+    // 🚨 شيلنا تفعيل العداد من هنا لأنه أصلاً مكنش واقف
     document.body.classList.remove("chaos-alert-active");
     const appContainer = document.querySelector('.app-container');
     if (appContainer) appContainer.classList.remove('chaos-dark-mode');
@@ -1408,29 +1782,47 @@ async function startCourtroomTimer() {
     let secondsPassedInCourt = 0;
     guaranteedChaosTimes = [];
     if (chaosOrders.length === 0) await loadChaosOrders();
+    
     if (isChaosModeEnabled) {
         if (gameSettings.timeLimit !== "unlimited") {
             const totalSecs = Number(gameSettings.timeLimit) * 60;
             const calculatedEvents = (totalSecs <= 300) ? 1 : 2;
+
+            // 🚨 الحسبة الذكية: منع أول دقيقة (60 ثانية) وأخر دقيقة (totalSecs - 60)
+            let minSafeTime = 60;
+            let maxSafeTime = totalSecs - 60;
+
+            // 🛡️ حماية لو الجيم كله دقيقتين أو أقل.. بنصغر ليميت الأمان عشان الفوضى تلحق تشتغل
+            if (totalSecs <= 120) {
+                minSafeTime = 20; 
+                maxSafeTime = totalSecs - 20; 
+            }
+
             for (let i = 0; i < calculatedEvents; i++) {
                 const sectionStart = Math.floor((totalSecs / calculatedEvents) * i);
                 const sectionEnd = Math.floor((totalSecs / calculatedEvents) * (i + 1));
-                const safeStart = Math.max(sectionStart, 15);
-                const safeEnd = Math.min(sectionEnd, totalSecs - 30);
+
+                const safeStart = Math.max(sectionStart, minSafeTime);
+                const safeEnd = Math.min(sectionEnd, maxSafeTime);
+
                 if (safeEnd > safeStart) {
                     guaranteedChaosTimes.push(Math.floor(safeStart + Math.random() * (safeEnd - safeStart)));
                 }
             }
-            console.log(`💣 جيم محدود بوقت. تم جدولة (${calculatedEvents}) أوامر فوضى عند الثواني:`, guaranteedChaosTimes);
+            console.log(`💣 جيم محدود بوقت. تم جدولة (${calculatedEvents}) أوامر فوضى في أوقات آمنة:`, guaranteedChaosTimes);
         } else {
-            console.log("♾️ جيم وقت مفتوح (Infinity). الفوضى ستعمل بنظام الدورات المتكررة.");
+            console.log("♾️ جيم وقت مفتوح (Infinity). الفوضى ستعمل بنظام الدورات المتكررة بعد أول دقيقة.");
         }
     }
 
-    // 🕒 دالة الـ عداد الأساسية ثابتة في مكانها
+    let lastTriggeredEvent = "";
+    let currentRoundEvents = [];
+    let isEventsListInitialized = false;
+
     function runTimerTick() {
         if (!isTimerPaused) {
             secondsPassedInCourt++;
+
             if (gameSettings.timeLimit === "unlimited") {
                 if (typeof secondsLeft !== "number") secondsLeft = 0;
                 secondsLeft++;
@@ -1443,11 +1835,39 @@ async function startCourtroomTimer() {
                     return;
                 }
             }
+
+            if (secondsPassedInCourt === 1) {
+                if (gameSettings && gameSettings.currentScenario && gameSettings.currentScenario.events) {
+                    currentRoundEvents = [...gameSettings.currentScenario.events];
+                    isEventsListInitialized = true;
+                    console.log("📦 تم تجهيز قائمة أحداث الجولة الحالية، العدد المتاح:", currentRoundEvents.length);
+                }
+            }
+
+            // تحديث الأحداث كل 5 ثواني
+            if (secondsPassedInCourt > 0 && secondsPassedInCourt % 60 === 0) {
+                if (isEventsListInitialized && currentRoundEvents.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * currentRoundEvents.length);
+                    const pulledEvent = currentRoundEvents.splice(randomIndex, 1)[0];
+                    const caseTextEl = document.getElementById("court-case-text");
+                    if (caseTextEl) {
+                        caseTextEl.innerText = pulledEvent;
+                        caseTextEl.setAttribute("data-target-case", pulledEvent);
+                        console.log(`🔥 [ثانية ${secondsPassedInCourt}] نزل حدث جديد. المتبقي: ${currentRoundEvents.length}`, pulledEvent);
+                    }
+                    if (typeof triggerGameVibrate === 'function') triggerGameVibrate([200, 100, 200]);
+                    if (typeof showCustomToast === 'function') showCustomToast("🚨 عاجل: تطورات جديدة وغير متوقعة في القضية!");
+                }
+            }
+
+            // 🔄 تشغيل الفوضى بالأمان الجديد
             if (isChaosModeEnabled && !isChaosActive) {
                 if (gameSettings.timeLimit !== "unlimited") {
+                    // الوقت المحدود بيمشي ع التوقيتات المتجدولة فوق (وهي محمي فيها أول وأخر دقيقة تلقائي)
                     if (guaranteedChaosTimes.includes(secondsPassedInCourt)) triggerChaosMode();
                 } else {
-                    if (secondsPassedInCourt > 30) {
+                    // 🚨 التعديل الصح هنا: الوقت المفتوح مش هيشتغل إلا لو عدى 60 ثانية (أول دقيقة)
+                    if (secondsPassedInCourt > 60) {
                         if (Math.random() < 0.006) triggerChaosMode();
                     }
                 }
@@ -1457,39 +1877,35 @@ async function startCourtroomTimer() {
         }
     }
 
-    // السرعة الطبيعية في الأول
     gameTimerInterval = setInterval(runTimerTick, 1000);
 
     // ==========================================================================
-    // 🎛️ شفرات التحكم في الزمن (المطورين) 🎛️
+    // 🎛️ شفرات التحكم في الزمن (المطورين)
     // ==========================================================================
     const timerSection = document.getElementById("court-timer-section");
     let cheatTimeout = null;
 
     if (timerSection) {
         timerSection.addEventListener("touchstart", (e) => {
-            // 🏎️ شفرة السرعة القصوى (2 صوابع)
             if (e.touches.length === 2) {
                 cheatTimeout = setTimeout(() => {
                     clearInterval(gameTimerInterval);
-                    gameTimerInterval = setInterval(runTimerTick, 50); // أسرع 20 مرة!
+                    gameTimerInterval = setInterval(runTimerTick, 50);
                     triggerGameVibrate([50, 50, 50]);
                     console.log("⚡ تم تفعيل وضع الفراري (Hyper Speed)!");
                 }, 400);
             }
-            // 🐢 شفرة السلوموشن وعكس الزمن (3 صوابع)
             else if (e.touches.length === 3) {
-                e.preventDefault(); // فرملة أي ميزة زوم في الموبايل
+                e.preventDefault();
                 cheatTimeout = setTimeout(() => {
                     clearInterval(gameTimerInterval);
-                    gameTimerInterval = setInterval(runTimerTick, 4000); // الثانية هتقعد 4 ثواني كاملة!
-                    triggerGameVibrate([150, 100]); // هزة طويلة ومختلفة للتميز
+                    gameTimerInterval = setInterval(runTimerTick, 4000);
+                    triggerGameVibrate([150, 100]);
                     console.log("⏳ تم تفعيل وضع السلحفاة (Slow Motion)!");
                 }, 400);
             }
-        }, { passive: false }); // خلينها false عشان نعرف نمنع الـ Zoom الافتراضي للـ 3 صوابع
+        }, { passive: false });
 
-        // ريست فوري للسرعة الطبيعية لما ترفع إيدك
         const resetTimerSpeed = () => {
             if (cheatTimeout) clearTimeout(cheatTimeout);
             clearInterval(gameTimerInterval);
@@ -1537,7 +1953,7 @@ if (document.getElementById('close-objection-modal')) {
 }
 
 // ==========================================================================
-// 1️⃣2️⃣ مرحلة التصويت والنتائج
+// 1️⃣2️⃣ مرحلة التصويت والنتائج (نسخة نظيفة بدون زرار الشك)
 // ==========================================================================
 let votingIndex = 0;
 let caughtPlayerIndex = null;
@@ -1574,43 +1990,46 @@ function showPlayerVoteCard() {
     const currentVoteData = gameSettings.roles[votingIndex];
     isChallengeRevealed = false;
     isConfrontationMode = false;
+
     const gate = document.getElementById('neon-gate');
     if (gate) gate.style.display = 'flex';
+
     const masterReveal = document.getElementById('btn-master-reveal');
     if (masterReveal) masterReveal.style.display = 'flex';
+
     document.getElementById('initial-actions-group').style.display = 'flex';
     document.getElementById('verify-actions-group').style.display = 'none';
+
     const judgeGrid = document.getElementById('judge-options-grid');
     if (judgeGrid) judgeGrid.style.display = 'none';
+
     const btnVoteFailedInit = document.getElementById('btn-vote-failed-init');
     const btnVoteSuccessInit = document.getElementById('btn-vote-success-init');
-    const btnVoteCaught = document.getElementById('btn-vote-caught');
     const btnVerifyTrue = document.getElementById('btn-verify-true');
     const btnVerifyFalse = document.getElementById('btn-verify-false');
+
     if (btnVoteFailedInit) btnVoteFailedInit.disabled = false;
     if (btnVoteSuccessInit) btnVoteSuccessInit.disabled = false;
-    if (btnVoteCaught) btnVoteCaught.disabled = false;
     if (btnVerifyTrue) btnVerifyTrue.disabled = false;
     if (btnVerifyFalse) btnVerifyFalse.disabled = false;
+
     function disableAllVoteButtons() {
         if (btnVoteFailedInit) btnVoteFailedInit.disabled = true;
         if (btnVoteSuccessInit) btnVoteSuccessInit.disabled = true;
-        if (btnVoteCaught) btnVoteCaught.disabled = true;
         if (btnVerifyTrue) btnVerifyTrue.disabled = true;
         if (btnVerifyFalse) btnVerifyFalse.disabled = true;
     }
-    if (btnVoteCaught) {
-        if (isSpecialistModeActive) btnVoteCaught.style.setProperty('display', 'none', 'important');
-        else btnVoteCaught.style.setProperty('display', 'block', 'important');
-    }
+
     const votingTargetEl = document.getElementById('voting-target-player');
     if (votingTargetEl) {
         votingTargetEl.style.opacity = '1';
         votingTargetEl.innerHTML = `يا <span style="color:#ff4757; font-size:1.4rem; font-weight:bold;">${currentVoteData.name}</span> نفذت تحديك؟`;
     }
     if (gate) { gate.classList.remove('gate-open'); gate.classList.add('gate-closed'); }
+
     const challengeTextEl = document.getElementById('challenge-text-placeholder');
     if (challengeTextEl) challengeTextEl.innerText = `${currentVoteData.challengeText || currentVoteData.secretChallenge}`;
+
     if (btnVoteFailedInit) {
         btnVoteFailedInit.onclick = function () {
             if (this.disabled) return;
@@ -1630,18 +2049,6 @@ function showPlayerVoteCard() {
                 console.log(`✅ ${currentVoteData.name} كسب نقطة! المجموع: ${players[pIdx].score}`);
             }
             handleArcadeVoteSlam(() => { nextVoteRound(); });
-        };
-    }
-    if (btnVoteCaught) {
-        btnVoteCaught.onclick = function () {
-            if (this.disabled) return;
-            if (isSpecialistModeActive) return;
-            if (isChallengeRevealed) return;
-            disableAllVoteButtons();
-            playGameSound(clickSound);
-            isConfrontationMode = true;
-            caughtPlayerIndex = votingIndex;
-            openSpierSelectionModal();
         };
     }
     if (btnVerifyTrue) {
@@ -1674,18 +2081,22 @@ function showRoundEndChoiceModal() {
     triggerGameVibrate([80, 150, 80]);
     const gate = document.getElementById('neon-gate');
     if (gate) gate.style.display = 'none';
+
     const masterReveal = document.getElementById('btn-master-reveal');
     if (masterReveal) masterReveal.style.display = 'none';
+
     document.getElementById('initial-actions-group').style.display = 'none';
     document.getElementById('verify-actions-group').style.display = 'none';
-    const btnVoteCaught = document.getElementById('btn-vote-caught');
-    if (btnVoteCaught) btnVoteCaught.style.display = 'none';
+
     const judgeGrid = document.getElementById('judge-options-grid');
     if (judgeGrid) judgeGrid.style.display = 'none';
+
     const roundEndGroup = document.getElementById('round-end-actions-group');
     if (roundEndGroup) roundEndGroup.style.display = 'grid';
+
     const btnNextRound = document.getElementById('btn-next-round-actual');
     const btnViewResults = document.getElementById('btn-view-results-actual');
+
     if (btnNextRound) {
         btnNextRound.onclick = function () {
             playGameSound(clickSound);
@@ -1735,6 +2146,7 @@ function handleArcadeVoteSlam(callback) {
     }, 300);
 }
 
+// تعديل بسيط هنا عشان نشيل الـ announcer مع الـ slide
 function nextVoteRound() {
     if (typeof saveLobbyPlayers === "function") saveLobbyPlayers();
     const gate = document.getElementById('neon-gate');

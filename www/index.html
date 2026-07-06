@@ -40,7 +40,7 @@
 
 <body id="gamer">
 
-    <div id="fullscreen-overlay" class="fullscreen-overlay">
+    <!-- <div id="fullscreen-overlay" class="fullscreen-overlay">
         <div class="overlay-content">
             <h1 class="game-title">لعبة الاستخبص</h1>
             <p class="game-subtitle">لتجربة لعب أفضل وأكثر حماسية، يرجى الانتقال إلى وضع ملء الشاشة</p>
@@ -48,7 +48,7 @@
                 <span>🚀 ابدأ اللعبة الآن</span>
             </button>
         </div>
-    </div>
+    </div> -->
 
     <div class="app-container">
 
@@ -85,9 +85,8 @@
                             دليلك للاستخبص</h2>
                         <p class="game-description"
                             style="text-align: center; color: #aaa; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
-                            اللعبة بدأت ... والثقة انتهت
-                            كل كلمة ليها معنى، وكل حركة ممكن تفضحك
-                            العبها صح ... أو خليك أول واحد يقع
+                            كل جولة هتعيش قضية مصرية جديدة، وليك دور جواها الأدلة هتظهر واحدة واحدة، والشك هيزيد
+                            خليك مقنع وخلي التهمة تبعد عنك. 
                         </p>
 
                         <div class="roles-explanation-grid"
@@ -101,8 +100,7 @@
                                 <p class="role-desc"
                                     style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e0e0e0; line-height: 1.5;">
                                     معاك مهمة محدش يعرفها غيرك
-                                    خلصها وسط الناس وكأن مفيش حاجة بتحصل
-                                    أهم قاعدة .. متخليش حد يشك فيك
+                                    نفذها وسط النقاش من غير ما تلفت الانتباه.
                                 </p>
                             </div>
 
@@ -113,8 +111,8 @@
                                     style="font-weight: bold; color: #ff5252; font-size: 1.05rem;">إنذار اللعبة </span>
                                 <p class="role-desc"
                                     style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e0e0e0; line-height: 1.5;">
-                                    فجأة اللعبة هتقطع عليك الكلام، وهتفرض أمر
-                                    لازم الكل ينفذه قبل انتهاء الوقت. مفيش استثناءات ... إلا لو معاك VIP 🔥
+                                    أثناء الجولة ممكن اللعبة تتدخل في أي لحظة
+                                    هتنزل أوامر جماعية لازم الكل ينفذها قبل انتهاء الوقت، وبعدها النقاش يكمل عادي.
                                 </p>
                             </div>
 
@@ -581,35 +579,46 @@
                         </g>
                     </svg>
                 </p>
-
                 <button id="btn-i-am-player" class="roles-mini-action-btn">يلا وريني</button>
             </div>
 
             <div id="role-step-gameplay" class="role-phase-container hidden free-scratch-page-layout">
-
                 <h2 class="roles-screen-title" id="role-phase-guide-text">بص في شاشتك لوحدك</h2>
 
-
                 <div class="roles-card-wrapper">
-
                     <img src="./img/per.png" class="peeking-character-avatar" alt="character">
 
                     <div class="swipe-canvas-wrapper">
+                        <div id="secret-card-content" class="roles-hidden-card-info"
+                            style="opacity: 0; display: flex; flex-direction: column; gap: 8px;">
 
-                        <div id="secret-card-content" class="roles-hidden-card-info" style="opacity: 0;">
-                            <span id="player-role-badge" class="roles-badge-element"></span>
+                            <span id="player-scenario-title"
+                                style="font-size: 13px; color: #dfb76c; opacity: 0.8; font-weight: bold;"></span>
 
-                            <div class="roles-challenge-container">
-
-                                <p class="roles-challenge-label">🚨 التحدي بتاعك هو:</p>
-                                <p id="challenge-text-content" class="roles-challenge-text"></p>
+                            <div
+                                style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 10px;">
+                                <h2 id="player-role-name"
+                                    style="font-size: 24px; font-weight: 900; margin: 0; color: #fff;"></h2>
+                                <span id="player-role-badge" class="roles-badge-element crimson"
+                                    style="display: none; margin: 0; font-size: 11px; padding: 3px 8px;">VIP 🔥</span>
                             </div>
 
+                            <p id="player-role-bio"
+                                style="text-align: center; font-style: italic; color: #b3b3b3; font-size: 14px; margin: 5px 0 10px 0; padding-right: 8px; line-height: 1.4;">
+                            </p>
+
+                            <hr
+                                style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; margin: 5px 0;">
+
+                            <div class="roles-challenge-container">
+                                <p class="roles-challenge-label">🎯 التحدي السري هو:</p>
+                                <p id="challenge-text-content" class="roles-challenge-text"></p>
+                            </div>
                         </div>
 
                         <div id="swipe-cover-card" class="roles-cover-card-element">
                             <div class="cover-card-graphic">
-                                <h3 class="cover-main-title">طّير الكارت وشوف التحدي !</h3>
+                                <h3 class="cover-main-title">طّير الكارت وشوف دورك !</h3>
                             </div>
                             <div class="swipe-arrow-indicator">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1em" viewBox="0 0 12 8">
@@ -618,14 +627,12 @@
                                 </svg>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
                 <button id="btn-role-done" class="roles-done-btn-trigger hidden"
                     onclick="playGameSound(new Audio('./sounds/click.mp3'))">اللي بعده</button>
             </div>
-
         </div>
 
         <div id="screen-court" class="game-screen hidden court-screen-context">
@@ -729,18 +736,14 @@
 
                 <div id="main-voting-dock" class="arcade-voting-dock">
 
+                    <!-- تم تنظيف الجروب ده ليعرض خيارين فقط في صف واحد -->
                     <div id="initial-actions-group"
-                        style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <button id="btn-vote-success-init" class="arcade-btn arcade-success">
-                                <span class="btn-top">نفذته</span>
-                            </button>
-                            <button id="btn-vote-failed-init" class="arcade-btn arcade-failed">
-                                <span class="btn-top">منَفذتوش</span>
-                            </button>
-                        </div>
-                        <button id="btn-vote-caught" class="arcade-btn arcade-caught">
-                            <span class="btn-top">حد شاكك فيا؟</span>
+                        style="display: none; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+                        <button id="btn-vote-success-init" class="arcade-btn arcade-success">
+                            <span class="btn-top">نفذته</span>
+                        </button>
+                        <button id="btn-vote-failed-init" class="arcade-btn arcade-failed">
+                            <span class="btn-top">منَفذتوش</span>
                         </button>
                     </div>
 
@@ -755,9 +758,7 @@
                     </div>
 
                     <div id="round-end-actions-group" style="display:none;">
-
                         <div class="round-popup">
-
                             <div class="popup-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
                                     <path d="M0 0h48v48H0z" fill="none" />
@@ -815,38 +816,20 @@
                                         </defs>
                                     </g>
                                 </svg>
-
                             </div>
 
                             <h2>انتهت الجولة!</h2>
-
-                            <p>
-                                حابين تكملوا جولة كمان بنفس السكور
-                                ولا نعرض النتائج؟
-                            </p>
+                            <p>حابين تكملوا جولة كمان بنفس السكور ولا نعرض النتائج؟</p>
 
                             <div class="popup-buttons">
-
                                 <button class="arcade-btn arcade-success" id="btn-next-round-actual">
-
-                                    <span class="btn-top">
-                                        جولة كمان
-                                    </span>
-
+                                    <span class="btn-top">جولة كمان</span>
                                 </button>
-
                                 <button class="arcade-btn arcade-failed" id="btn-view-results-actual">
-
-                                    <span class="btn-top">
-                                        النتائج
-                                    </span>
-
+                                    <span class="btn-top">النتائج</span>
                                 </button>
-
                             </div>
-
                         </div>
-
                     </div>
 
                 </div>
