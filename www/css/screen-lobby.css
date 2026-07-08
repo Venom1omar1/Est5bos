@@ -539,20 +539,20 @@
     font-size: 10px;
     font-weight: 900;
     color: #fff;
-    border: 1.5px solid rgb(0 0 0 / 90%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
     box-shadow: 0 2px 6px rgba(0, 0, 0, .35);
     transition: .25s;
 }
 
 .badge-boy {
 
-    background: #00bcd46b;
+    background: #00bcd485;
 
 }
 
 .badge-girl {
 
-    background: #ff72a28c;
+    background: #ff72a28f;
 
 }
 
