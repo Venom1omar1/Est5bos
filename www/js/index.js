@@ -567,6 +567,7 @@ function getNextUniqueAvatar() {
 function addPlayerFromInput() {
     const input = document.getElementById('player-name-input');
     if (!input) return;
+
     if (players.length >= 10) {
         playGameSound(errorSound);
         triggerGameVibrate([80, 80, 250]);
@@ -574,16 +575,32 @@ function addPlayerFromInput() {
         input.value = '';
         return;
     }
+
     const name = input.value.trim();
+
     if (name && !players.some(p => p.name === name)) {
+
         const playerAvatar = getNextUniqueAvatar();
-        players.push({ name: name, score: 0, avatar: playerAvatar });
-        if (typeof addSound !== 'undefined') playGameSound(addSound);
+
+        players.push({
+            name: name,
+            score: 0,
+            avatar: playerAvatar,
+            gender: 'M'
+        });
+
+        if (typeof addSound !== 'undefined')
+            playGameSound(addSound);
+
         triggerGameVibrate([40]);
+
         input.value = '';
+
         saveLobbyPlayers();
         renderPlayers();
+
     } else if (name) {
+
         playGameSound(errorSound);
         triggerGameVibrate([100, 50, 100, 50, 100]);
         showCustomToast("⚠️ الاسم ده اتكتب قبل كده !");
@@ -591,22 +608,57 @@ function addPlayerFromInput() {
 }
 
 function renderPlayers() {
+
     const listContainer = document.getElementById('players-list');
     const currentCountSpan = document.getElementById('current-count');
+
     if (!listContainer) return;
+
     listContainer.innerHTML = '';
-    if (currentCountSpan) currentCountSpan.innerText = players.length;
+
+    if (currentCountSpan)
+        currentCountSpan.innerText = players.length;
+
     players.forEach((player) => {
+
+        const currentGender = player.gender || 'M';
+
+        const genderIcon = currentGender === 'F' ? '👧' : '👦';
+        const genderClass = currentGender === 'F' ? 'dot-girl' : 'dot-boy';
+
         const chipHTML = `
-        <div class="player-chip" data-player-name="${player.name}">
-            <button class="remove-player-btn" onclick="removePlayer('${player.name}', event); playGameSound(removeSound)">×</button>
+        <div class="player-chip" data-player-name="${player.name}" data-gender="${currentGender}">
+
+            <button
+                class="remove-player-btn"
+                onclick="removePlayer('${player.name}', event); playGameSound(removeSound)">
+                ×
+            </button>
+
             <div class="player-info-side">
+
                 <span class="player-name-text">${player.name}</span>
-                <img src="${player.avatar}" class="player-avatar" alt="User">
+
+                <div class="avatar-wrapper">
+
+                    <img src="${player.avatar}" class="player-avatar" alt="User">
+
+                    <span
+                        class="gender-dot ${genderClass}"
+                        title="اضغط لتغيير ولد / بنت"
+                        onclick="togglePlayerGender('${player.name}', event)">
+                        ${genderIcon}
+                    </span>
+
+                </div>
+
             </div>
+
         </div>`;
+
         listContainer.innerHTML += chipHTML;
     });
+
 }
 
 window.removePlayer = function (playerName, e) {
@@ -641,6 +693,20 @@ window.removePlayer = function (playerName, e) {
         if (!animationHandled) { animationHandled = true; cleanup(); }
     }, 200);
 };
+
+function togglePlayerGender(playerName) {
+    const player = players.find(p => p.name === playerName);
+    if (player) {
+        // لو ولد يقلب بنت، ولو بنت يقلب ولد
+        player.gender = player.gender === 'F' ? 'M' : 'F';
+        
+        // شغل صوت كليك خفيف لو عندك
+        if (typeof clickSound !== 'undefined') playGameSound(clickSound); 
+        
+        saveLobbyPlayers(); // احفظ في الـ LocalStorage
+        renderPlayers();    // حدّث الشاشة فورًا باللون الجديد
+    }
+}
 
 // ==========================================================================
 // 8️⃣ توزيع الأدوار وكارت السحب السري
@@ -1350,6 +1416,33 @@ else monitorSpecialistInput();
 let typewriterTimeout = null;
 let isEventTriggeredInThisRound = false; // لمنع تكرار نزول الحدث في نفس الجولة
 
+fetch('gameData.json')
+    .then(response => response.json())
+    .then(data => {
+        console.log("🔍 البيانات الكاملة:", data);
+
+        // ✅ الوصول الصحيح: data.scenarios
+        const scenarios = data.scenarios;
+
+        if (!scenarios || scenarios.length === 0) {
+            throw new Error("مفيش سيناريوهات في الملف");
+        }
+
+        // اختيار سيناريو عشوائي
+        const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+
+        console.log("✅ السيناريو المختار:", randomScenario);
+
+        // تحديث الـ HTML
+        document.getElementById("court-case-title").textContent = randomScenario.title;
+        document.getElementById("court-case-text").textContent = randomScenario.location_desc;
+    })
+    .catch(error => {
+        console.error("❌ خطأ:", error);
+        document.getElementById("court-case-title").textContent = "الموضوع كبر مننا";
+    });
+
+
 function startPreGameCountdown() {
     if (gameTimerInterval) clearInterval(gameTimerInterval);
     if (typewriterTimeout) clearTimeout(typewriterTimeout);
@@ -1719,9 +1812,9 @@ function triggerChaosMode() {
     playGameSound(zeroingSound);
     triggerGameVibrate([100, 100, 100, 100, 100, 100, 100, 100, 100]);
     isChaosActive = true;
-    
+
     // 🚨 رجعنا فرملة العداد الأساسي برة عشان يقف طول ما الفوضى شغالة
-    isTimerPaused = true; 
+    isTimerPaused = true;
 
     const randomIndex = Math.floor(Math.random() * chaosOrders.length);
     const selectedOrder = chaosOrders[randomIndex];
@@ -1766,9 +1859,9 @@ function triggerChaosMode() {
 function clearChaosUI() {
     if (chaosInterval) { clearInterval(chaosInterval); chaosInterval = null; }
     isChaosActive = false;
-    
+
     // 🚨 شغل العداد الأساسي تاني فوراً بعد انتهاء الفوضى
-    isTimerPaused = false; 
+    isTimerPaused = false;
 
     document.body.classList.remove("chaos-alert-active");
     const appContainer = document.querySelector('.app-container');

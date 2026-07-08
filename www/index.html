@@ -86,7 +86,7 @@
                         <p class="game-description"
                             style="text-align: center; color: #aaa; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
                             كل جولة هتعيش قضية مصرية جديدة، وليك دور جواها الأدلة هتظهر واحدة واحدة، والشك هيزيد
-                            خليك مقنع وخلي التهمة تبعد عنك. 
+                            خليك مقنع وخلي التهمة تبعد عنك.
                         </p>
 
                         <div class="roles-explanation-grid"
@@ -104,7 +104,6 @@
                                 </p>
                             </div>
 
-                            <!-- بوكس الصعوبات (ألوانك المظبوطة #ff003c) -->
                             <div class="role-box chaos-info"
                                 style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 10px; border-right: 4px solid #ff5252;">
                                 <span class="role-title"
@@ -591,20 +590,17 @@
                     <div class="swipe-canvas-wrapper">
                         <div id="secret-card-content" class="roles-hidden-card-info"
                             style="opacity: 0; display: flex; flex-direction: column; gap: 8px;">
-
-                            <span id="player-scenario-title"
-                                style="font-size: 13px; color: #dfb76c; opacity: 0.8; font-weight: bold;"></span>
-
                             <div
                                 style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 10px;">
                                 <h2 id="player-role-name"
-                                    style="font-size: 24px; font-weight: 900; margin: 0; color: #fff;"></h2>
+                                    style=" transform: scale(1.1); font-size: 17px; font-weight: 900; margin: 0; color: #fff;">
+                                </h2>
                                 <span id="player-role-badge" class="roles-badge-element crimson"
                                     style="display: none; margin: 0; font-size: 11px; padding: 3px 8px;">VIP 🔥</span>
                             </div>
 
                             <p id="player-role-bio"
-                                style="text-align: center; font-style: italic; color: #b3b3b3; font-size: 14px; margin: 5px 0 10px 0; padding-right: 8px; line-height: 1.4;">
+                                style="font-weight: 500; text-align: center; font-style: italic; color: #b3b3b3; font-size: 14px; margin: 5px 0 10px 0; padding-right: 8px; line-height: 1.4;">
                             </p>
 
                             <hr
@@ -658,12 +654,13 @@
 
 
                 <div id="court-case-box" class="court-case-container">
-                    <h3>الموضوع كبر مننا</h3>
+                    <h3 id="court-case-title">الموضوع كبر مننا</h3> <!-- أضفنا id -->
                     <p id="court-case-text" class="court-case-text-content"></p>
                     <div id="court-speakers" class="court-speakers-badge hidden">
                         📢 المتحدثين بس يتكلمو
                     </div>
                 </div>
+
 
                 <div id="court-timer-section" class="court-timer-section hidden-element">
                     <div class="timer-circle-container">

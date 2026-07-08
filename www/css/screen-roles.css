@@ -215,7 +215,7 @@
     position: relative;
     background: linear-gradient(145deg, var(--hidden-card-grad-start), var(--hidden-card-grad-end)) !important;
     border-radius: 24px !important;
-    padding: 30px 20px !important;
+    padding: 25px 20px !important;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -278,7 +278,7 @@
 
 .roles-challenge-label {
     color: var(--gold);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -287,7 +287,7 @@
 }
 
 .roles-screen-context .roles-challenge-text {
-    font-size: clamp(1.1rem, 5vw, 1.4rem);
+    font-size: clamp(0.95rem, 4vw, 1.3rem);
     font-weight: 800;
     line-height: 1.3;
     color: var(--text-white);
