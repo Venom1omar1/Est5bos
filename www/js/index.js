@@ -623,11 +623,15 @@ function renderPlayers() {
 
         const currentGender = player.gender || 'M';
 
-        const genderIcon = currentGender === 'F' ? '👧' : '👦';
-        const genderClass = currentGender === 'F' ? 'dot-girl' : 'dot-boy';
+        const genderIcon = currentGender === 'F' ? '' : '';
+        const genderClass = currentGender === 'F'
+            ? 'badge-girl'
+            : 'badge-boy';
 
-        const chipHTML = `
-        <div class="player-chip" data-player-name="${player.name}" data-gender="${currentGender}">
+        listContainer.innerHTML += `
+        <div class="player-chip"
+             data-player-name="${player.name}"
+             data-gender="${currentGender}">
 
             <button
                 class="remove-player-btn"
@@ -639,15 +643,17 @@ function renderPlayers() {
 
                 <span class="player-name-text">${player.name}</span>
 
-                <div class="avatar-wrapper">
+                <div class="avatar-wrapper"
+                     onclick="togglePlayerGender('${player.name}', event)"
+                     title="اضغط لتغيير ولد / بنت">
 
-                    <img src="${player.avatar}" class="player-avatar" alt="User">
+                    <img
+                        src="${player.avatar}"
+                        class="player-avatar"
+                        alt="User">
 
-                    <span
-                        class="gender-dot ${genderClass}"
-                        title="اضغط لتغيير ولد / بنت"
-                        onclick="togglePlayerGender('${player.name}', event)">
-                        ${genderIcon}
+                    <span class="gender-badge ${genderClass}">
+                        ${currentGender === 'F' ? 'بنت' : 'ولد'}
                     </span>
 
                 </div>
@@ -655,8 +661,6 @@ function renderPlayers() {
             </div>
 
         </div>`;
-
-        listContainer.innerHTML += chipHTML;
     });
 
 }
@@ -694,18 +698,25 @@ window.removePlayer = function (playerName, e) {
     }, 200);
 };
 
-function togglePlayerGender(playerName) {
+function togglePlayerGender(playerName, event) {
+
+    if (event) event.stopPropagation();
+
     const player = players.find(p => p.name === playerName);
-    if (player) {
-        // لو ولد يقلب بنت، ولو بنت يقلب ولد
-        player.gender = player.gender === 'F' ? 'M' : 'F';
-        
-        // شغل صوت كليك خفيف لو عندك
-        if (typeof clickSound !== 'undefined') playGameSound(clickSound); 
-        
-        saveLobbyPlayers(); // احفظ في الـ LocalStorage
-        renderPlayers();    // حدّث الشاشة فورًا باللون الجديد
-    }
+
+    if (!player) return;
+
+    player.gender = player.gender === 'F' ? 'M' : 'F';
+
+    if (typeof clickSound !== 'undefined')
+        playGameSound(clickSound);
+
+    triggerGameVibrate([25]);
+
+    saveLobbyPlayers();
+
+    renderPlayers();
+
 }
 
 // ==========================================================================
