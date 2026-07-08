@@ -285,7 +285,7 @@
     font-size: 1rem !important;
     cursor: pointer;
     padding: 0 4px;
-    top: -3 !important;
+    top: -3px !important;
     transition: color 0.2s ease;
 }
 
