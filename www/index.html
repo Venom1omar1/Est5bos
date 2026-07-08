@@ -40,7 +40,7 @@
 
 <body id="gamer">
 
-    <div id="fullscreen-overlay" class="fullscreen-overlay">
+    <!-- <div id="fullscreen-overlay" class="fullscreen-overlay">
         <div class="overlay-content">
             <h1 class="game-title">لعبة الاستخبص</h1>
             <p class="game-subtitle">لتجربة لعب أفضل وأكثر حماسية، يرجى الانتقال إلى وضع ملء الشاشة</p>
@@ -48,7 +48,7 @@
                 <span>🚀 ابدأ اللعبة الآن</span>
             </button>
         </div>
-    </div>
+    </div> -->
 
     <div class="app-container">
 
@@ -76,49 +76,41 @@
                     </svg>
                 </button>
 
-                <!-- المودال بالشرح المتوازن والكامل مع الحفاظ على الألوان الأصلية -->
-                <div id="help-modal" class="modal-layer-context hidden"
-                    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; box-sizing: border-box;">
-                    <div class="modal-card-body glass-modal" style="max-width: 480px; width: 100%;">
-                        <h2 class="modal-card-title"
-                            style="text-align: center; color: #fff; margin-bottom: 12px; font-weight: 800; font-size: 1.4rem;">
-                            دليلك للاستخبص</h2>
+                <div id="help-modal" class="modal-layer-context hidden">
+                    <div class="modal-card-body glass-modal" style="max-width: 380px; width: 100%;">
+                        <h2 class="modal-card-title" style="margin-bottom: 4px;">دليلك للاستخبص</h2>
                         <p class="game-description"
                             style="text-align: center; color: #aaa; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
                             كل جولة هتعيش قضية مصرية جديدة، وليك دور جواها الأدلة هتظهر واحدة واحدة، والشك هيزيد
                             خليك مقنع وخلي التهمة تبعد عنك.
                         </p>
 
-                        <div class="roles-explanation-grid"
-                            style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; text-align: right;">
+                        <div class="roles-explanation-grid-new">
 
-                            <!-- بوكس التحديات (ألوانك المظبوطة #00ffcc) -->
-                            <div class="role-box challenge-info"
-                                style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 10px; border-right: 4px solid #2ecc71;">
-                                <span class="role-title" style="font-weight: bold; color: #2ecc71; font-size: 1.05rem;">
-                                    التحدي السري</span>
-                                <p class="role-desc"
-                                    style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e0e0e0; line-height: 1.5;">
-                                    معاك مهمة محدش يعرفها غيرك
-                                    نفذها وسط النقاش من غير ما تلفت الانتباه.
-                                </p>
+                            <div class="role-box-mini challenge-border">
+                                <span class="role-title-mini" style="color: #d7b603;"> التحدي السري</span>
+                                <p class="role-desc-mini">مهمة خاصة بيك، نفذها وسط الكلام من غير ما حد يلقطك.</p>
                             </div>
 
-                            <div class="role-box chaos-info"
-                                style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 10px; border-right: 4px solid #ff5252;">
-                                <span class="role-title"
-                                    style="font-weight: bold; color: #ff5252; font-size: 1.05rem;">إنذار اللعبة </span>
-                                <p class="role-desc"
-                                    style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e0e0e0; line-height: 1.5;">
-                                    أثناء الجولة ممكن اللعبة تتدخل في أي لحظة
-                                    هتنزل أوامر جماعية لازم الكل ينفذها قبل انتهاء الوقت، وبعدها النقاش يكمل عادي.
-                                </p>
+                            <div class="role-box-mini gender-border">
+                                <span class="role-title-mini" style="color: #d7b603;"> نوع اللاعب</span>
+                                <p class="role-desc-mini">دوس علي الأفاتار للتبديل بين ولد وبنت.</p>
+                            </div>
+
+                            <div class="role-box-mini vip-border">
+                                <span class="role-title-mini" style="color: #d7b603;"> VIP</span>
+                                <p class="role-desc-mini">أنت محصن تمامًا؛ محدش يقدر يفرض عليك أي حكم أو أمر.</p>
+                            </div>
+
+                            <div class="role-box-mini chaos-border">
+                                <span class="role-title-mini" style="color: #d7b603;"> إنذار اللعبة</span>
+                                <p class="role-desc-mini">أوامر مفاجئة هتنزل للكل لازم تتنفذ فورًا قبل انتهاء الوقت.</p>
                             </div>
 
                         </div>
 
                         <button class="close-modal-btn" id="close-help-btn" type="button"
-                            style="width: 100%; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer;"
+                            style="width: 100%; padding: 12px; font-weight: bold; border-radius: 14px; cursor: pointer; font-size: 0.9rem; background: var(--btn-cancel-bg); border: 1px solid var(--btn-cancel-border); color: #fff; margin-top: 12px;"
                             onclick="playGameSound(new Audio('./sounds/click.mp3'))">فهمت</button>
                     </div>
                 </div>
