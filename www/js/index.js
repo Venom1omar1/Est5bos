@@ -665,6 +665,18 @@ function renderPlayers() {
 
 }
 
+function togglePlayerGender(playerName, event) {
+    if (event) event.stopPropagation();
+    const player = players.find(p => p.name === playerName);
+    if (!player) return;
+    player.gender = player.gender === 'F' ? 'M' : 'F';
+    if (typeof clickSound !== 'undefined')
+        playGameSound(clickSound);
+    triggerGameVibrate([25]);
+    saveLobbyPlayers();
+    renderPlayers();
+}
+
 window.removePlayer = function (playerName, e) {
     if (e && e.preventDefault) e.preventDefault();
     if (e && e.stopPropagation) e.stopPropagation();
@@ -697,27 +709,6 @@ window.removePlayer = function (playerName, e) {
         if (!animationHandled) { animationHandled = true; cleanup(); }
     }, 200);
 };
-
-function togglePlayerGender(playerName, event) {
-
-    if (event) event.stopPropagation();
-
-    const player = players.find(p => p.name === playerName);
-
-    if (!player) return;
-
-    player.gender = player.gender === 'F' ? 'M' : 'F';
-
-    if (typeof clickSound !== 'undefined')
-        playGameSound(clickSound);
-
-    triggerGameVibrate([25]);
-
-    saveLobbyPlayers();
-
-    renderPlayers();
-
-}
 
 // ==========================================================================
 // 8️⃣ توزيع الأدوار وكارت السحب السري
@@ -987,12 +978,11 @@ function startRolesDistribution() {
         return;
     }
 
-    // 🛡️ صمام الأمان الحديدي المطور (بيجبر الـ Local والـ Global يبقوا تمام)
+    // 🛡️ صمام الأمان الحديدي المطور
     if (typeof gameData === 'undefined' || !gameData || !gameData.scenarios || !gameData.challenges || gameData.scenarios.length === 0) {
         console.error("🚨 يا عمر الـ gameData مش متعرّفة أو ملهاش وجود جوه الـ JSON!");
         showCustomToast("⚠️ عطل في قراءة ملف السيناريوهات! جاري تشغيل داتا الطوارئ...");
 
-        // شحن البيانات في كل الحتت الممكنة عشان نمنع الـ undefined تماماً
         const fallbackData = {
             scenarios: [{
                 "id": "emergency_01",
@@ -1008,28 +998,28 @@ function startRolesDistribution() {
         };
 
         window.gameData = fallbackData;
-        gameData = fallbackData; // إجبار الـ local variable لو كان موجود بره
+        gameData = fallbackData;
     }
 
     gameSettings.timeLimit = selectedGameTime;
     gameSettings.roles = [];
 
-    // 1. اختار سيناريو عشوائي (مع حماية إضافية مستحيل تضرب)
+    // 1. اختار سيناريو عشوائي
     let scenariosList = (gameData && gameData.scenarios) ? gameData.scenarios : window.gameData.scenarios;
     let selectedScenario = scenariosList[Math.floor(Math.random() * scenariosList.length)];
-    gameSettings.currentScenario = selectedScenario; // حفظ السيناريو الحالي للجولة
+    gameSettings.currentScenario = selectedScenario;
 
-    // 2. خلط الأدوار المتاحة جوه السيناريو ده عشان نوزعها عشوائي بدون تكرار
+    // 2. خلط الأدوار المتاحة
     let scenarioRolesPool = [...selectedScenario.roles];
     shuffleArray(scenarioRolesPool);
 
-    // 3. تحديد أسامي/مؤشرات الـ VIP بناء على عدد اللاعبين
+    // 3. تحديد أسامي/مؤشرات الـ VIP
     let shuffledIndices = players.map((_, i) => i).sort(() => Math.random() - 0.5);
     let vipIndices = [];
     if (players.length <= 5) {
-        vipIndices.push(shuffledIndices[0]); // VIP واحد لو 5 أو أقل
+        vipIndices.push(shuffledIndices[0]);
     } else {
-        vipIndices.push(shuffledIndices[0], shuffledIndices[1]); // 2 VIP لو أكتر من 5
+        vipIndices.push(shuffledIndices[0], shuffledIndices[1]);
     }
 
     // 4. تجهيز لستة التحديات السرية العامة وخلطها
@@ -1037,12 +1027,31 @@ function startRolesDistribution() {
     let mainChallengesPool = [...challengesList];
     shuffleArray(mainChallengesPool);
 
-    // 5. بناء الكروت وتوزيع الأدوار لكل لاعب بالترتيب
+    // 5. بناء الكروت وتوزيع الأدوار لكل لاعب بالترتيب مع الفرز الذكي لـ (ولد / بنت)
     players.forEach((player, idx) => {
         let isVip = vipIndices.includes(idx);
 
-        // سحب دور فريد من السيناريو
-        let assignedRole = scenarioRolesPool.pop() || { "name": "أحد الحضور", "bio": "أنا واقف بتفرج ومستني أشوف أخرتها." };
+        // سحب دور من الـ Pool
+        let assignedRole = scenarioRolesPool.pop();
+        
+        // المتغيرات النهائية اللي هتروح للكارت
+        let finalRoleName = "أحد الحضور";
+        let finalRoleBio = "أنا واقف بتفرج ومستني أشوف أخرتها.";
+
+        if (assignedRole) {
+            // 💡 هنا السحر والفرز الذكي:
+            // لو الدور مرن وفيه خيار البنت (female) بنفصله حسب جنس اللاعب، لو مفيش بنعتبره دور عادي
+            let isFlexible = assignedRole.female ? true : false;
+            const pGender = player.gender || 'M'; // لو مش متحدد نخليه ولد افتراضي
+
+            finalRoleName = isFlexible 
+                ? (pGender === 'F' ? assignedRole.female : assignedRole.male) 
+                : assignedRole.name;
+
+            finalRoleBio = isFlexible 
+                ? (pGender === 'F' ? assignedRole.bioFemale : assignedRole.bioMale) 
+                : assignedRole.bio;
+        }
 
         // سحب تحدي سري
         if (mainChallengesPool.length === 0) {
@@ -1052,19 +1061,19 @@ function startRolesDistribution() {
         let selectedChallenge = mainChallengesPool.pop();
         let challengeText = selectedChallenge.text || "اتكلم بثقة وبس";
 
-        // تخزين البيانات كاملة للكارت
+        // تخزين البيانات كاملة للكارت في المصفوفة الرئيسية للعبة
         gameSettings.roles.push({
             playerIndex: idx,
             name: player.name,
             scenarioTitle: selectedScenario.title,
-            roleName: assignedRole.name,
-            roleBio: assignedRole.bio,
+            roleName: finalRoleName, // الاسم المفرز (ولد أو بنت أو عادي)
+            roleBio: finalRoleBio,   // الستوري المفرزة
             isVip: isVip,
             challengeText: challengeText
         });
     });
 
-    // هندلة وضع المتخصص لو شغال (يستبدل التحديات فقط)
+    // هندلة وضع المتخصص لو شغال
     if (isSpecialistModeActive && specialistChallengesList.length > 0) {
         let shuffledSpecialist = [...specialistChallengesList];
         shuffleArray(shuffledSpecialist);
