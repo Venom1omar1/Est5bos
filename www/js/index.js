@@ -1155,7 +1155,7 @@ function initPlayerRoleScreen(playerData) {
     const challengeContainer = document.querySelector('.roles-challenge-container');
     if (challengeContainer) {
         challengeContainer.innerHTML = `
-            <p class="roles-challenge-label">🎯 التحدي السري هو:</p>
+            <p class="roles-challenge-label"> التحدي السري هو:</p>
             <p id="challenge-text-content" class="roles-challenge-text"></p>
         `;
     }
@@ -1574,7 +1574,64 @@ function runCourtroomAction() {
             }
             caseTextEl.classList.add("typing-done");
 
+            // 📊 حسبة مهلة التعارف بالثواني
+            let secondsIntro = 15; // لو 5 أو أقل
+            if (gameSettings && gameSettings.roles && gameSettings.roles.length > 5) {
+                secondsIntro = 30; // لو أكتر من 5
+            }
+            let introDelay = secondsIntro * 1000;
+
+            // ظهور بانر التعارف مع العداد التنازلي في أول ثانية
+            if (speakersEl) {
+                speakersEl.classList.remove("hidden");
+                speakersEl.style.background = "rgb(255 255 255 / 10%)";
+                speakersEl.style.padding = "8px 12px";
+                speakersEl.style.opacity = "1";
+                speakersEl.style.transform = "translateY(0)";
+                speakersEl.innerHTML = `
+                    <span style="color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        📢 كل واحد يعرف نفسه! 
+                        <span id="intro-countdown-timer" style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; font-family: monospace; color: #ffcc00;">${secondsIntro}s</span>
+                    </span>`;
+            }
+
+            // ⏰ تشغيل عداد داخلي لتحديث الرقم كل ثانية
+            let currentSecondsLeft = secondsIntro;
+            let introCountdownInterval = setInterval(() => {
+                currentSecondsLeft--;
+                const timerEl = document.getElementById("intro-countdown-timer");
+                if (timerEl) {
+                    timerEl.innerText = `${currentSecondsLeft}s`;
+                    // لو فاضل أقل من 5 ثواني اقلب العداد أحمر عشان يوترهم!
+                    if (currentSecondsLeft <= 5) {
+                        timerEl.style.color = "#ff4d4d";
+                        timerEl.style.fontWeight = "900";
+                    }
+                }
+                if (currentSecondsLeft <= 0) {
+                    clearInterval(introCountdownInterval);
+                }
+            }, 1000);
+
+            // 🎬 تشغيل الـ Fade Out قبل النهاية بنص ثانية (450ms)
             typewriterTimeout = setTimeout(() => {
+                if (speakersEl) {
+                    speakersEl.animate([
+                        { opacity: 1, transform: 'translateY(0)' },
+                        { opacity: 0, transform: 'translateY(-5px)' }
+                    ], {
+                        duration: 450,
+                        fill: 'forwards',
+                        easing: 'ease-out'
+                    });
+                }
+            }, introDelay - 450);
+
+            // ⏳ انتهاء مهلة التعارف وبدء الجيم الفعلي
+            typewriterTimeout = setTimeout(() => {
+                // تنظيف احتياطي للـ Interval عشان الأمان
+                clearInterval(introCountdownInterval);
+
                 if (caseBoxEl) caseBoxEl.classList.add("move-up");
                 if (timerSectionEl) timerSectionEl.classList.remove("hidden-element");
                 playGameSound(startSound);
@@ -1582,21 +1639,35 @@ function runCourtroomAction() {
                 const btnChaosVote = document.getElementById("btn-chaos-vote");
                 if (btnChaosVote) btnChaosVote.classList.remove("hidden-element");
 
-                // 🛠️ تصليح فلترة الـ VIP بناءً على الـ Boolean المظبوط (isVip)
                 if (speakersEl) {
-                    speakersEl.classList.remove("hidden");
+                    speakersEl.style.opacity = "0";
+                    speakersEl.style.background = "";
+                    speakersEl.style.padding = "";
+
                     let vips = gameSettings.roles.filter(r => r.isVip === true);
 
                     if (vips.length === 1) {
-                        speakersEl.innerHTML = ` الـ VIP : <span style="color: #ffcc00; font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.5);"> ${vips[0].name} </span>`;
+                        speakersEl.innerHTML = ` الـ VIP : &nbsp; <span style="color: #ffcc00; font-weight: bold; text-shadow: 0 0 5px rgba(255,204,0,0.5);"> ${vips[0].name} </span>`;
                     } else if (vips.length >= 2) {
-                        speakersEl.innerHTML = ` الـ VIP : &nbsp;<span style="color: #ffcc00; font-weight: bold;"> ${vips[0].name} </span> &nbsp;,&nbsp; <span style="color: #ffcc00; font-weight: bold;"> ${vips[1].name} </span>`;
+                        speakersEl.innerHTML = ` الـ VIP : &nbsp; <span style="color: #ffcc00; font-weight: bold;"> ${vips[0].name} </span> &nbsp;,&nbsp; <span style="color: #ffcc00; font-weight: bold;"> ${vips[1].name} </span>`;
                     } else {
                         speakersEl.innerHTML = `📢 ركّزوا مع الـ VIP!`;
                     }
+
+                    setTimeout(() => {
+                        speakersEl.animate([
+                            { opacity: 0, transform: 'translateY(8px)' },
+                            { opacity: 1, transform: 'translateY(0)' }
+                        ], {
+                            duration: 500,
+                            fill: 'forwards',
+                            easing: 'ease-out'
+                        });
+                    }, 30);
                 }
+
                 startCourtroomTimer();
-            }, 1500);
+            }, introDelay);
         }
     }
     typeWriter();

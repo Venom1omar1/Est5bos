@@ -88,7 +88,8 @@
 
                             <div class="role-box-mini gender-border">
                                 <span class="role-title-mini" style="color: #d7b603;"> نوع اللاعب</span>
-                                <p class="role-desc-mini">دوس علي الأفاتار للتبديل بين ولد وبنت عشان الدور يبقا علي مقاسك.</p>
+                                <p class="role-desc-mini">دوس علي الأفاتار للتبديل بين ولد وبنت عشان الدور يبقا علي
+                                    مقاسك.</p>
                             </div>
 
                             <div class="role-box-mini challenge-border">
@@ -581,24 +582,37 @@
                     <div class="swipe-canvas-wrapper">
                         <div id="secret-card-content" class="roles-hidden-card-info"
                             style="opacity: 0; display: flex; flex-direction: column; gap: 8px;">
+
+                            <!-- الـ H2 رجع مكانه فوق لوحده رايق -->
                             <div
                                 style="display: flex; align-items: center; justify-content: center; width: 100%; gap: 10px;">
                                 <h2 id="player-role-name"
-                                    style=" transform: scale(1.1); font-size: 17px; font-weight: 900; margin: 0; color: #fff;">
+                                    style="transform: scale(1.1); font-size: 17px; font-weight: 900; margin: 0; color: #fff;">
                                 </h2>
-                                <span id="player-role-badge" class="roles-badge-element crimson"
-                                    style="display: none; margin: 0; font-size: 11px; padding: 3px 8px;">VIP 🔥</span>
                             </div>
 
                             <p id="player-role-bio"
                                 style="font-weight: 500; text-align: center; font-style: italic; color: #b3b3b3; font-size: 14px; margin: 5px 0 10px 0; padding-right: 8px; line-height: 1.4;">
                             </p>
 
-                            <hr
-                                style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; margin: 5px 0;">
+                            <!-- الحاوية السحرية: نزلنا الـ span هنا مع الـ hr عشان يركبوا فوق بعض بالملي -->
+                            <div
+                                style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin: 5px 0;">
+
+                                <!-- الخط مفرود عادي -->
+                                <hr
+                                    style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; margin: 0;">
+
+                                <!-- الـ Badge بقت هنا absolute وقاعدة في السنتر فوق الخط -->
+                                <!-- ملحوظة: غير الـ background-color دي لنفس لون خلفية الكارت بالظبط عشان تمسح الخط اللي وراها -->
+                                <span id="player-role-badge" class="roles-badge-element crimson"
+                                    style="display: none; position: absolute; font-size: 12px; padding: 6px 10px; margin: 0; line-height: 1; z-index: 2; background-color: #1a1a1a;">
+                                    VIP 🔥
+                                </span>
+                            </div>
 
                             <div class="roles-challenge-container">
-                                <p class="roles-challenge-label">🎯 التحدي السري هو:</p>
+                                <p class="roles-challenge-label">التحدي السري هو:</p>
                                 <p id="challenge-text-content" class="roles-challenge-text"></p>
                             </div>
                         </div>
